@@ -15,7 +15,7 @@ export class Real3DSceneManager {
     this.isXRay = false;
     this.isWireframe = false;
     this.isAutoRotate = false;
-    this.isPulsing = false;
+    this.isPulsing = true;
 
     this.clock = new THREE.Clock();
     this.loader = new GLTFLoader();
@@ -350,27 +350,32 @@ export class Real3DSceneManager {
         if (child.isMesh && child.material) {
           const matName = child.material.name || '';
           if (matName.toLowerCase().includes('glass') || child.name.toLowerCase().includes('glass')) {
-            child.material = new THREE.MeshStandardMaterial({
+            child.material = new THREE.MeshPhysicalMaterial({
               color: 0xffffff,
               transparent: true,
-              opacity: 0.16,
-              roughness: 0.05,
+              opacity: 0.14,
+              roughness: 0.02,
               metalness: 0.0,
+              transmission: 0.98,
+              ior: 1.376,
               depthWrite: false, // Essential: never occlude inner eye!
               side: THREE.FrontSide
             });
           } else {
-            // Inner eyeball (with high-res baked iris, pupil and sclera texture)
+            // Inner eyeball (with high-res baked iris, pupil and sclera texture from Sketchfab)
             if (child.material.map) {
-              child.material.roughness = 0.25;
+              child.material.roughness = 0.22;
               child.material.metalness = 0.0;
               child.material.depthWrite = true;
               child.material.side = THREE.DoubleSide;
+              if (child.material.normalMap && child.material.normalScale) {
+                child.material.normalScale.set(1.2, 1.2);
+              }
               child.material.needsUpdate = true;
             } else {
               child.material = new THREE.MeshStandardMaterial({
                 color: 0xf8fafc,
-                roughness: 0.25,
+                roughness: 0.22,
                 metalness: 0.0,
                 side: THREE.DoubleSide
               });
@@ -551,14 +556,15 @@ export class Real3DSceneManager {
 
     this.currentModelGroup.traverse((child) => {
       if (child.isMesh && child.material) {
+        const isGlass = (child.material.name || '').toLowerCase().includes('glass') || child.name.toLowerCase().includes('glass');
         if (this.isXRay) {
           child.material.transparent = true;
           child.material.opacity = 0.45;
           child.material.depthWrite = false;
         } else {
-          child.material.transparent = false;
-          child.material.opacity = 1.0;
-          child.material.depthWrite = true;
+          child.material.transparent = isGlass ? true : false;
+          child.material.opacity = isGlass ? 0.14 : 1.0;
+          child.material.depthWrite = isGlass ? false : true;
         }
         child.material.needsUpdate = true;
       }
@@ -622,6 +628,14 @@ export class Real3DSceneManager {
         // Natural thoracic respiration
         const breath = 1.0 + Math.sin(elapsedTime * 1.8) * 0.045;
         this.currentModelGroup.scale.set(breath, breath, breath);
+      } else if (this.currentModelKey === 'eye') {
+        // Natural micro-saccades and subtle physiological gaze
+        const saccadeX = Math.sin(elapsedTime * 0.8) * 0.035;
+        const saccadeY = Math.cos(elapsedTime * 0.6) * 0.02;
+        if (this.currentModelGroup.children[0]) {
+          this.currentModelGroup.children[0].rotation.y = saccadeX;
+          this.currentModelGroup.children[0].rotation.x = saccadeY;
+        }
       }
     }
 
