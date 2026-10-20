@@ -82,6 +82,16 @@ export class Real3DSceneManager {
         path: '/models/hand.glb',
         targetScale: 2.5,
         yOffset: 0.0
+      },
+      pancreas: {
+        path: '/models/pancreas.glb',
+        targetScale: 2.3,
+        yOffset: 0.0
+      },
+      oral_cavity: {
+        path: '/models/oral_cavity.glb',
+        targetScale: 2.3,
+        yOffset: 0.0
       }
     };
 
@@ -809,50 +819,107 @@ export class Real3DSceneManager {
         }
       });
     } else if (key === 'skull' || key === 'skeleton' || key === 'musculoskeletal_system' || key === 'hand_fingers') {
-      // Natural warm ivory bone osteo-material & anatomical cartilage/enamel shaders
+      // Anatomical Pedagogical Color Coding (Medical Atlas standard)
+      const getBoneColor = (node) => {
+        const n = (node.name || '').toLowerCase();
+        const p = (node.parent && node.parent.name ? node.parent.name : '').toLowerCase();
+        const mat = (node.material && node.material.name ? node.material.name : '').toLowerCase();
+        const all = n + ' ' + p;
+
+        // Teeth: High gloss white enamel
+        if (mat.includes('teeth') || mat.includes('dentine') || all.includes('tooth') || all.includes('teeth')) {
+          return { color: 0xffffff, roughness: 0.12, metalness: 0.02 };
+        }
+        // Cranial Sutures: Fibrous slate
+        if (mat.includes('suture') || all.includes('suture')) {
+          return { color: 0x475569, roughness: 0.65, metalness: 0.0 };
+        }
+        // Costal & Articular Cartilage: Translucent Aqua Blue
+        if (mat.includes('cartilage') || all.includes('cartilage')) {
+          return { color: 0x38bdf8, roughness: 0.25, metalness: 0.02, transparent: true, opacity: 0.88 };
+        }
+
+        // Cranium & Facial Bones (Bosh suyagi bo'limlari)
+        if (all.includes('frontal')) return { color: 0x38bdf8, roughness: 0.38 }; // Cerulean Blue (Peshona)
+        if (all.includes('parietal')) return { color: 0xfacc15, roughness: 0.38 }; // Amber Gold (Tepa)
+        if (all.includes('temporal')) return { color: 0x10b981, roughness: 0.38 }; // Emerald Green (Chakka)
+        if (all.includes('occipital')) return { color: 0x6366f1, roughness: 0.38 }; // Indigo (Ensa)
+        if (all.includes('sphenoid')) return { color: 0xa855f7, roughness: 0.38 }; // Violet Purple (Ponasimon)
+        if (all.includes('ethmoid')) return { color: 0xec4899, roughness: 0.38 }; // Magenta Pink (G'alvirsimon)
+        if (all.includes('maxilla')) return { color: 0xf97316, roughness: 0.38 }; // Warm Orange (Yuqori jag')
+        if (all.includes('mandible')) return { color: 0x06b6d4, roughness: 0.38 }; // Cyan (Pastki jag')
+        if (all.includes('zygomatic')) return { color: 0xf43f5e, roughness: 0.38 }; // Coral Rose (Yonoq)
+        if (all.includes('nasal')) return { color: 0x14b8a6, roughness: 0.38 }; // Teal (Burun)
+        if (all.includes('lacrimal')) return { color: 0x84cc16, roughness: 0.38 }; // Lime Green (Ko'z yoshi)
+        if (all.includes('palatine') || all.includes('vomer')) return { color: 0xeab308, roughness: 0.38 };
+        if (all.includes('hyoid')) return { color: 0xf59e0b, roughness: 0.38 };
+        if (all.includes('incus') || all.includes('malleus') || all.includes('stapes')) return { color: 0xfb7185, roughness: 0.35 };
+
+        // Vertebral Column (Umurtqa pog'onasi zonalari)
+        if (all.includes('c1') || all.includes('c2') || all.includes('c3') || all.includes('c4') || all.includes('c5') || all.includes('c6') || all.includes('c7') || all.includes('atlas') || all.includes('axis')) {
+          return { color: 0x818cf8, roughness: 0.38 }; // Cervical periwinkle (Bo'yin umurtqalari)
+        }
+        if (all.includes('vertebra_t') || all.includes('thoracic')) return { color: 0x34d399, roughness: 0.38 }; // Thoracic emerald (Ko'krak)
+        if (all.includes('vertebra_l') || all.includes('lumbar')) return { color: 0xfbbf24, roughness: 0.38 }; // Lumbar gold (Bel umurtqalari)
+        if (all.includes('sacrum') || all.includes('coccyx')) return { color: 0xc084fc, roughness: 0.38 }; // Sacrum lavender (Dumg'aza va dum)
+
+        // Thoracic Cage & Pelvis
+        if (all.includes('rib')) return { color: 0xfb7185, roughness: 0.38 }; // Coral ribs (Qovurg'alar)
+        if (all.includes('sternum') || all.includes('xiphoid') || all.includes('manubrium')) return { color: 0xe11d48, roughness: 0.38 }; // Crimson (To'sh)
+        if (all.includes('clavicle')) return { color: 0xf59e0b, roughness: 0.38 }; // Gold (O'mrov)
+        if (all.includes('scapula')) return { color: 0xd97706, roughness: 0.38 }; // Amber (Kurak)
+        if (all.includes('hip') || all.includes('ilium') || all.includes('ischium') || all.includes('pubis')) return { color: 0x0284c7, roughness: 0.38 }; // Pelvis blue (Tos suyaklari)
+
+        // Upper Limbs (Qo'l suyaklari)
+        if (all.includes('humerus')) return { color: 0xa855f7, roughness: 0.38 }; // Purple (Yelka)
+        if (all.includes('radius')) return { color: 0x06b6d4, roughness: 0.38 }; // Cyan (Bilak - radius)
+        if (all.includes('ulna')) return { color: 0x3b82f6, roughness: 0.38 }; // Blue (Tirsak - ulna)
+
+        // Hand Bones & Phalanges (Kaft va barmoqlar)
+        if (all.includes('scaphoid')) return { color: 0xf43f5e, roughness: 0.38 };
+        if (all.includes('lunate')) return { color: 0xec4899, roughness: 0.38 };
+        if (all.includes('triquetrum')) return { color: 0xd946ef, roughness: 0.38 };
+        if (all.includes('pisiform')) return { color: 0xc084fc, roughness: 0.38 };
+        if (all.includes('trapezium')) return { color: 0x8b5cf6, roughness: 0.38 };
+        if (all.includes('trapezoid')) return { color: 0x6366f1, roughness: 0.38 };
+        if (all.includes('capitate')) return { color: 0xa855f7, roughness: 0.38 };
+        if (all.includes('hamate')) return { color: 0x7c3aed, roughness: 0.38 };
+        if (all.includes('carpal')) return { color: 0xec4899, roughness: 0.38 };
+
+        if (all.includes('first_metacarpal')) return { color: 0xef4444, roughness: 0.38 };
+        if (all.includes('second_metacarpal')) return { color: 0xf97316, roughness: 0.38 };
+        if (all.includes('third_metacarpal')) return { color: 0xf59e0b, roughness: 0.38 };
+        if (all.includes('fourth_metacarpal')) return { color: 0xeab308, roughness: 0.38 };
+        if (all.includes('fifth_metacarpal') || all.includes('metacarpal')) return { color: 0x10b981, roughness: 0.38 };
+
+        if (all.includes('distal_phalanx')) return { color: 0xef4444, roughness: 0.38 }; // Red tip (Tirnoq falangalari)
+        if (all.includes('middle_phalanx')) return { color: 0xfacc15, roughness: 0.38 }; // Yellow middle (O'rta falangalar)
+        if (all.includes('proximal_phalanx') || all.includes('phalanx')) return { color: 0x10b981, roughness: 0.38 }; // Green base (Asosiy falangalar)
+
+        // Lower Limbs (Oyoq suyaklari)
+        if (all.includes('femur')) return { color: 0x6366f1, roughness: 0.38 }; // Indigo (Son)
+        if (all.includes('patella')) return { color: 0xf43f5e, roughness: 0.38 }; // Rose (Tizza qopqog'i)
+        if (all.includes('tibia')) return { color: 0x0d9488, roughness: 0.38 }; // Teal (Katta boldir)
+        if (all.includes('fibula')) return { color: 0x84cc16, roughness: 0.38 }; // Lime (Kichik boldir)
+        if (all.includes('tarsal') || all.includes('calcaneus') || all.includes('talus') || all.includes('cuneiform') || all.includes('cuboid') || all.includes('navicular')) return { color: 0x8b5cf6, roughness: 0.38 };
+        if (all.includes('metatarsal')) return { color: 0xf97316, roughness: 0.38 };
+
+        return { color: 0xf5eedb, roughness: 0.44 }; // Default bone
+      };
+
       group.traverse((child) => {
         if (child.isMesh && child.material) {
-          const matName = (child.material.name || '').toLowerCase();
-          const nodeName = (child.name || '').toLowerCase();
-
+          const cfg = getBoneColor(child);
+          child.material = new THREE.MeshStandardMaterial({
+            color: cfg.color,
+            roughness: cfg.roughness !== undefined ? cfg.roughness : 0.4,
+            metalness: cfg.metalness !== undefined ? cfg.metalness : 0.05,
+            transparent: !!cfg.transparent,
+            opacity: cfg.opacity !== undefined ? cfg.opacity : 1.0,
+            side: THREE.DoubleSide
+          });
           child.castShadow = true;
           child.receiveShadow = true;
-
-          if (matName.includes('cartilage') || nodeName.includes('cartilage')) {
-            // Costal & Articular Cartilage: translucent pearl bluish-cyan
-            child.material = new THREE.MeshStandardMaterial({
-              color: 0x93c5fd,
-              roughness: 0.28,
-              metalness: 0.05,
-              transparent: true,
-              opacity: 0.9,
-              side: THREE.DoubleSide
-            });
-          } else if (matName.includes('teeth') || matName.includes('dentine') || nodeName.includes('tooth') || nodeName.includes('teeth')) {
-            // Tooth enamel: pearl ivory with high specularity
-            child.material = new THREE.MeshStandardMaterial({
-              color: 0xfffff2,
-              roughness: 0.16,
-              metalness: 0.02,
-              side: THREE.DoubleSide
-            });
-          } else if (matName.includes('suture') || nodeName.includes('suture')) {
-            // Cranial sutures: fibrous junction lines
-            child.material = new THREE.MeshStandardMaterial({
-              color: 0xd6cdbe,
-              roughness: 0.55,
-              metalness: 0.02,
-              side: THREE.DoubleSide
-            });
-          } else {
-            // Authentic medical warm ivory cortical bone
-            child.material = new THREE.MeshStandardMaterial({
-              color: 0xf5eedb,
-              roughness: 0.44,
-              metalness: 0.05,
-              side: THREE.DoubleSide
-            });
-          }
         }
       });
     } else if (key === 'eye') {
@@ -936,6 +1003,28 @@ export class Real3DSceneManager {
           }
           child.castShadow = true;
           child.receiveShadow = true;
+        }
+      });
+    } else if (key === 'oral_cavity') {
+      // Photorealistic oral mucosa, teeth enamel and wet saliva glossiness
+      group.traverse((child) => {
+        if (child.isMesh && child.material) {
+          child.castShadow = true;
+          child.receiveShadow = true;
+          child.material.side = THREE.DoubleSide;
+          const matName = (child.material.name || '').toLowerCase();
+          if (matName.includes('teeth')) {
+            child.material.roughness = 0.16;
+            child.material.metalness = 0.02;
+          } else if (matName.includes('wet') || child.name.toLowerCase().includes('wet') || matName.includes('material')) {
+            child.material.roughness = 0.06;
+            child.material.metalness = 0.0;
+            child.material.transparent = true;
+            child.material.opacity = 0.82;
+          } else {
+            child.material.roughness = 0.36;
+          }
+          child.material.needsUpdate = true;
         }
       });
     } else {

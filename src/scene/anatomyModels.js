@@ -535,22 +535,26 @@ export function createGallbladderModel() {
   const group = new THREE.Group();
   group.name = "gallbladder";
 
-  // Specialized PBR shaders for the biliary system
+  // Specialized PBR Physical shaders for the biliary system
   const gbShader = new THREE.MeshPhysicalMaterial({
-    color: 0x15803d,
-    emissive: 0x064e3b,
-    emissiveIntensity: 0.18,
-    roughness: 0.22,
-    metalness: 0.05,
-    clearcoat: 0.85,
-    clearcoatRoughness: 0.15,
+    color: 0x166534,
+    emissive: 0x052e16,
+    emissiveIntensity: 0.15,
+    roughness: 0.18,
+    metalness: 0.03,
+    clearcoat: 0.95,
+    clearcoatRoughness: 0.08,
+    transmission: 0.18,
+    ior: 1.36,
     side: THREE.DoubleSide
   });
 
-  const ductShader = new THREE.MeshStandardMaterial({
-    color: 0x22c55e,
-    roughness: 0.28,
-    metalness: 0.08,
+  const ductShader = new THREE.MeshPhysicalMaterial({
+    color: 0x15803d,
+    roughness: 0.24,
+    metalness: 0.04,
+    clearcoat: 0.8,
+    clearcoatRoughness: 0.12,
     side: THREE.DoubleSide
   });
 
