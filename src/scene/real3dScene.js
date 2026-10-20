@@ -260,7 +260,7 @@ export class Real3DSceneManager {
     const center = bbox.getCenter(new THREE.Vector3());
 
     const maxDim = Math.max(size.x, size.y, size.z) || 1.0;
-    const targetScale = 2.2;
+    const targetScale = (key === 'oral_cavity' || key === 'pancreas' || key === 'gallbladder') ? 2.45 : 2.2;
     const scale = targetScale / maxDim;
     modelRoot.scale.set(scale, scale, scale);
 

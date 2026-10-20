@@ -529,81 +529,219 @@ export function createGallbladderModel() {
   const group = new THREE.Group();
   group.name = "gallbladder";
 
-  // Gallbladder Fundus & Corpus (Pear-shaped green reservoir)
-  const gbGeo = new THREE.SphereGeometry(0.85, 32, 24);
-  gbGeo.scale(0.82, 1.55, 0.88);
-  const gbMesh = new THREE.Mesh(gbGeo, BileGreenMaterial.clone());
-  gbMesh.rotation.z = -0.35;
-  gbMesh.rotation.x = 0.2;
-  group.add(gbMesh);
+  // Specialized PBR shaders for the biliary system
+  const gbShader = new THREE.MeshPhysicalMaterial({
+    color: 0x15803d,
+    emissive: 0x064e3b,
+    emissiveIntensity: 0.18,
+    roughness: 0.22,
+    metalness: 0.05,
+    clearcoat: 0.85,
+    clearcoatRoughness: 0.15,
+    side: THREE.DoubleSide
+  });
 
-  // Gallbladder Neck (Collum vesicae)
-  const neckCurve = new THREE.CatmullRomCurve3([
-    new THREE.Vector3(0.2, 0.9, 0),
-    new THREE.Vector3(0.35, 1.25, -0.1),
-    new THREE.Vector3(0.15, 1.55, -0.25)
-  ]);
-  const neckMesh = makeTube(neckCurve.points, 0.16, 20, 12, BileGreenMaterial);
+  const ductShader = new THREE.MeshStandardMaterial({
+    color: 0x22c55e,
+    roughness: 0.28,
+    metalness: 0.08,
+    side: THREE.DoubleSide
+  });
+
+  // A. PEAR-SHAPED GALLBLADDER RESERVOIR (Vesica biliaris)
+  // 1. Fundus vesicae biliaris (Expanded rounded blind end)
+  const fundusGeo = new THREE.SphereGeometry(0.52, 32, 28);
+  fundusGeo.scale(0.88, 1.15, 0.92);
+  const fundusMesh = new THREE.Mesh(fundusGeo, gbShader);
+  fundusMesh.rotation.z = -0.42;
+  fundusMesh.rotation.x = 0.28;
+  fundusMesh.position.set(0.68, -0.72, 0.45);
+  group.add(fundusMesh);
+
+  // 2. Corpus vesicae biliaris (Main body tapering posterosuperiorly)
+  const bodyPoints = [
+    new THREE.Vector3(0.68, -0.72, 0.45),
+    new THREE.Vector3(0.52, -0.35, 0.32),
+    new THREE.Vector3(0.36, 0.08, 0.18),
+    new THREE.Vector3(0.22, 0.48, 0.02)
+  ];
+  const bodyMesh = makeTube(bodyPoints, 0.42, 28, 18, gbShader);
+  group.add(bodyMesh);
+
+  // 3. Collum vesicae biliaris with Hartmann's Pouch (Infundibulum)
+  const neckPoints = [
+    new THREE.Vector3(0.22, 0.48, 0.02),
+    new THREE.Vector3(0.18, 0.78, -0.12),
+    new THREE.Vector3(0.06, 1.05, -0.25)
+  ];
+  const neckMesh = makeTube(neckPoints, 0.24, 20, 16, gbShader);
   group.add(neckMesh);
 
-  // Cystic Duct (Ductus cysticus - spiral duct)
+  // Hartmann's pouch anatomical bulging
+  const pouchGeo = new THREE.SphereGeometry(0.25, 20, 18);
+  pouchGeo.scale(1.1, 0.85, 0.9);
+  const pouchMesh = new THREE.Mesh(pouchGeo, gbShader);
+  pouchMesh.position.set(0.22, 0.65, -0.06);
+  group.add(pouchMesh);
+
+  // Peritoneal serosa reflection fold (Mesocyst)
+  const serosaGeo = new THREE.TorusGeometry(0.48, 0.045, 8, 24, Math.PI * 0.9);
+  const serosaMat = new THREE.MeshStandardMaterial({
+    color: 0x86efac,
+    transparent: true,
+    opacity: 0.6,
+    roughness: 0.3
+  });
+  const serosaMesh = new THREE.Mesh(serosaGeo, serosaMat);
+  serosaMesh.rotation.x = Math.PI / 2.2;
+  serosaMesh.rotation.y = -0.3;
+  serosaMesh.position.set(0.46, -0.25, 0.22);
+  group.add(serosaMesh);
+
+  // B. CYSTIC DUCT & SPIRAL VALVE OF HEISTER (Ductus cysticus & Plica spiralis)
   const cysticCurve = new THREE.CatmullRomCurve3([
-    new THREE.Vector3(0.15, 1.55, -0.25),
-    new THREE.Vector3(-0.05, 1.45, -0.35),
-    new THREE.Vector3(-0.25, 1.3, -0.3)
+    new THREE.Vector3(0.06, 1.05, -0.25),
+    new THREE.Vector3(-0.08, 1.18, -0.32),
+    new THREE.Vector3(-0.16, 0.98, -0.36),
+    new THREE.Vector3(-0.25, 0.82, -0.32)
   ]);
-  const cysticMesh = makeTube(cysticCurve.points, 0.09, 16, 10, BileGreenMaterial);
+  const cysticMesh = makeTube(cysticCurve.points, 0.085, 24, 12, ductShader);
   group.add(cysticMesh);
 
-  // Common Hepatic Duct (from liver)
-  const hepaticCurve = new THREE.CatmullRomCurve3([
-    new THREE.Vector3(-0.45, 1.95, -0.2),
-    new THREE.Vector3(-0.35, 1.6, -0.25),
-    new THREE.Vector3(-0.25, 1.3, -0.3)
-  ]);
-  const hepaticMesh = makeTube(hepaticCurve.points, 0.1, 16, 10, BileGreenMaterial);
-  group.add(hepaticMesh);
+  // Helical ridges representing the Spiral Valve of Heister
+  for (let s = 0; s < 7; s++) {
+    const t = s / 7;
+    const pt = cysticCurve.getPoint(t);
+    const ringGeo = new THREE.TorusGeometry(0.095, 0.016, 8, 16);
+    const ringMat = new THREE.MeshStandardMaterial({ color: 0x16a34a, roughness: 0.3 });
+    const ringMesh = new THREE.Mesh(ringGeo, ringMat);
+    ringMesh.position.copy(pt);
+    ringMesh.rotation.x = Math.PI / 2 + s * 0.45;
+    ringMesh.rotation.y = s * 0.35;
+    group.add(ringMesh);
+  }
 
-  // Left & Right Hepatic Ducts
-  const rhdCurve = new THREE.CatmullRomCurve3([
-    new THREE.Vector3(-0.75, 2.25, -0.1),
-    new THREE.Vector3(-0.45, 1.95, -0.2)
-  ]);
-  const lhdCurve = new THREE.CatmullRomCurve3([
-    new THREE.Vector3(-0.15, 2.25, -0.25),
-    new THREE.Vector3(-0.45, 1.95, -0.2)
-  ]);
-  group.add(makeTube(rhdCurve.points, 0.07, 10, 8, BileGreenMaterial));
-  group.add(makeTube(lhdCurve.points, 0.07, 10, 8, BileGreenMaterial));
+  // C. INTRAHEPATIC & COMMON HEPATIC DUCTS (Ductus hepaticus)
+  // Right Hepatic Duct (Anterior & Posterior branches)
+  const rhdAnt = [new THREE.Vector3(-0.75, 1.75, -0.15), new THREE.Vector3(-0.48, 1.45, -0.26)];
+  const rhdPost = [new THREE.Vector3(-0.68, 1.62, -0.42), new THREE.Vector3(-0.48, 1.45, -0.26)];
+  group.add(makeTube(rhdAnt, 0.065, 12, 8, ductShader));
+  group.add(makeTube(rhdPost, 0.06, 12, 8, ductShader));
 
-  // Common Bile Duct (Ductus choledochus - travels down to duodenum)
-  const choledochusCurve = new THREE.CatmullRomCurve3([
-    new THREE.Vector3(-0.25, 1.3, -0.3),
-    new THREE.Vector3(-0.22, 0.6, -0.35),
-    new THREE.Vector3(-0.18, -0.1, -0.35),
-    new THREE.Vector3(-0.15, -0.7, -0.2)
-  ]);
-  const choledochusMesh = makeTube(choledochusCurve.points, 0.11, 24, 12, BileGreenMaterial);
-  group.add(choledochusMesh);
+  // Left Hepatic Duct (Medial & Lateral branches)
+  const lhdLat = [new THREE.Vector3(-0.12, 1.78, -0.18), new THREE.Vector3(-0.32, 1.45, -0.28)];
+  const lhdMed = [new THREE.Vector3(-0.02, 1.60, -0.38), new THREE.Vector3(-0.32, 1.45, -0.28)];
+  group.add(makeTube(lhdLat, 0.065, 12, 8, ductShader));
+  group.add(makeTube(lhdMed, 0.06, 12, 8, ductShader));
 
-  // Duodenum C-Loop Section (Curved intestinal frame)
+  // Common Hepatic Duct Confluence
+  const hepaticConfluence = [
+    new THREE.Vector3(-0.40, 1.45, -0.27),
+    new THREE.Vector3(-0.32, 1.15, -0.30),
+    new THREE.Vector3(-0.25, 0.82, -0.32)
+  ];
+  group.add(makeTube(hepaticConfluence, 0.095, 18, 10, ductShader));
+
+  // D. COMMON BILE DUCT (Ductus choledochus)
+  const choledochusCurve = [
+    new THREE.Vector3(-0.25, 0.82, -0.32),
+    new THREE.Vector3(-0.22, 0.35, -0.36),
+    new THREE.Vector3(-0.18, -0.15, -0.38),
+    new THREE.Vector3(-0.14, -0.62, -0.34),
+    new THREE.Vector3(-0.12, -0.92, -0.22)
+  ];
+  group.add(makeTube(choledochusCurve, 0.105, 30, 12, ductShader));
+
+  // E. CALOT'S TRIANGLE & ARTERIAL SUPPLY (Arteria cystica)
+  // Proper Hepatic Artery
+  const phaCurve = [
+    new THREE.Vector3(-0.48, 0.45, -0.28),
+    new THREE.Vector3(-0.44, 0.95, -0.26),
+    new THREE.Vector3(-0.42, 1.35, -0.24)
+  ];
+  group.add(makeTube(phaCurve, 0.068, 16, 8, AortaMaterial));
+
+  // Cystic Artery branching from RHA and fanning over gallbladder
+  const cysticArteryMain = [
+    new THREE.Vector3(-0.43, 1.05, -0.25),
+    new THREE.Vector3(-0.15, 0.95, -0.15),
+    new THREE.Vector3(0.08, 0.72, 0.02)
+  ];
+  group.add(makeTube(cysticArteryMain, 0.038, 14, 8, AortaMaterial));
+
+  const cysticArtSuperficial = [
+    new THREE.Vector3(0.08, 0.72, 0.02),
+    new THREE.Vector3(0.28, 0.42, 0.22),
+    new THREE.Vector3(0.48, 0.05, 0.34),
+    new THREE.Vector3(0.58, -0.42, 0.42)
+  ];
+  group.add(makeTube(cysticArtSuperficial, 0.026, 16, 8, AortaMaterial));
+
+  const cysticArtDeep = [
+    new THREE.Vector3(0.08, 0.72, 0.02),
+    new THREE.Vector3(0.20, 0.45, -0.05),
+    new THREE.Vector3(0.32, 0.05, 0.08),
+    new THREE.Vector3(0.42, -0.38, 0.18)
+  ];
+  group.add(makeTube(cysticArtDeep, 0.024, 16, 8, AortaMaterial));
+
+  // Portal Vein Trunk in the hepatoduodenal ligament
+  const pvCurve = [
+    new THREE.Vector3(-0.35, 0.35, -0.42),
+    new THREE.Vector3(-0.38, 0.90, -0.38),
+    new THREE.Vector3(-0.40, 1.40, -0.34)
+  ];
+  group.add(makeTube(pvCurve, 0.095, 16, 8, VeinMaterial));
+
+  // F. DUODENUM SECTION & SPHINCTER OF ODDI (Papilla duodeni major)
+  // Duodenum C-loop descending limb
   const duoCurve = new THREE.CatmullRomCurve3([
-    new THREE.Vector3(-0.8, -0.3, 0.1),
-    new THREE.Vector3(-0.4, -0.75, 0),
-    new THREE.Vector3(0.2, -0.85, -0.1),
-    new THREE.Vector3(0.65, -0.5, -0.2),
-    new THREE.Vector3(0.5, 0.1, -0.1)
+    new THREE.Vector3(-0.75, -0.45, 0.05),
+    new THREE.Vector3(-0.42, -0.88, -0.05),
+    new THREE.Vector3(0.12, -1.05, -0.15),
+    new THREE.Vector3(0.62, -0.75, -0.22),
+    new THREE.Vector3(0.68, -0.15, -0.12)
   ]);
-  const duoMat = new THREE.MeshStandardMaterial({ color: 0xfda4af, roughness: 0.45 });
-  const duoMesh = makeTube(duoCurve.points, 0.28, 28, 16, duoMat);
-  group.add(duoMesh);
+  const duoMat = new THREE.MeshStandardMaterial({
+    color: 0xfda4af,
+    roughness: 0.38,
+    metalness: 0.05,
+    side: THREE.DoubleSide
+  });
+  group.add(makeTube(duoCurve.points, 0.28, 32, 16, duoMat));
 
-  // Sphincter of Oddi (Papilla of Vater connection point)
-  const sphincterGeo = new THREE.SphereGeometry(0.16, 14, 14);
-  const sphincterMat = new THREE.MeshStandardMaterial({ color: 0xe11d48, roughness: 0.3 });
-  const sphincterMesh = new THREE.Mesh(sphincterGeo, sphincterMat);
-  sphincterMesh.position.set(-0.15, -0.7, -0.15);
-  group.add(sphincterMesh);
+  // Duodenal mucosal circular folds (Plicae circulares / Kerckring)
+  for (let d = 0; d < 10; d++) {
+    const t = 0.15 + (d / 10) * 0.7;
+    const pt = duoCurve.getPoint(t);
+    const foldGeo = new THREE.TorusGeometry(0.29, 0.022, 6, 20);
+    const foldMat = new THREE.MeshStandardMaterial({ color: 0xf472b6, roughness: 0.4 });
+    const foldMesh = new THREE.Mesh(foldGeo, foldMat);
+    foldMesh.position.copy(pt);
+    foldMesh.rotation.y = Math.PI / 2;
+    group.add(foldMesh);
+  }
+
+  // Major Duodenal Papilla (Ampulla of Vater) & Sphincter of Oddi
+  const papillaGeo = new THREE.SphereGeometry(0.14, 16, 14);
+  papillaGeo.scale(1.2, 0.9, 0.8);
+  const papillaMat = new THREE.MeshStandardMaterial({
+    color: 0xe11d48,
+    roughness: 0.28,
+    emissive: 0x9f1239,
+    emissiveIntensity: 0.3
+  });
+  const papillaMesh = new THREE.Mesh(papillaGeo, papillaMat);
+  papillaMesh.position.set(-0.12, -0.92, -0.16);
+  group.add(papillaMesh);
+
+  // Concentric muscular ring representing the Sphincter of Oddi
+  const oddiRingGeo = new THREE.TorusGeometry(0.11, 0.035, 8, 16);
+  const oddiRingMat = new THREE.MeshStandardMaterial({ color: 0xbe123c, roughness: 0.35 });
+  const oddiRingMesh = new THREE.Mesh(oddiRingGeo, oddiRingMat);
+  oddiRingMesh.position.set(-0.12, -0.92, -0.14);
+  oddiRingMesh.rotation.y = Math.PI / 2.5;
+  group.add(oddiRingMesh);
 
   group.scale.set(1.4, 1.4, 1.4);
   return group;
@@ -616,75 +754,223 @@ export function createPancreasModel() {
   const group = new THREE.Group();
   group.name = "pancreas";
 
-  // Pancreas Lobulated Body (Yellow-Orange glandular texture)
-  const bodyCurve = new THREE.CatmullRomCurve3([
-    new THREE.Vector3(-1.1, -0.2, 0.1), // Caput (Head)
-    new THREE.Vector3(-0.4, 0.05, 0.05), // Collum (Neck)
-    new THREE.Vector3(0.4, 0.2, 0.0),    // Corpus (Body)
-    new THREE.Vector3(1.3, 0.45, -0.15)  // Cauda (Tail)
-  ]);
-  const bodyMesh = makeTube(bodyCurve.points, 0.38, 32, 16, PancreasYellowMaterial);
-  group.add(bodyMesh);
+  // Specialized PBR shaders
+  const pancShader = new THREE.MeshStandardMaterial({
+    color: 0xf59e0b,
+    roughness: 0.38,
+    metalness: 0.06,
+    bumpScale: 0.04
+  });
 
-  // Head of Pancreas (Caput pancreatis - enlarged lower lobe)
-  const headGeo = new THREE.SphereGeometry(0.65, 24, 20);
-  headGeo.scale(0.85, 1.25, 0.9);
-  const headMesh = new THREE.Mesh(headGeo, PancreasYellowMaterial.clone());
-  headMesh.position.set(-1.15, -0.35, 0.12);
-  group.add(headMesh);
-
-  // Duodenum C-Loop Cradling the Head (Creamy-pink intestinal loop)
-  const duoCurve = new THREE.CatmullRomCurve3([
-    new THREE.Vector3(-0.9, 0.7, 0.2),
-    new THREE.Vector3(-1.85, 0.3, 0.25),
-    new THREE.Vector3(-1.95, -0.7, 0.2),
-    new THREE.Vector3(-1.45, -1.35, 0.1),
-    new THREE.Vector3(-0.45, -1.2, 0.0)
-  ]);
-  const duoMat = new THREE.MeshStandardMaterial({ color: 0xfda4af, roughness: 0.4 });
-  const duoMesh = makeTube(duoCurve.points, 0.3, 28, 16, duoMat);
-  group.add(duoMesh);
-
-  // Pancreatic Duct of Wirsung (Ductus pancreaticus - inner glowing white duct)
-  const ductCurve = new THREE.CatmullRomCurve3([
-    new THREE.Vector3(1.2, 0.42, -0.1),
-    new THREE.Vector3(0.4, 0.2, 0.02),
-    new THREE.Vector3(-0.4, 0.06, 0.08),
-    new THREE.Vector3(-1.05, -0.15, 0.15),
-    new THREE.Vector3(-1.3, -0.3, 0.18)
-  ]);
-  const ductMat = new THREE.MeshStandardMaterial({
+  const ductShader = new THREE.MeshStandardMaterial({
     color: 0xffffff,
     emissive: 0x38bdf8,
-    emissiveIntensity: 0.4,
-    roughness: 0.2
+    emissiveIntensity: 0.55,
+    roughness: 0.15,
+    transparent: true,
+    opacity: 0.92
   });
-  const ductMesh = makeTube(ductCurve.points, 0.07, 24, 10, ductMat);
-  group.add(ductMesh);
 
-  // Splenic Artery (Arteria lienalis - tortuous red vessel on upper border)
-  const arteryCurve = new THREE.CatmullRomCurve3([
-    new THREE.Vector3(-0.3, 0.35, -0.1),
-    new THREE.Vector3(0.0, 0.5, -0.05),
-    new THREE.Vector3(0.3, 0.4, -0.1),
-    new THREE.Vector3(0.65, 0.6, -0.15),
-    new THREE.Vector3(1.0, 0.55, -0.2),
-    new THREE.Vector3(1.4, 0.75, -0.25)
-  ]);
-  const arteryMesh = makeTube(arteryCurve.points, 0.065, 28, 10, AortaMaterial);
-  group.add(arteryMesh);
+  // A. LOBULATED GLANDULAR PARENCHYMA (Caput, Collum, Corpus, Cauda)
+  // 1. Caput pancreatis (Head) nestled in duodenum C-loop
+  const headGeo = new THREE.SphereGeometry(0.72, 32, 24);
+  headGeo.scale(0.85, 1.25, 0.82);
+  const headMesh = new THREE.Mesh(headGeo, pancShader.clone());
+  headMesh.position.set(-1.18, -0.32, 0.10);
+  group.add(headMesh);
 
-  // Superior Mesenteric Vessels (Passing behind neck)
-  const smaCurve = new THREE.CatmullRomCurve3([
-    new THREE.Vector3(-0.35, 0.6, -0.25),
-    new THREE.Vector3(-0.38, -0.9, -0.15)
+  // 2. Processus uncinatus (Uncinate process hooking behind mesenteric vessels)
+  const uncinateGeo = new THREE.CylinderGeometry(0.22, 0.34, 0.48, 16);
+  uncinateGeo.scale(1.1, 1.0, 0.7);
+  const uncinateMesh = new THREE.Mesh(uncinateGeo, pancShader.clone());
+  uncinateMesh.rotation.z = Math.PI / 3.8;
+  uncinateMesh.rotation.y = -0.25;
+  uncinateMesh.position.set(-0.95, -0.78, -0.05);
+  group.add(uncinateMesh);
+
+  // 3. Collum & Corpus pancreatis (Neck & Triangular body)
+  const bodyPoints = [
+    new THREE.Vector3(-1.12, -0.18, 0.10), // Head junction
+    new THREE.Vector3(-0.55, 0.05, 0.06),  // Neck (Collum)
+    new THREE.Vector3(0.15, 0.22, 0.01),   // Mid-body
+    new THREE.Vector3(0.85, 0.36, -0.08),  // Distal body
+    new THREE.Vector3(1.48, 0.52, -0.18)   // Cauda (Tail)
+  ];
+  const bodyMesh = makeTube(bodyPoints, 0.36, 32, 16, pancShader);
+  group.add(bodyMesh);
+
+  // 4. Cauda pancreatis (Tapered tail reaching splenic hilum)
+  const tailGeo = new THREE.ConeGeometry(0.32, 0.65, 16);
+  tailGeo.scale(1.0, 1.0, 0.65);
+  const tailMesh = new THREE.Mesh(tailGeo, pancShader.clone());
+  tailMesh.rotation.z = -Math.PI / 2.2;
+  tailMesh.rotation.y = 0.2;
+  tailMesh.position.set(1.58, 0.54, -0.20);
+  group.add(tailMesh);
+
+  // 5. Glandular Acinar Lobules (Surface nodular clusters / Lobuli pancreatis)
+  // Generates genuine human cobblestone lobular texture
+  const lobuleGroup = new THREE.Group();
+  lobuleGroup.name = "acinar_lobules";
+  const lobulePositions = [
+    // Head lobules
+    [-1.35, -0.15, 0.32], [-1.45, -0.45, 0.22], [-1.25, -0.72, 0.24],
+    [-1.02, -0.58, 0.35], [-0.85, -0.32, 0.30], [-1.22, 0.05, 0.25],
+    // Body lobules
+    [-0.45, 0.20, 0.26], [-0.20, 0.26, 0.22], [0.05, 0.32, 0.20],
+    [0.35, 0.38, 0.15], [0.65, 0.44, 0.10], [0.95, 0.48, 0.05],
+    [1.25, 0.55, -0.05],
+    // Inferior border lobules
+    [-0.50, -0.10, 0.20], [-0.15, -0.02, 0.18], [0.25, 0.08, 0.14],
+    [0.60, 0.16, 0.08], [1.00, 0.25, -0.02]
+  ];
+  lobulePositions.forEach(pos => {
+    const lGeo = new THREE.DodecahedronGeometry(0.14 + Math.random() * 0.06, 1);
+    lGeo.scale(1.1, 0.9, 0.9);
+    const lMesh = new THREE.Mesh(lGeo, pancShader);
+    lMesh.position.set(pos[0], pos[1], pos[2]);
+    lobuleGroup.add(lMesh);
+  });
+  group.add(lobuleGroup);
+
+  // B. MAIN PANCREATIC DUCT OF WIRSUNG & ACCESSORY DUCT OF SANTORINI
+  // 1. Ductus pancreaticus (Wirsung)
+  const wirsungCurve = new THREE.CatmullRomCurve3([
+    new THREE.Vector3(1.50, 0.50, -0.14),
+    new THREE.Vector3(0.95, 0.38, -0.04),
+    new THREE.Vector3(0.25, 0.24, 0.04),
+    new THREE.Vector3(-0.45, 0.08, 0.08),
+    new THREE.Vector3(-1.05, -0.12, 0.12),
+    new THREE.Vector3(-1.32, -0.42, 0.16)
   ]);
-  const smvCurve = new THREE.CatmullRomCurve3([
-    new THREE.Vector3(-0.2, 0.6, -0.22),
-    new THREE.Vector3(-0.23, -0.9, -0.12)
+  const wirsungMesh = makeTube(wirsungCurve.points, 0.065, 32, 12, ductShader);
+  group.add(wirsungMesh);
+
+  // Interlobular herringbone tributary branches
+  for (let b = 1; b < 7; b++) {
+    const t = b / 7;
+    const pt = wirsungCurve.getPoint(t);
+    [-1, 1].forEach(side => {
+      const tribPts = [
+        pt,
+        new THREE.Vector3(pt.x + 0.04, pt.y + side * 0.16, pt.z + side * 0.08)
+      ];
+      group.add(makeTube(tribPts, 0.022, 8, 6, ductShader));
+    });
+  }
+
+  // 2. Ductus pancreaticus accessorius (Santorini)
+  const santoriniCurve = [
+    new THREE.Vector3(-1.05, -0.12, 0.12),
+    new THREE.Vector3(-1.22, 0.12, 0.15),
+    new THREE.Vector3(-1.42, 0.28, 0.20)
+  ];
+  group.add(makeTube(santoriniCurve, 0.042, 14, 8, ductShader));
+
+  // C. DUODENUM C-LOOP WITH ANATOMICAL WINDOW (Kerckring folds & Papillae)
+  const duoCurve = new THREE.CatmullRomCurve3([
+    new THREE.Vector3(-0.85, 0.75, 0.18),  // Pars superior (bulb)
+    new THREE.Vector3(-1.85, 0.35, 0.24),  // Superior flexure
+    new THREE.Vector3(-2.02, -0.45, 0.18), // Pars descendens
+    new THREE.Vector3(-1.65, -1.25, 0.08), // Inferior flexure
+    new THREE.Vector3(-0.65, -1.28, 0.02), // Pars horizontalis
+    new THREE.Vector3(-0.15, -0.95, -0.04) // Pars ascendens
   ]);
-  group.add(makeTube(smaCurve.points, 0.075, 12, 8, AortaMaterial));
-  group.add(makeTube(smvCurve.points, 0.085, 12, 8, VeinMaterial));
+  const duoMat = new THREE.MeshStandardMaterial({
+    color: 0xfda4af,
+    roughness: 0.38,
+    side: THREE.DoubleSide
+  });
+  group.add(makeTube(duoCurve.points, 0.28, 36, 16, duoMat));
+
+  // Circular mucosal folds (Plicae circulares of Kerckring)
+  for (let k = 0; k < 12; k++) {
+    const t = 0.12 + (k / 12) * 0.75;
+    const pt = duoCurve.getPoint(t);
+    const foldGeo = new THREE.TorusGeometry(0.29, 0.022, 6, 20);
+    const foldMat = new THREE.MeshStandardMaterial({ color: 0xf472b6, roughness: 0.4 });
+    const foldMesh = new THREE.Mesh(foldGeo, foldMat);
+    foldMesh.position.copy(pt);
+    foldMesh.rotation.y = Math.PI / 2;
+    group.add(foldMesh);
+  }
+
+  // Major Duodenal Papilla (Ampulla of Vater) with Sphincter of Oddi
+  const majPapillaGeo = new THREE.SphereGeometry(0.14, 14, 14);
+  const majPapillaMat = new THREE.MeshStandardMaterial({
+    color: 0xe11d48,
+    roughness: 0.28,
+    emissive: 0x9f1239,
+    emissiveIntensity: 0.35
+  });
+  const majPapilla = new THREE.Mesh(majPapillaGeo, majPapillaMat);
+  majPapilla.position.set(-1.75, -0.45, 0.20);
+  group.add(majPapilla);
+
+  // Minor Duodenal Papilla (Santorini entrance)
+  const minPapilla = new THREE.Mesh(
+    new THREE.SphereGeometry(0.08, 12, 10),
+    majPapillaMat.clone()
+  );
+  minPapilla.position.set(-1.68, 0.15, 0.22);
+  group.add(minPapilla);
+
+  // D. PERIPANCREATIC VASCULAR ARCHITECTURE
+  // 1. Splenic Artery (Arteria lienalis - famously serpentine & tortuous)
+  const splenicArtPoints = [
+    new THREE.Vector3(-0.55, 0.18, -0.06),
+    new THREE.Vector3(-0.30, 0.42, -0.04),
+    new THREE.Vector3(-0.05, 0.26, -0.08),
+    new THREE.Vector3(0.25, 0.48, -0.10),
+    new THREE.Vector3(0.55, 0.34, -0.14),
+    new THREE.Vector3(0.90, 0.58, -0.16),
+    new THREE.Vector3(1.22, 0.45, -0.22),
+    new THREE.Vector3(1.65, 0.72, -0.26)
+  ];
+  group.add(makeTube(splenicArtPoints, 0.062, 32, 10, AortaMaterial));
+
+  // Pancreatic branches from splenic artery
+  [0.2, 0.5, 0.8].forEach(pct => {
+    const curve = new THREE.CatmullRomCurve3(splenicArtPoints);
+    const pt = curve.getPoint(pct);
+    const branchPts = [pt, new THREE.Vector3(pt.x, pt.y - 0.22, pt.z + 0.08)];
+    group.add(makeTube(branchPts, 0.024, 8, 6, AortaMaterial));
+  });
+
+  // 2. Splenic Vein (Vena lienalis - straight posterior groove)
+  const splenicVeinPoints = [
+    new THREE.Vector3(1.55, 0.45, -0.28),
+    new THREE.Vector3(0.85, 0.32, -0.20),
+    new THREE.Vector3(0.15, 0.18, -0.14),
+    new THREE.Vector3(-0.55, 0.05, -0.12)
+  ];
+  group.add(makeTube(splenicVeinPoints, 0.078, 18, 10, VeinMaterial));
+
+  // 3. Superior Mesenteric Artery & Vein (AMS & VMS)
+  // Passing through the incisura pancreatis over uncinate process
+  const smaPoints = [
+    new THREE.Vector3(-0.52, 0.48, -0.18),
+    new THREE.Vector3(-0.55, -0.05, 0.08),
+    new THREE.Vector3(-0.58, -0.85, 0.16)
+  ];
+  group.add(makeTube(smaPoints, 0.075, 14, 8, AortaMaterial));
+
+  const smvPoints = [
+    new THREE.Vector3(-0.38, 0.45, -0.16),
+    new THREE.Vector3(-0.42, -0.05, 0.10),
+    new THREE.Vector3(-0.46, -0.85, 0.18)
+  ];
+  group.add(makeTube(smvPoints, 0.085, 14, 8, VeinMaterial));
+
+  // 4. Common Bile Duct entering the pancreatic head
+  const cbdPoints = [
+    new THREE.Vector3(-0.85, 0.65, -0.15),
+    new THREE.Vector3(-0.95, 0.05, -0.12),
+    new THREE.Vector3(-1.15, -0.28, -0.02),
+    new THREE.Vector3(-1.42, -0.42, 0.12)
+  ];
+  const bileMat = new THREE.MeshStandardMaterial({ color: 0x16a34a, roughness: 0.3 });
+  group.add(makeTube(cbdPoints, 0.07, 16, 8, bileMat));
 
   group.scale.set(1.4, 1.4, 1.4);
   return group;
@@ -697,84 +983,315 @@ export function createOralCavityModel() {
   const group = new THREE.Group();
   group.name = "oral_cavity";
 
-  // Upper & Lower Gingiva Arches (Pink Gums)
-  const upperGumCurve = new THREE.CatmullRomCurve3([
-    new THREE.Vector3(-0.95, 0.3, -0.4),
-    new THREE.Vector3(-0.75, 0.3, 0.35),
-    new THREE.Vector3(0, 0.3, 0.8),
-    new THREE.Vector3(0.75, 0.3, 0.35),
-    new THREE.Vector3(0.95, 0.3, -0.4)
-  ]);
-  const upperGum = makeTube(upperGumCurve.points, 0.16, 24, 12, GumPinkMaterial);
-  group.add(upperGum);
+  // Dedicated PBR shaders for oral structures
+  const enamelMat = new THREE.MeshPhysicalMaterial({
+    color: 0xfdfcf8,
+    roughness: 0.14,
+    metalness: 0.03,
+    clearcoat: 0.85,
+    clearcoatRoughness: 0.12
+  });
 
-  const lowerGumCurve = new THREE.CatmullRomCurve3([
-    new THREE.Vector3(-0.95, -0.3, -0.4),
-    new THREE.Vector3(-0.75, -0.3, 0.35),
-    new THREE.Vector3(0, -0.3, 0.8),
-    new THREE.Vector3(0.75, -0.3, 0.35),
-    new THREE.Vector3(0.95, -0.3, -0.4)
-  ]);
-  const lowerGum = makeTube(lowerGumCurve.points, 0.16, 24, 12, GumPinkMaterial);
-  group.add(lowerGum);
+  const gingivaMat = new THREE.MeshStandardMaterial({
+    color: 0xf472b6,
+    roughness: 0.38,
+    metalness: 0.04
+  });
 
-  // 32 Anatomical Teeth (White Enamel Crowns)
-  const toothTypes = [
-    { count: 16, yPos: 0.32, yDir: -1 },
-    { count: 16, yPos: -0.32, yDir: 1 }
+  const tongueMat = new THREE.MeshStandardMaterial({
+    color: 0xbe123c,
+    roughness: 0.32,
+    metalness: 0.04
+  });
+
+  const palateMat = new THREE.MeshStandardMaterial({
+    color: 0xfb7185,
+    roughness: 0.42,
+    side: THREE.DoubleSide
+  });
+
+  // A. GINGIVAL ALVEOLAR ARCHES (Gingiva propria & Processus alveolaris)
+  // Upper arch (Maxillary) and Lower arch (Mandibular)
+  const archRadii = [
+    { yPos: 0.38, tilt: -0.18, isUpper: true },
+    { yPos: -0.38, tilt: 0.18, isUpper: false }
   ];
 
-  toothTypes.forEach(row => {
-    for (let i = 0; i < row.count; i++) {
-      const t = i / (row.count - 1);
-      const angle = (t - 0.5) * Math.PI * 0.95;
-      const x = Math.sin(angle) * (0.8 + Math.abs(angle) * 0.15);
-      const z = Math.cos(angle) * 0.85 - 0.2;
+  archRadii.forEach(arch => {
+    // Parabolic horseshoe gum arch
+    const gumCurve = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(-0.85, arch.yPos, -0.55),
+      new THREE.Vector3(-0.78, arch.yPos, 0.05),
+      new THREE.Vector3(-0.55, arch.yPos, 0.48),
+      new THREE.Vector3(0.00, arch.yPos, 0.72),
+      new THREE.Vector3(0.55, arch.yPos, 0.48),
+      new THREE.Vector3(0.78, arch.yPos, 0.05),
+      new THREE.Vector3(0.85, arch.yPos, -0.55)
+    ]);
+    const gumMesh = makeTube(gumCurve.points, 0.18, 32, 14, gingivaMat);
+    group.add(gumMesh);
 
-      // Distinguish molar vs incisor size
-      const isMolar = (i < 3 || i > 12);
-      const isCanine = (i === 4 || i === 11);
-      const tRadius = isMolar ? 0.08 : isCanine ? 0.065 : 0.055;
-      const tHeight = isMolar ? 0.14 : isCanine ? 0.18 : 0.15;
-
-      const tGeo = isMolar ? new THREE.BoxGeometry(tRadius * 2, tHeight, tRadius * 2) : new THREE.CylinderGeometry(tRadius * 0.7, tRadius, tHeight, 10);
-      const tMesh = new THREE.Mesh(tGeo, ToothEnamelMaterial);
-      tMesh.position.set(x, row.yPos + row.yDir * (tHeight * 0.5), z);
-      group.add(tMesh);
+    // Scalloped cervical collar & interdental papillae
+    for (let p = 0; p < 15; p++) {
+      const t = p / 14;
+      const pt = gumCurve.getPoint(t);
+      const papGeo = new THREE.ConeGeometry(0.045, 0.12, 6);
+      const papMesh = new THREE.Mesh(papGeo, gingivaMat);
+      papMesh.rotation.x = arch.isUpper ? Math.PI : 0;
+      papMesh.position.set(pt.x, arch.yPos + (arch.isUpper ? -0.06 : 0.06), pt.z);
+      group.add(papMesh);
     }
   });
 
-  // Muscular Tongue (Lingua - Anatomical crimson organ)
-  const tongueGeo = new THREE.SphereGeometry(0.75, 28, 24);
-  tongueGeo.scale(0.85, 0.45, 1.35);
-  const tongueMesh = new THREE.Mesh(tongueGeo, TongueRedMaterial);
-  tongueMesh.position.set(0, -0.18, 0.05);
-  group.add(tongueMesh);
+  // B. 32 INDIVIDUAL ANATOMICAL TEETH (Dentes)
+  // Upper & Lower Jaw with true morphological differentiation
+  archRadii.forEach(arch => {
+    const count = 16;
+    for (let i = 0; i < count; i++) {
+      const t = i / (count - 1); // 0 (right 3rd molar) to 1 (left 3rd molar)
+      // Parabolic dental arch coordinates
+      const angle = (t - 0.5) * Math.PI * 0.94;
+      const x = Math.sin(angle) * (0.74 + Math.abs(angle) * 0.18);
+      const z = Math.cos(angle) * 0.88 - 0.28;
+      const dirY = arch.isUpper ? -1 : 1;
 
-  // Median Lingual Sulcus (Middle groove)
-  const sulcusCurve = new THREE.CatmullRomCurve3([
-    new THREE.Vector3(0, -0.02, 0.7),
-    new THREE.Vector3(0, -0.04, 0.0),
-    new THREE.Vector3(0, -0.08, -0.6)
-  ]);
-  const sulcusMat = new THREE.MeshStandardMaterial({ color: 0x991b1b, roughness: 0.6 });
-  group.add(makeTube(sulcusCurve.points, 0.045, 16, 8, sulcusMat));
+      // Identify tooth type (0-15 from Right 3rd Molar to Left 3rd Molar)
+      // Quadrant index from midline (0 = Central Incisor, 7 = 3rd Molar)
+      const qIdx = Math.abs(i - 7.5) - 0.5;
 
-  // Hard & Soft Palate (Roof of mouth)
-  const palateGeo = new THREE.SphereGeometry(0.9, 24, 20, 0, Math.PI, 0, Math.PI * 0.5);
-  palateGeo.scale(1.0, 0.35, 1.1);
-  const palateMat = new THREE.MeshStandardMaterial({ color: 0xfb7185, roughness: 0.45, side: THREE.DoubleSide });
+      const tGroup = new THREE.Group();
+      tGroup.position.set(x, arch.yPos, z);
+
+      // Rotate tooth to face radially outward along arch normal
+      const normalAngle = Math.atan2(x, z + 0.1);
+      tGroup.rotation.y = normalAngle;
+
+      if (qIdx === 0) {
+        // CENTRAL INCISOR (D. incisivus centralis) - Chisel crown with incisal edge
+        const crownW = arch.isUpper ? 0.16 : 0.11;
+        const crownH = arch.isUpper ? 0.22 : 0.18;
+        const crownD = 0.09;
+        const incGeo = new THREE.BoxGeometry(crownW, crownH, crownD);
+        incGeo.scale(1.0, 1.0, 0.85);
+        const incMesh = new THREE.Mesh(incGeo, enamelMat);
+        incMesh.position.set(0, dirY * (crownH * 0.5), 0);
+        tGroup.add(incMesh);
+
+        // Anatomical root into gum
+        const rootGeo = new THREE.ConeGeometry(crownW * 0.42, 0.28, 8);
+        const rootMesh = new THREE.Mesh(rootGeo, enamelMat);
+        rootMesh.rotation.x = arch.isUpper ? 0 : Math.PI;
+        rootMesh.position.set(0, -dirY * 0.14, 0);
+        tGroup.add(rootMesh);
+      } else if (qIdx === 1) {
+        // LATERAL INCISOR (D. incisivus lateralis)
+        const crownW = arch.isUpper ? 0.13 : 0.11;
+        const crownH = 0.20;
+        const crownD = 0.09;
+        const incGeo = new THREE.BoxGeometry(crownW, crownH, crownD);
+        const incMesh = new THREE.Mesh(incGeo, enamelMat);
+        incMesh.position.set(0, dirY * (crownH * 0.5), 0);
+        tGroup.add(incMesh);
+
+        const rootGeo = new THREE.ConeGeometry(crownW * 0.42, 0.26, 8);
+        const rootMesh = new THREE.Mesh(rootGeo, enamelMat);
+        rootMesh.rotation.x = arch.isUpper ? 0 : Math.PI;
+        rootMesh.position.set(0, -dirY * 0.13, 0);
+        tGroup.add(rootMesh);
+      } else if (qIdx === 2) {
+        // CANINE (D. caninus) - Strong conical spear-point cusp & labial ridge
+        const crownR = 0.09;
+        const crownH = 0.26;
+        const canGeo = new THREE.ConeGeometry(crownR, crownH, 10);
+        canGeo.scale(1.1, 1.0, 0.85);
+        const canMesh = new THREE.Mesh(canGeo, enamelMat);
+        canMesh.rotation.x = arch.isUpper ? Math.PI : 0;
+        canMesh.position.set(0, dirY * (crownH * 0.5), 0);
+        tGroup.add(canMesh);
+
+        const rootGeo = new THREE.ConeGeometry(crownR * 0.85, 0.35, 8);
+        const rootMesh = new THREE.Mesh(rootGeo, enamelMat);
+        rootMesh.rotation.x = arch.isUpper ? 0 : Math.PI;
+        rootMesh.position.set(0, -dirY * 0.17, 0);
+        tGroup.add(rootMesh);
+      } else if (qIdx === 3 || qIdx === 4) {
+        // PREMOLARS 1 & 2 (D. premolares) - Bicuspid with buccal & lingual cusps
+        const bicuspidGroup = new THREE.Group();
+        const bGeo = new THREE.ConeGeometry(0.065, 0.18, 8);
+        const bMesh = new THREE.Mesh(bGeo, enamelMat);
+        bMesh.rotation.x = arch.isUpper ? Math.PI : 0;
+        bMesh.position.set(0, dirY * 0.09, 0.04);
+        bicuspidGroup.add(bMesh);
+
+        const lGeo = new THREE.ConeGeometry(0.055, 0.15, 8);
+        const lMesh = new THREE.Mesh(lGeo, enamelMat);
+        lMesh.rotation.x = arch.isUpper ? Math.PI : 0;
+        lMesh.position.set(0, dirY * 0.075, -0.04);
+        bicuspidGroup.add(lMesh);
+
+        // Base crown table
+        const baseGeo = new THREE.CylinderGeometry(0.08, 0.07, 0.08, 12);
+        const baseMesh = new THREE.Mesh(baseGeo, enamelMat);
+        baseMesh.position.set(0, dirY * 0.04, 0);
+        bicuspidGroup.add(baseMesh);
+
+        tGroup.add(bicuspidGroup);
+      } else {
+        // MOLARS 1, 2 & 3 (D. molares / Wisdom tooth) - Multicuspid occlusal tables (4-5 cusps)
+        const molarGroup = new THREE.Group();
+        const mW = qIdx === 7 ? 0.18 : 0.22;
+        const mH = 0.16;
+        const mGeo = new THREE.BoxGeometry(mW, mH, mW * 0.95);
+        const mMesh = new THREE.Mesh(mGeo, enamelMat);
+        mMesh.position.set(0, dirY * (mH * 0.5), 0);
+        molarGroup.add(mMesh);
+
+        // 4 Occlusal Cusps on biting table
+        const cuspR = mW * 0.26;
+        const cuspH = 0.07;
+        [[-1, -1], [-1, 1], [1, -1], [1, 1]].forEach(cOffset => {
+          const cGeo = new THREE.ConeGeometry(cuspR, cuspH, 6);
+          const cMesh = new THREE.Mesh(cGeo, enamelMat);
+          cMesh.rotation.x = arch.isUpper ? Math.PI : 0;
+          cMesh.position.set(
+            cOffset[0] * cuspR * 0.9,
+            dirY * (mH + cuspH * 0.4),
+            cOffset[1] * cuspR * 0.9
+          );
+          molarGroup.add(cMesh);
+        });
+
+        // Dual/Triple roots
+        [-1, 1].forEach(rSide => {
+          const rootGeo = new THREE.ConeGeometry(0.055, 0.28, 6);
+          const rootMesh = new THREE.Mesh(rootGeo, enamelMat);
+          rootMesh.rotation.x = arch.isUpper ? 0 : Math.PI;
+          rootMesh.position.set(rSide * 0.05, -dirY * 0.14, 0);
+          molarGroup.add(rootMesh);
+        });
+
+        tGroup.add(molarGroup);
+      }
+
+      group.add(tGroup);
+    }
+  });
+
+  // C. THE MUSCULAR TONGUE (Lingua - Dorsum, Sulcus medianus, Sulcus terminalis, Papillae)
+  const tongueGroup = new THREE.Group();
+  tongueGroup.name = "muscular_tongue";
+  tongueGroup.position.set(0, -0.22, 0.02);
+
+  // 1. Muscular Body (Corpus linguae) with natural dorsal arch
+  const tongueGeo = new THREE.SphereGeometry(0.68, 32, 28);
+  tongueGeo.scale(0.88, 0.42, 1.35);
+  const tongueMesh = new THREE.Mesh(tongueGeo, tongueMat);
+  tongueGroup.add(tongueMesh);
+
+  // 2. Apex linguae (Tip of tongue)
+  const tipGeo = new THREE.ConeGeometry(0.32, 0.42, 16);
+  tipGeo.scale(1.0, 0.35, 1.1);
+  const tipMesh = new THREE.Mesh(tipGeo, tongueMat);
+  tipMesh.rotation.x = Math.PI / 2.2;
+  tipMesh.position.set(0, -0.04, 0.85);
+  tongueGroup.add(tipMesh);
+
+  // 3. Median Lingual Sulcus (Sulcus medianus linguae)
+  const sulcusCurve = [
+    new THREE.Vector3(0, 0.08, 0.78),
+    new THREE.Vector3(0, 0.09, 0.35),
+    new THREE.Vector3(0, 0.07, -0.05),
+    new THREE.Vector3(0, 0.02, -0.38)
+  ];
+  const sulcusMesh = makeTube(sulcusCurve, 0.038, 20, 8, new THREE.MeshStandardMaterial({
+    color: 0x9f1239,
+    roughness: 0.55
+  }));
+  tongueGroup.add(sulcusMesh);
+
+  // 4. V-Shaped Terminal Sulcus (Sulcus terminalis) & Foramen Cecum
+  const vLeft = [new THREE.Vector3(0, 0.02, -0.38), new THREE.Vector3(-0.35, 0.04, -0.65)];
+  const vRight = [new THREE.Vector3(0, 0.02, -0.38), new THREE.Vector3(0.35, 0.04, -0.65)];
+  tongueGroup.add(makeTube(vLeft, 0.025, 10, 6, new THREE.MeshStandardMaterial({ color: 0x881337 })));
+  tongueGroup.add(makeTube(vRight, 0.025, 10, 6, new THREE.MeshStandardMaterial({ color: 0x881337 })));
+
+  // Foramen caecum
+  const foramenMesh = new THREE.Mesh(
+    new THREE.SphereGeometry(0.04, 10, 10),
+    new THREE.MeshStandardMaterial({ color: 0x4c0519, roughness: 0.8 })
+  );
+  foramenMesh.position.set(0, 0.02, -0.38);
+  tongueGroup.add(foramenMesh);
+
+  // 5. Circumvallate Papillae (Papillae vallatae - 9 buttons along the V)
+  for (let cp = 0; cp < 9; cp++) {
+    const t = cp / 8;
+    const px = (t - 0.5) * 0.65;
+    const pz = -0.38 - Math.abs(px) * 0.8;
+    const papGeo = new THREE.CylinderGeometry(0.032, 0.035, 0.025, 10);
+    const papMat = new THREE.MeshStandardMaterial({ color: 0xf43f5e, roughness: 0.3 });
+    const papMesh = new THREE.Mesh(papGeo, papMat);
+    papMesh.position.set(px, 0.045, pz);
+    tongueGroup.add(papMesh);
+  }
+
+  // 6. Sublingual Frenulum (Frenulum linguae on underside)
+  const frenGeo = new THREE.BoxGeometry(0.03, 0.22, 0.45);
+  const frenMesh = new THREE.Mesh(frenGeo, gingivaMat);
+  frenMesh.position.set(0, -0.22, 0.25);
+  tongueGroup.add(frenMesh);
+
+  group.add(tongueGroup);
+
+  // D. HARD & SOFT PALATE, UVULA, AND TONSILS
+  // 1. Vaulted Palate (Palatum durum & molle)
+  const palateGeo = new THREE.SphereGeometry(0.85, 32, 20, 0, Math.PI, 0, Math.PI * 0.55);
+  palateGeo.scale(0.92, 0.35, 1.05);
   const palateMesh = new THREE.Mesh(palateGeo, palateMat);
   palateMesh.rotation.x = Math.PI;
-  palateMesh.position.set(0, 0.55, 0.1);
+  palateMesh.position.set(0, 0.62, 0.08);
   group.add(palateMesh);
 
-  // Uvula (Tilcha)
-  const uvulaGeo = new THREE.ConeGeometry(0.08, 0.24, 10);
-  const uvulaMesh = new THREE.Mesh(uvulaGeo, GumPinkMaterial);
+  // 2. Transverse Palatine Rugae (Plicae palatinae transversae)
+  for (let r = 0; r < 4; r++) {
+    const rz = 0.45 - r * 0.14;
+    const rCurve = [
+      new THREE.Vector3(-0.35, 0.44 + r * 0.02, rz),
+      new THREE.Vector3(0.0, 0.52 + r * 0.02, rz + 0.05),
+      new THREE.Vector3(0.35, 0.44 + r * 0.02, rz)
+    ];
+    group.add(makeTube(rCurve, 0.024, 12, 6, gingivaMat));
+  }
+
+  // 3. Palatine Uvula (Uvula palatina hanging down from soft palate)
+  const uvulaGeo = new THREE.ConeGeometry(0.075, 0.28, 12);
+  const uvulaMesh = new THREE.Mesh(uvulaGeo, gingivaMat);
   uvulaMesh.rotation.x = Math.PI;
-  uvulaMesh.position.set(0, 0.28, -0.7);
+  uvulaMesh.position.set(0, 0.32, -0.68);
   group.add(uvulaMesh);
+
+  // 4. Palatine Tonsils (Tonsillae palatinae nestled bilaterally)
+  [-1, 1].forEach(side => {
+    const tonsilGeo = new THREE.DodecahedronGeometry(0.14, 1);
+    tonsilGeo.scale(0.7, 1.2, 0.9);
+    const tonsilMat = new THREE.MeshStandardMaterial({
+      color: 0xe11d48,
+      roughness: 0.45,
+      emissive: 0x881337,
+      emissiveIntensity: 0.2
+    });
+    const tonsilMesh = new THREE.Mesh(tonsilGeo, tonsilMat);
+    tonsilMesh.position.set(side * 0.56, 0.05, -0.62);
+    group.add(tonsilMesh);
+
+    // Palatoglossal arch (anterior tonsillar pillar)
+    const pillarCurve = [
+      new THREE.Vector3(side * 0.35, 0.45, -0.55),
+      new THREE.Vector3(side * 0.62, 0.12, -0.58),
+      new THREE.Vector3(side * 0.48, -0.18, -0.42)
+    ];
+    group.add(makeTube(pillarCurve, 0.035, 12, 6, gingivaMat));
+  });
 
   group.scale.set(1.4, 1.4, 1.4);
   return group;

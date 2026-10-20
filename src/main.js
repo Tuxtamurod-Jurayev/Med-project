@@ -35,12 +35,11 @@ const SYSTEM_ORGANS_MAP = {
   digestive: {
     title: 'Ovqat hazm',
     organs: [
-      { id: 'digestive_system', label: 'Hazm trakt (Yaxlit)' },
+      { id: 'oral_cavity', label: 'Og\'iz bo\'shlig\'i: Tishlar va Til' },
       { id: 'stomach', label: 'Oshqozon' },
-      { id: 'liver', label: 'Jigar' },
-      { id: 'gallbladder', label: 'O\'t pufagi va yo\'llari' },
       { id: 'pancreas', label: 'Oshqozon osti bezi' },
-      { id: 'oral_cavity', label: 'Og\'iz bo\'shlig\'i (Tishlar, Til)' }
+      { id: 'liver', label: 'Jigar' },
+      { id: 'gallbladder', label: 'O\'t pufagi va yo\'llari' }
     ]
   },
   musculoskeletal: {
