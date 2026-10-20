@@ -551,34 +551,35 @@ export const ANATOMY_DATA = {
     ]
   },
 
-  // 13. TAYANCH-HARAKAT SISTEMASI / TO'LIQ TIZIM
+  // 13. TAYANCH-HARAKAT SISTEMASI / INSON SKELETI
   musculoskeletal_system: {
     id: "musculoskeletal_system",
-    nameUz: "Tayanch-harakat a'zolari (Suyaklar, Bo'g'imlar, Mushaklar)",
-    nameLat: "Systema musculoskeletale",
-    nameEn: "Musculoskeletal System 3D",
+    nameUz: "Tayanch-harakat a'zolari: Inson skeleti (To'liq karkas)",
+    nameLat: "Systema skeletale humanum",
+    nameEn: "Human Skeleton 3D",
     systemKey: "musculoskeletal",
-    system: "Tayanch-harakat a’zolari: Suyaklar, bo‘g‘imlar va skelet mushaklari",
-    category: "Lokomotor biomekanik tizim",
-    bonesCount: "206 ta suyak & 600+ mushaklar",
-    weight: "~40-50% tana vazni",
-    keywords: ["tayanch-harakat a'zolari", "tayanch harakat", "tayanch", "harakat", "suyaklar", "bogimlar", "bo'g'imlar", "skelet", "mushaklar", "muskullar", "systema musculoskeletale", "skeleton", "muscles"],
-    description: "Inson tayanch-harakat apparatining to'liq 3D modeli: 206 ta suyakdan iborat qattiq Skelet karkasi, erkin harakatlanuvchi Bo'g'imlar (artikulyatsiyalar) va kuch hamda harakat hosil qiluvchi qizil Skelet mushaklari (biceps, triceps, deltasimon, qorin pressi, to'rt boshli son mushaklari).",
+    system: "Tayanch-harakat a’zolari: Suyaklar, bo‘g‘imlar va skelet karkasi",
+    category: "Lokomotor osteologik tizim",
+    bonesCount: "206 ta suyak",
+    weight: "~14-20% tana vazni (suyak massasi)",
+    keywords: ["tayanch-harakat a'zolari", "tayanch harakat", "tayanch", "harakat", "suyaklar", "bogimlar", "bo'g'imlar", "skelet", "skalet", "inson skeleti", "systema skeletale", "skeleton", "bones"],
+    description: "Inson skeletining to'liq haqiqiy 3D anatomik modeli: 206 ta mustahkam suyakdan iborat tabiiy karkas. Kalla suyagi, umurtqa pog'onasi (bo'yin, ko'krak va bel umurtqalari), 12 juft qovurg'a va to'sh suyagi, yelka va qo'l suyaklari (barcha bilakuzuk, kaft va barmoq falangalari bilan), tos suyagi hamda oyoq va tovon suyaklarini to'liq o'z ichiga oladi.",
     parts: [
-      { id: "axial_skeleton", nameUz: "Aksial skelet", nameLat: "Skeleton axiale", desc: "Bosh suyagi, umurtqa pog'onasi, qovurg'alar va to'sh suyagi; hayotiy a'zolar himoya karkasi." },
-      { id: "appendicular_skeleton", nameUz: "Qo'shimcha skelet", nameLat: "Skeleton appendiculare", desc: "Qo'l va oyoq kamarlari hamda erkin suyaklari; fazoda faol siljishni ta'minlaydi." },
-      { id: "synovial_joints", nameUz: "Sinovial bo'g'imlar", nameLat: "Articulationes synoviales", desc: "Yelka, tirsak, chanoq-son va tizza bo'g'imlari; sirpanuvchi tog'ay va bo'g'im suyuqligi bilan qoplangan." },
-      { id: "skeletal_muscles", nameUz: "Skelet mushaklari", nameLat: "Musculi skeleti", desc: "Ko'ndalang-targ'il mushak tolalari; asab impulslari ta'sirida qisqarib suyaklarni harakatga keltiradi." }
+      { id: "axial_skeleton", nameUz: "Aksial skelet", nameLat: "Skeleton axiale", desc: "Kalla suyagi, umurtqa pog'onasi (33-34 ta umurtqa), 12 juft qovurg'a va to'sh suyagi; ichki a'zolarni himoyalovchi karkas." },
+      { id: "appendicular_skeleton", nameUz: "Qo'shimcha skelet", nameLat: "Skeleton appendiculare", desc: "Qo'l va oyoq kamarlari, yelka, bilak, kaft va barmoq suyaklari hamda son, boldir va tovon suyaklari." },
+      { id: "hand_skeleton", nameUz: "Kaft va barmoqlar skeleti", nameLat: "Ossa manus & Digiti", desc: "8 ta bilakuzuk (carpus), 5 ta kaft (metacarpus) va 14 ta barmoq falangalari (proksimal, o'rta, distal)." },
+      { id: "joints_cartilage", nameUz: "Bo'g'imlar va qovurg'a tog'aylari", nameLat: "Juncturae & Cartilagines", desc: "Qovurg'a tog'aylari, umurtqalararo disklar va yirik harakatchan sinovial bo'g'imlar." }
     ],
     functions: [
-      "Gavdaga mustahkam shakl berish va vertikal tayanchni saqlash",
-      "Fazoda turli xil harakatlar (yurish, yugurish, sakrash, mehnat qilish)ni amalga oshirish",
-      "Mineral moddalar (kaltsiy, fosfor) deposi va qon yaratish (qizil ilik)"
+      "Gavdaga mustahkam shakl berish va vertikal tayanchni ta'minlash",
+      "Bosh miya, yurak, o'pka va orqa miyani mexanik shikastlanishlardan ishonchli himoya qilish",
+      "Fazoda erkin harakatlanish imkoniyatini yaratish (bo'g'imlar vositasida)",
+      "Mineral moddalar (kaltsiy, fosfor) deposi va suyak ko'migida qon hujayralarini yaratish (gemopoez)"
     ],
     clinical: [
       "Osteoporoz - suyak to'qimasi zichligining pasayishi va mo'rtlashishi.",
-      "Artroz va Artrit - bo'g'im tog'aylarining yemirilishi va yallig'lanishi.",
-      "Miopatiya va mushaklar distrofiyasi."
+      "Skolioz va lordoz - umurtqa pog'onasining g'ayritabiiy qiyshayishi.",
+      "Artroz va Artrit - bo'g'im tog'aylarining yemirilishi va yallig'lanishi."
     ],
     quiz: [
       {

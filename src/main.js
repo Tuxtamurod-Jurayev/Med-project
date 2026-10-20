@@ -45,10 +45,10 @@ const SYSTEM_ORGANS_MAP = {
   musculoskeletal: {
     title: 'Tayanch-harakat',
     organs: [
-      { id: 'musculoskeletal_system', label: 'Skelet va mushaklar' },
+      { id: 'musculoskeletal_system', label: 'Inson skeleti (To\'liq 3D)' },
       { id: 'skull', label: 'Bosh suyagi' },
       { id: 'spine', label: 'Umurtqa pog\'onasi' },
-      { id: 'hand_fingers', label: 'Barmoqlar va panja tuzilishi' }
+      { id: 'hand_fingers', label: 'Barmoqlar va panja skeleti' }
     ]
   },
   urinary: {

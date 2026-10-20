@@ -72,6 +72,16 @@ export class Real3DSceneManager {
         path: '/models/spine.glb',
         targetScale: 2.5,
         yOffset: -0.1
+      },
+      musculoskeletal_system: {
+        path: '/models/skeleton.glb',
+        targetScale: 2.7,
+        yOffset: 0.0
+      },
+      hand_fingers: {
+        path: '/models/hand.glb',
+        targetScale: 2.5,
+        yOffset: 0.0
       }
     };
 
@@ -167,19 +177,6 @@ export class Real3DSceneManager {
         return;
       } catch (err) {
         console.warn('Realistic nervous system load failed, falling back to procedural:', err);
-      }
-    }
-
-    // SPECIAL: Photorealistic Full-Body Musculoskeletal System (Real Skull GLB + Articulated Spine GLB + Thorax + Limbs + Striated Muscles & Tendons)
-    if (key === 'musculoskeletal_system') {
-      try {
-        const pivotGroup = await this.loadRealisticMusculoskeletalSystem();
-        this.loadedModelsCache[key] = pivotGroup;
-        this.displayModel(pivotGroup, key);
-        this.onProgress(false, 'Tayyor');
-        return;
-      } catch (err) {
-        console.warn('Realistic musculoskeletal system load failed, falling back to procedural:', err);
       }
     }
 
@@ -749,515 +746,6 @@ export class Real3DSceneManager {
   }
 
   /**
-   * Constructs a photorealistic, full-body Musculoskeletal System (Systema musculoskeletale)
-   * combining high-res skull.glb, articulated spine.glb, rib cage, clavicles, sternum,
-   * upper and lower limbs, and striated muscle bellies with glistening white fibrous tendons.
-   */
-  async loadRealisticMusculoskeletalSystem() {
-    this.onProgress(true, "Haqiqiy bosh suyagi 3D modeli yuklanmoqda...");
-
-    const compositeGroup = new THREE.Group();
-    compositeGroup.name = "unified_photorealistic_musculoskeletal_system";
-
-    const makeSeg = (pts, radius = 0.05, segs = 14, rSegs = 8, mat = BoneMaterial) => {
-      const curve = new THREE.CatmullRomCurve3(pts);
-      const geo = new THREE.TubeGeometry(curve, segs, radius, rSegs, false);
-      const mesh = new THREE.Mesh(geo, mat.clone());
-      mesh.castShadow = true;
-      mesh.receiveShadow = true;
-      return mesh;
-    };
-
-    // 1. LOAD REAL CRANIUM (skull.glb)
-    let skullLoaded = false;
-    try {
-      const skullGltf = await this.loadGLTFAsync('/models/skull.glb', (p) => {
-        this.onProgress(true, `Bosh suyagi yuklanmoqda (${Math.round(p * 50)}%)...`);
-      });
-      const skullModel = skullGltf.scene;
-      this.colorizeModelTissues(skullModel, 'skull');
-
-      skullModel.updateMatrixWorld(true);
-      const skBbox = new THREE.Box3().setFromObject(skullModel);
-      const skSize = skBbox.getSize(new THREE.Vector3());
-      const skCenter = skBbox.getCenter(new THREE.Vector3());
-      const skMaxDim = Math.max(skSize.x, skSize.y, skSize.z) || 1.0;
-
-      const skScale = 0.68 / skMaxDim;
-      skullModel.scale.set(skScale, skScale, skScale);
-
-      // Place skull so foramen magnum sits on cervical spine at Y = 1.62
-      const skOffsetY = 1.62 - (skBbox.min.y * skScale);
-      skullModel.position.set(
-        -skCenter.x * skScale,
-        skOffsetY,
-        -skCenter.z * skScale + 0.04
-      );
-      compositeGroup.add(skullModel);
-      skullLoaded = true;
-    } catch (skullErr) {
-      console.warn("Real skull GLB load failed:", skullErr);
-    }
-
-    // 2. LOAD REAL ARTICULATED SPINE & PELVIS (spine.glb)
-    let spineLoaded = false;
-    try {
-      this.onProgress(true, "Umurtqa va tos suyaklari yuklanmoqda...");
-      const spineGltf = await this.loadGLTFAsync('/models/spine.glb', (p) => {
-        this.onProgress(true, `Umurtqa va tos suyaklari yuklanmoqda (${50 + Math.round(p * 50)}%)...`);
-      });
-      const spineModel = spineGltf.scene;
-      this.colorizeModelTissues(spineModel, 'spine');
-
-      spineModel.updateMatrixWorld(true);
-      const sBbox = new THREE.Box3().setFromObject(spineModel);
-      const sSize = sBbox.getSize(new THREE.Vector3());
-      const sCenter = sBbox.getCenter(new THREE.Vector3());
-
-      const sTargetHeight = 1.65;
-      const sScale = sTargetHeight / (sSize.y || 1.0);
-      spineModel.scale.set(sScale, sScale, sScale);
-
-      // Align top of thoracic spine right at Y = 1.25, extending down to pelvis/sacrum at Y = -0.40
-      const sOffsetY = 1.25 - (sBbox.max.y * sScale);
-      spineModel.position.set(
-        -sCenter.x * sScale,
-        sOffsetY,
-        -sCenter.z * sScale - 0.04
-      );
-      compositeGroup.add(spineModel);
-      spineLoaded = true;
-    } catch (spineErr) {
-      console.warn("Real spine GLB load failed:", spineErr);
-    }
-
-    // 3. COMPLETE AXIAL & APPENDICULAR SKELETON (Thorax, Limbs, Joints)
-    // A. Cervical Spine (C1-C7)
-    for (let c = 0; c < 7; c++) {
-      const cy = 1.60 - c * 0.055;
-      const cvGeo = new THREE.CylinderGeometry(0.12, 0.13, 0.038, 16);
-      const cvMesh = new THREE.Mesh(cvGeo, BoneMaterial.clone());
-      cvMesh.position.set(0, cy, -0.04);
-      compositeGroup.add(cvMesh);
-
-      const cdGeo = new THREE.CylinderGeometry(0.125, 0.125, 0.016, 16);
-      const cdMesh = new THREE.Mesh(cdGeo, CartilageMaterial.clone());
-      cdMesh.position.set(0, cy - 0.022, -0.04);
-      compositeGroup.add(cdMesh);
-    }
-
-    // B. Procedural skull fallback if GLB not loaded
-    if (!skullLoaded) {
-      const calvGeo = new THREE.SphereGeometry(0.38, 28, 24);
-      calvGeo.scale(0.88, 1.05, 1.12);
-      const calvMesh = new THREE.Mesh(calvGeo, BoneMaterial.clone());
-      calvMesh.position.set(0, 1.82, 0);
-      compositeGroup.add(calvMesh);
-
-      const faceGeo = new THREE.BoxGeometry(0.36, 0.32, 0.34);
-      const faceMesh = new THREE.Mesh(faceGeo, BoneMaterial.clone());
-      faceMesh.position.set(0, 1.60, 0.16);
-      compositeGroup.add(faceMesh);
-    }
-
-    // C. Sternum, Clavicles, Scapulae & Rib Cage
-    const sternumCurve = [
-      new THREE.Vector3(0, 1.18, 0.32),
-      new THREE.Vector3(0, 0.88, 0.36),
-      new THREE.Vector3(0, 0.55, 0.30),
-      new THREE.Vector3(0, 0.40, 0.24)
-    ];
-    compositeGroup.add(makeSeg(sternumCurve, 0.065, 18, 8, BoneMaterial));
-
-    [-1, 1].forEach(side => {
-      // Clavicle
-      const clavCurve = [
-        new THREE.Vector3(side * 0.08, 1.20, 0.30),
-        new THREE.Vector3(side * 0.38, 1.22, 0.22),
-        new THREE.Vector3(side * 0.68, 1.16, 0.08)
-      ];
-      compositeGroup.add(makeSeg(clavCurve, 0.045, 16, 8, BoneMaterial));
-
-      // Scapula
-      const scapGeo = new THREE.BoxGeometry(0.36, 0.48, 0.04);
-      const scapMesh = new THREE.Mesh(scapGeo, BoneMaterial.clone());
-      scapMesh.position.set(side * 0.46, 0.95, -0.22);
-      scapMesh.rotation.y = -side * 0.25;
-      compositeGroup.add(scapMesh);
-    });
-
-    // Ribs (12 pairs)
-    for (let r = 0; r < 12; r++) {
-      const ry = 1.16 - r * 0.075;
-      const rzVertebra = -0.06 - Math.sin((r / 12) * Math.PI) * 0.05;
-      const rWidth = 0.36 + Math.sin((r / 12) * Math.PI) * 0.32;
-      const antY = 1.14 - r * 0.068;
-
-      [-1, 1].forEach(side => {
-        const ribPts = [
-          new THREE.Vector3(side * 0.08, ry, rzVertebra),
-          new THREE.Vector3(side * (rWidth * 0.7), ry - 0.02, -0.15),
-          new THREE.Vector3(side * rWidth, ry - 0.05, 0.08),
-          new THREE.Vector3(side * (rWidth * 0.6), antY - 0.06, 0.30),
-          new THREE.Vector3(side * 0.12, antY - 0.08, 0.32)
-        ];
-        compositeGroup.add(makeSeg(ribPts, 0.028, 18, 6, BoneMaterial));
-
-        if (r < 7) {
-          const cartPts = [
-            new THREE.Vector3(side * 0.12, antY - 0.08, 0.32),
-            new THREE.Vector3(side * 0.03, antY - 0.07, 0.33)
-          ];
-          compositeGroup.add(makeSeg(cartPts, 0.026, 6, 6, CartilageMaterial));
-        }
-      });
-    }
-
-    // D. Procedural Pelvis & Spine fallback if GLB not loaded
-    if (!spineLoaded) {
-      for (let l = 0; l < 5; l++) {
-        const ly = 0.14 - l * 0.09;
-        const lGeo = new THREE.CylinderGeometry(0.18, 0.19, 0.065, 16);
-        const lMesh = new THREE.Mesh(lGeo, BoneMaterial.clone());
-        lMesh.position.set(0, ly, -0.03 + l * 0.015);
-        compositeGroup.add(lMesh);
-      }
-
-      const sacrumGeo = new THREE.ConeGeometry(0.28, 0.38, 12);
-      sacrumGeo.scale(1.0, 1.0, 0.55);
-      const sacrumMesh = new THREE.Mesh(sacrumGeo, BoneMaterial.clone());
-      sacrumMesh.rotation.x = Math.PI * 0.94;
-      sacrumMesh.position.set(0, -0.42, -0.08);
-      compositeGroup.add(sacrumMesh);
-
-      [-1, 1].forEach(side => {
-        const iliumGeo = new THREE.TorusGeometry(0.38, 0.09, 10, 24, Math.PI * 1.15);
-        const iliumMesh = new THREE.Mesh(iliumGeo, BoneMaterial.clone());
-        iliumMesh.rotation.y = side * 0.42;
-        iliumMesh.rotation.z = side * 0.38;
-        iliumMesh.position.set(side * 0.38, -0.35, -0.04);
-        compositeGroup.add(iliumMesh);
-      });
-    }
-
-    // E. Upper Limbs (Humerus, Radius, Ulna, Hands)
-    [-1, 1].forEach(side => {
-      const humPts = [
-        new THREE.Vector3(side * 0.72, 1.12, 0.05),
-        new THREE.Vector3(side * 0.78, 0.75, 0.04),
-        new THREE.Vector3(side * 0.82, 0.42, 0.02)
-      ];
-      compositeGroup.add(makeSeg(humPts, 0.055, 16, 8, BoneMaterial));
-
-      const elbowGeo = new THREE.SphereGeometry(0.085, 12, 10);
-      const elbowMesh = new THREE.Mesh(elbowGeo, CartilageMaterial.clone());
-      elbowMesh.position.set(side * 0.82, 0.42, 0.02);
-      compositeGroup.add(elbowMesh);
-
-      const radPts = [
-        new THREE.Vector3(side * 0.84, 0.40, 0.02),
-        new THREE.Vector3(side * 0.88, 0.08, 0.05),
-        new THREE.Vector3(side * 0.90, -0.18, 0.08)
-      ];
-      const ulnPts = [
-        new THREE.Vector3(side * 0.80, 0.40, 0.00),
-        new THREE.Vector3(side * 0.82, 0.08, 0.02),
-        new THREE.Vector3(side * 0.84, -0.18, 0.04)
-      ];
-      compositeGroup.add(makeSeg(radPts, 0.038, 14, 8, BoneMaterial));
-      compositeGroup.add(makeSeg(ulnPts, 0.036, 14, 8, BoneMaterial));
-
-      const handPts = [
-        new THREE.Vector3(side * 0.87, -0.20, 0.06),
-        new THREE.Vector3(side * 0.90, -0.38, 0.08),
-        new THREE.Vector3(side * 0.92, -0.52, 0.10)
-      ];
-      compositeGroup.add(makeSeg(handPts, 0.045, 10, 6, BoneMaterial));
-    });
-
-    // F. Lower Limbs (Femur, Patella, Tibia, Fibula, Feet)
-    [-1, 1].forEach(side => {
-      const femPts = [
-        new THREE.Vector3(side * 0.34, -0.55, 0.02),
-        new THREE.Vector3(side * 0.42, -0.62, 0.02),
-        new THREE.Vector3(side * 0.38, -1.05, 0.04),
-        new THREE.Vector3(side * 0.32, -1.48, 0.02)
-      ];
-      compositeGroup.add(makeSeg(femPts, 0.075, 20, 10, BoneMaterial));
-
-      const patGeo = new THREE.SphereGeometry(0.09, 14, 10);
-      patGeo.scale(1.1, 1.2, 0.55);
-      const patMesh = new THREE.Mesh(patGeo, BoneMaterial.clone());
-      patMesh.position.set(side * 0.32, -1.48, 0.12);
-      compositeGroup.add(patMesh);
-
-      const kneeGeo = new THREE.SphereGeometry(0.12, 12, 10);
-      const kneeMesh = new THREE.Mesh(kneeGeo, CartilageMaterial.clone());
-      kneeMesh.position.set(side * 0.32, -1.48, 0.02);
-      compositeGroup.add(kneeMesh);
-
-      const tibPts = [
-        new THREE.Vector3(side * 0.32, -1.52, 0.02),
-        new THREE.Vector3(side * 0.30, -1.95, 0.04),
-        new THREE.Vector3(side * 0.28, -2.35, 0.02)
-      ];
-      compositeGroup.add(makeSeg(tibPts, 0.065, 18, 10, BoneMaterial));
-
-      const fibPts = [
-        new THREE.Vector3(side * 0.42, -1.56, 0.00),
-        new THREE.Vector3(side * 0.40, -1.95, 0.02),
-        new THREE.Vector3(side * 0.36, -2.35, 0.00)
-      ];
-      compositeGroup.add(makeSeg(fibPts, 0.035, 16, 8, BoneMaterial));
-
-      const footPts = [
-        new THREE.Vector3(side * 0.32, -2.38, -0.12),
-        new THREE.Vector3(side * 0.30, -2.42, 0.08),
-        new THREE.Vector3(side * 0.28, -2.46, 0.32)
-      ];
-      compositeGroup.add(makeSeg(footPts, 0.065, 14, 8, BoneMaterial));
-    });
-
-    // 4. STRIATED MUSCULAR SYSTEM (Muscles & Tendons)
-    // A. Neck & Head
-    [-1, 1].forEach(side => {
-      const scmPts = [
-        new THREE.Vector3(side * 0.22, 1.70, -0.06),
-        new THREE.Vector3(side * 0.16, 1.45, 0.12),
-        new THREE.Vector3(side * 0.06, 1.22, 0.28)
-      ];
-      compositeGroup.add(makeSeg(scmPts, 0.052, 14, 8, MuscleMaterial));
-
-      const scmTendon = [
-        new THREE.Vector3(side * 0.06, 1.22, 0.28),
-        new THREE.Vector3(side * 0.04, 1.18, 0.30)
-      ];
-      compositeGroup.add(makeSeg(scmTendon, 0.042, 6, 6, TendonMaterial));
-
-      const massGeo = new THREE.BoxGeometry(0.12, 0.22, 0.08);
-      const massMesh = new THREE.Mesh(massGeo, MuscleMaterial);
-      massMesh.position.set(side * 0.22, 1.55, 0.16);
-      compositeGroup.add(massMesh);
-    });
-
-    // B. Chest & Shoulder
-    [-1, 1].forEach(side => {
-      const pecGeo = new THREE.SphereGeometry(0.42, 24, 20);
-      pecGeo.scale(1.25, 0.82, 0.45);
-      const pecMesh = new THREE.Mesh(pecGeo, MuscleMaterial);
-      pecMesh.position.set(side * 0.36, 0.88, 0.28);
-      pecMesh.rotation.z = side * 0.28;
-      pecMesh.rotation.y = side * 0.15;
-      compositeGroup.add(pecMesh);
-
-      const pecTendon = [
-        new THREE.Vector3(side * 0.58, 0.94, 0.24),
-        new THREE.Vector3(side * 0.72, 1.02, 0.12)
-      ];
-      compositeGroup.add(makeSeg(pecTendon, 0.042, 8, 6, TendonMaterial));
-
-      const deltGeo = new THREE.SphereGeometry(0.38, 24, 20);
-      deltGeo.scale(0.85, 1.35, 1.05);
-      const deltMesh = new THREE.Mesh(deltGeo, MuscleMaterial);
-      deltMesh.position.set(side * 0.76, 1.08, 0.06);
-      deltMesh.rotation.z = -side * 0.22;
-      compositeGroup.add(deltMesh);
-
-      for (let s = 0; s < 4; s++) {
-        const sy = 0.82 - s * 0.10;
-        const serPts = [
-          new THREE.Vector3(side * 0.45, sy, -0.05),
-          new THREE.Vector3(side * 0.52, sy - 0.02, 0.12)
-        ];
-        compositeGroup.add(makeSeg(serPts, 0.038, 8, 6, MuscleMaterial));
-      }
-
-      const trapGeo = new THREE.BoxGeometry(0.42, 0.52, 0.12);
-      const trapMesh = new THREE.Mesh(trapGeo, MuscleMaterial);
-      trapMesh.position.set(side * 0.32, 1.30, -0.18);
-      trapMesh.rotation.y = -side * 0.25;
-      compositeGroup.add(trapMesh);
-    });
-
-    // C. Arm & Forearm
-    [-1, 1].forEach(side => {
-      const bicepCurve = [
-        new THREE.Vector3(side * 0.74, 1.02, 0.10),
-        new THREE.Vector3(side * 0.78, 0.78, 0.15),
-        new THREE.Vector3(side * 0.80, 0.54, 0.10)
-      ];
-      compositeGroup.add(makeSeg(bicepCurve, 0.105, 16, 10, MuscleMaterial));
-
-      const bicepTendon = [
-        new THREE.Vector3(side * 0.80, 0.54, 0.10),
-        new THREE.Vector3(side * 0.82, 0.38, 0.06)
-      ];
-      compositeGroup.add(makeSeg(bicepTendon, 0.038, 8, 6, TendonMaterial));
-
-      const tricepCurve = [
-        new THREE.Vector3(side * 0.70, 1.05, -0.08),
-        new THREE.Vector3(side * 0.76, 0.78, -0.12),
-        new THREE.Vector3(side * 0.80, 0.52, -0.08)
-      ];
-      compositeGroup.add(makeSeg(tricepCurve, 0.115, 16, 10, MuscleMaterial));
-
-      const tricepTendon = [
-        new THREE.Vector3(side * 0.80, 0.52, -0.08),
-        new THREE.Vector3(side * 0.82, 0.40, -0.04)
-      ];
-      compositeGroup.add(makeSeg(tricepTendon, 0.048, 8, 6, TendonMaterial));
-
-      const forearmCurve = [
-        new THREE.Vector3(side * 0.84, 0.38, 0.06),
-        new THREE.Vector3(side * 0.88, 0.10, 0.08),
-        new THREE.Vector3(side * 0.89, -0.14, 0.06)
-      ];
-      compositeGroup.add(makeSeg(forearmCurve, 0.085, 16, 10, MuscleMaterial));
-    });
-
-    // D. Abdominal 6-pack & Obliques
-    for (let pack = 0; pack < 3; pack++) {
-      const py = 0.42 - pack * 0.18;
-      [-1, 1].forEach(side => {
-        const rectGeo = new THREE.BoxGeometry(0.18, 0.14, 0.08);
-        rectGeo.scale(1.0, 1.0, 0.85);
-        const rectMesh = new THREE.Mesh(rectGeo, MuscleMaterial);
-        rectMesh.position.set(side * 0.12, py, 0.32);
-        compositeGroup.add(rectMesh);
-      });
-
-      const bandPts = [
-        new THREE.Vector3(-0.25, py - 0.08, 0.33),
-        new THREE.Vector3(0.0, py - 0.08, 0.34),
-        new THREE.Vector3(0.25, py - 0.08, 0.33)
-      ];
-      compositeGroup.add(makeSeg(bandPts, 0.022, 10, 6, TendonMaterial));
-    }
-
-    const lineaAlbaPts = [
-      new THREE.Vector3(0, 0.52, 0.33),
-      new THREE.Vector3(0, 0.14, 0.34),
-      new THREE.Vector3(0, -0.32, 0.28)
-    ];
-    compositeGroup.add(makeSeg(lineaAlbaPts, 0.024, 16, 6, TendonMaterial));
-
-    [-1, 1].forEach(side => {
-      const obGeo = new THREE.BoxGeometry(0.26, 0.48, 0.14);
-      const obMesh = new THREE.Mesh(obGeo, MuscleMaterial);
-      obMesh.position.set(side * 0.38, 0.18, 0.16);
-      obMesh.rotation.y = side * 0.35;
-      compositeGroup.add(obMesh);
-    });
-
-    // E. Gluteal, Thigh & Calf
-    [-1, 1].forEach(side => {
-      const glutGeo = new THREE.SphereGeometry(0.35, 20, 18);
-      glutGeo.scale(0.95, 1.25, 0.95);
-      const glutMesh = new THREE.Mesh(glutGeo, MuscleMaterial);
-      glutMesh.position.set(side * 0.38, -0.42, -0.18);
-      glutMesh.rotation.z = -side * 0.25;
-      compositeGroup.add(glutMesh);
-
-      const quadCurve = [
-        new THREE.Vector3(side * 0.38, -0.62, 0.14),
-        new THREE.Vector3(side * 0.40, -1.02, 0.20),
-        new THREE.Vector3(side * 0.34, -1.35, 0.14)
-      ];
-      compositeGroup.add(makeSeg(quadCurve, 0.165, 20, 12, MuscleMaterial));
-
-      const vastLat = [
-        new THREE.Vector3(side * 0.52, -0.85, 0.08),
-        new THREE.Vector3(side * 0.48, -1.18, 0.08)
-      ];
-      compositeGroup.add(makeSeg(vastLat, 0.13, 10, 8, MuscleMaterial));
-
-      const quadTendon = [
-        new THREE.Vector3(side * 0.34, -1.35, 0.14),
-        new THREE.Vector3(side * 0.32, -1.45, 0.13)
-      ];
-      compositeGroup.add(makeSeg(quadTendon, 0.075, 8, 8, TendonMaterial));
-
-      const patLig = [
-        new THREE.Vector3(side * 0.32, -1.50, 0.12),
-        new THREE.Vector3(side * 0.31, -1.65, 0.09)
-      ];
-      compositeGroup.add(makeSeg(patLig, 0.055, 8, 8, TendonMaterial));
-
-      const sartPts = [
-        new THREE.Vector3(side * 0.48, -0.42, 0.12),
-        new THREE.Vector3(side * 0.36, -0.95, 0.16),
-        new THREE.Vector3(side * 0.24, -1.48, 0.06)
-      ];
-      compositeGroup.add(makeSeg(sartPts, 0.045, 16, 6, MuscleMaterial));
-
-      const hamCurve = [
-        new THREE.Vector3(side * 0.34, -0.65, -0.14),
-        new THREE.Vector3(side * 0.38, -1.05, -0.16),
-        new THREE.Vector3(side * 0.32, -1.42, -0.10)
-      ];
-      compositeGroup.add(makeSeg(hamCurve, 0.14, 18, 10, MuscleMaterial));
-
-      const tibCurve = [
-        new THREE.Vector3(side * 0.34, -1.60, 0.10),
-        new THREE.Vector3(side * 0.32, -1.95, 0.10),
-        new THREE.Vector3(side * 0.29, -2.25, 0.08)
-      ];
-      compositeGroup.add(makeSeg(tibCurve, 0.072, 16, 8, MuscleMaterial));
-
-      const tibTendon = [
-        new THREE.Vector3(side * 0.29, -2.25, 0.08),
-        new THREE.Vector3(side * 0.26, -2.40, 0.18)
-      ];
-      compositeGroup.add(makeSeg(tibTendon, 0.035, 8, 6, TendonMaterial));
-
-      [-1, 1].forEach(gHead => {
-        const calfPts = [
-          new THREE.Vector3(side * 0.32 + gHead * 0.07, -1.55, -0.06),
-          new THREE.Vector3(side * 0.33 + gHead * 0.08, -1.82, -0.12),
-          new THREE.Vector3(side * 0.31 + gHead * 0.04, -2.05, -0.08)
-        ];
-        compositeGroup.add(makeSeg(calfPts, 0.082, 14, 8, MuscleMaterial));
-      });
-
-      const soleusPts = [
-        new THREE.Vector3(side * 0.32, -1.75, -0.06),
-        new THREE.Vector3(side * 0.31, -2.05, -0.06)
-      ];
-      compositeGroup.add(makeSeg(soleusPts, 0.088, 10, 8, MuscleMaterial));
-
-      const achillesPts = [
-        new THREE.Vector3(side * 0.31, -2.05, -0.08),
-        new THREE.Vector3(side * 0.31, -2.22, -0.09),
-        new THREE.Vector3(side * 0.32, -2.38, -0.12)
-      ];
-      compositeGroup.add(makeSeg(achillesPts, 0.052, 12, 8, TendonMaterial));
-    });
-
-    // 5. NORMALIZE & CENTER UNIFIED FULL-BODY MUSCULOSKELETAL SYSTEM
-    compositeGroup.updateMatrixWorld(true);
-    const fullBbox = new THREE.Box3().setFromObject(compositeGroup);
-    const fullSize = fullBbox.getSize(new THREE.Vector3());
-    const fullCenter = fullBbox.getCenter(new THREE.Vector3());
-
-    const maxDim = Math.max(fullSize.x, fullSize.y, fullSize.z) || 1.0;
-    const targetScale = 2.5;
-    const scale = targetScale / maxDim;
-    compositeGroup.scale.set(scale, scale, scale);
-
-    compositeGroup.position.set(
-      -fullCenter.x * scale,
-      -fullCenter.y * scale,
-      -fullCenter.z * scale
-    );
-
-    const pivotGroup = new THREE.Group();
-    pivotGroup.name = "musculoskeletal_system_pivot";
-    pivotGroup.add(compositeGroup);
-
-    return pivotGroup;
-  }
-
-  /**
    * Anatomically accurate shading & tissue coloring without stripping textures
    */
   colorizeModelTissues(group, key) {
@@ -1320,18 +808,51 @@ export class Real3DSceneManager {
           child.receiveShadow = true;
         }
       });
-    } else if (key === 'skull') {
-      // Natural warm ivory bone osteo-material
+    } else if (key === 'skull' || key === 'skeleton' || key === 'musculoskeletal_system' || key === 'hand_fingers') {
+      // Natural warm ivory bone osteo-material & anatomical cartilage/enamel shaders
       group.traverse((child) => {
         if (child.isMesh && child.material) {
-          child.material = new THREE.MeshStandardMaterial({
-            color: 0xf5eedb,
-            roughness: 0.45,
-            metalness: 0.05,
-            side: THREE.DoubleSide
-          });
+          const matName = (child.material.name || '').toLowerCase();
+          const nodeName = (child.name || '').toLowerCase();
+
           child.castShadow = true;
           child.receiveShadow = true;
+
+          if (matName.includes('cartilage') || nodeName.includes('cartilage')) {
+            // Costal & Articular Cartilage: translucent pearl bluish-cyan
+            child.material = new THREE.MeshStandardMaterial({
+              color: 0x93c5fd,
+              roughness: 0.28,
+              metalness: 0.05,
+              transparent: true,
+              opacity: 0.9,
+              side: THREE.DoubleSide
+            });
+          } else if (matName.includes('teeth') || matName.includes('dentine') || nodeName.includes('tooth') || nodeName.includes('teeth')) {
+            // Tooth enamel: pearl ivory with high specularity
+            child.material = new THREE.MeshStandardMaterial({
+              color: 0xfffff2,
+              roughness: 0.16,
+              metalness: 0.02,
+              side: THREE.DoubleSide
+            });
+          } else if (matName.includes('suture') || nodeName.includes('suture')) {
+            // Cranial sutures: fibrous junction lines
+            child.material = new THREE.MeshStandardMaterial({
+              color: 0xd6cdbe,
+              roughness: 0.55,
+              metalness: 0.02,
+              side: THREE.DoubleSide
+            });
+          } else {
+            // Authentic medical warm ivory cortical bone
+            child.material = new THREE.MeshStandardMaterial({
+              color: 0xf5eedb,
+              roughness: 0.44,
+              metalness: 0.05,
+              side: THREE.DoubleSide
+            });
+          }
         }
       });
     } else if (key === 'eye') {
