@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
+import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
 import { PROCEDURAL_MODEL_BUILDERS, BoneMaterial, CartilageMaterial, NerveMaterial, MuscleMaterial, TendonMaterial } from './anatomyModels.js';
 
 export class Real3DSceneManager {
@@ -25,6 +26,7 @@ export class Real3DSceneManager {
     this.dracoLoader.setDecoderPath('/draco/gltf/');
     this.loader = new GLTFLoader();
     this.loader.setDRACOLoader(this.dracoLoader);
+    this.loader.setMeshoptDecoder(MeshoptDecoder);
 
     // Model configuration map for GLB paths & scales
     this.modelConfigs = {
@@ -92,6 +94,31 @@ export class Real3DSceneManager {
         path: '/models/oral_cavity.glb',
         targetScale: 2.3,
         yOffset: 0.0
+      },
+      gallbladder: {
+        path: '/models/gallbladder.glb',
+        targetScale: 2.5,
+        yOffset: 0.0
+      },
+      urinary_system: {
+        path: '/models/urinary_system.glb',
+        targetScale: 2.6,
+        yOffset: -0.05
+      },
+      endocrine_system: {
+        path: '/models/endocrine_system.glb',
+        targetScale: 2.6,
+        yOffset: -0.05
+      },
+      circulatory_system: {
+        path: '/models/circulatory_system.glb',
+        targetScale: 2.7,
+        yOffset: -0.05
+      },
+      nervous_system: {
+        path: '/models/nervous_system.glb',
+        targetScale: 2.7,
+        yOffset: -0.05
       }
     };
 
@@ -177,19 +204,6 @@ export class Real3DSceneManager {
 
     this.onProgress(true, `3D model yuklanmoqda...`);
 
-    // SPECIAL: Photorealistic Unified Nervous System (Real Brain GLB + Articulated Spine GLB + Medulla Spinalis + PNS)
-    if (key === 'nervous_system') {
-      try {
-        const pivotGroup = await this.loadRealisticNervousSystem();
-        this.loadedModelsCache[key] = pivotGroup;
-        this.displayModel(pivotGroup, key);
-        this.onProgress(false, 'Tayyor');
-        return;
-      } catch (err) {
-        console.warn('Realistic nervous system load failed, falling back to procedural:', err);
-      }
-    }
-
     // 1. Try GLB if configured
     if (this.modelConfigs[key]) {
       try {
@@ -240,6 +254,18 @@ export class Real3DSceneManager {
     });
 
     const modelRoot = gltf.scene;
+
+    // Remove any 3D floating label/pin groups (e.g. from Sketchfab models)
+    const labelsToRemove = [];
+    modelRoot.traverse((child) => {
+      const name = (child.name || '').toLowerCase();
+      if (name.includes('labelgroup') || name.startsWith('label') || name.includes('label_') || name.includes(':label')) {
+        labelsToRemove.push(child);
+      }
+    });
+    labelsToRemove.forEach((c) => {
+      if (c.parent) c.parent.remove(c);
+    });
 
     // Apply specialized Medical PBR Colorizing & Texture Preservations
     this.colorizeModelTissues(modelRoot, key);
@@ -322,437 +348,6 @@ export class Real3DSceneManager {
         (err) => reject(err)
       );
     });
-  }
-
-  /**
-   * Constructs a photorealistic, unified Nervous System 3D model
-   * combining high-res brain.glb, spine.glb, continuous spinal cord (Medulla spinalis),
-   * cauda equina, cervical/brachial/lumbosacral plexuses, and sciatic nerves.
-   */
-  async loadRealisticNervousSystem() {
-    this.onProgress(true, "Haqiqiy bosh miya 3D modeli yuklanmoqda...");
-
-    const compositeGroup = new THREE.Group();
-    compositeGroup.name = "unified_photorealistic_nervous_system";
-
-    // Reusable tube builder
-    const makeTube = (points, radius = 0.025, segments = 16, radSegs = 8, mat = NerveMaterial) => {
-      const curve = new THREE.CatmullRomCurve3(points);
-      const geo = new THREE.TubeGeometry(curve, segments, radius, radSegs, false);
-      const mesh = new THREE.Mesh(geo, mat.clone());
-      mesh.castShadow = true;
-      mesh.receiveShadow = true;
-      return mesh;
-    };
-
-    // 1. LOAD REAL HUMAN BRAIN (brain.glb - 250 high-res meshes of gyri, sulci, lobes, cerebellum, brainstem)
-    try {
-      const brainGltf = await this.loadGLTFAsync('/models/brain.glb', (p) => {
-        this.onProgress(true, `Bosh miya yuklanmoqda (${Math.round(p * 50)}%)...`);
-      });
-      const brainModel = brainGltf.scene;
-      this.colorizeModelTissues(brainModel, 'brain');
-
-      brainModel.updateMatrixWorld(true);
-      const bBbox = new THREE.Box3().setFromObject(brainModel);
-      const bSize = bBbox.getSize(new THREE.Vector3());
-      const bCenter = bBbox.getCenter(new THREE.Vector3());
-      const bMaxDim = Math.max(bSize.x, bSize.y, bSize.z) || 1.0;
-
-      // Scale brain to anatomical proportions
-      const bScale = 0.78 / bMaxDim;
-      brainModel.scale.set(bScale, bScale, bScale);
-
-      // Place brain so its brainstem (medulla) rests directly at Y = 0.68
-      const bOffsetY = 0.68 - (bBbox.min.y * bScale);
-      brainModel.position.set(
-        -bCenter.x * bScale,
-        bOffsetY,
-        -bCenter.z * bScale - 0.02
-      );
-      compositeGroup.add(brainModel);
-    } catch (brainErr) {
-      console.warn("Real brain GLB load failed:", brainErr);
-    }
-
-    // 2. LOAD REAL ARTICULATED SPINE (spine.glb with vertebrae, sacrum & pelvis)
-    let spineLoaded = false;
-    try {
-      this.onProgress(true, "Umurtqa pog'onasi 3D modeli yuklanmoqda...");
-      const spineGltf = await this.loadGLTFAsync('/models/spine.glb', (p) => {
-        this.onProgress(true, `Umurtqa pog'onasi yuklanmoqda (${50 + Math.round(p * 50)}%)...`);
-      });
-      const spineModel = spineGltf.scene;
-      this.colorizeModelTissues(spineModel, 'spine');
-
-      spineModel.updateMatrixWorld(true);
-      const sBbox = new THREE.Box3().setFromObject(spineModel);
-      const sSize = sBbox.getSize(new THREE.Vector3());
-      const sCenter = sBbox.getCenter(new THREE.Vector3());
-
-      const sTargetHeight = 1.32;
-      const sScale = sTargetHeight / (sSize.y || 1.0);
-      spineModel.scale.set(sScale, sScale, sScale);
-
-      // Align top of thoracic spine right at Y = 0.45, extending down to sacrum/pelvis at Y = -0.85
-      const sOffsetY = 0.45 - (sBbox.max.y * sScale);
-      spineModel.position.set(
-        -sCenter.x * sScale,
-        sOffsetY,
-        -sCenter.z * sScale - 0.04
-      );
-      compositeGroup.add(spineModel);
-      spineLoaded = true;
-    } catch (spineErr) {
-      console.warn("Real spine GLB load failed, building articulated anatomical spine fallback:", spineErr);
-    }
-
-    // 3. ARTICULATED CERVICAL SPINE (C1-C7)
-    // Connects base of skull/brainstem (Y = 0.68) smoothly to T1 (Y = 0.45)
-    const cervicalGroup = new THREE.Group();
-    cervicalGroup.name = "cervical_spine_C1_C7";
-    const cCount = 7;
-    const cStartY = 0.66;
-    const cEndY = 0.46;
-    const cStep = (cStartY - cEndY) / cCount;
-
-    for (let i = 0; i < cCount; i++) {
-      const cy = cStartY - i * cStep;
-      const cVert = new THREE.Group();
-      cVert.position.set(0, cy, -0.045 + Math.sin((i / cCount) * Math.PI) * 0.015);
-
-      // Vertebral Body (Corpus vertebrae)
-      const r = i === 0 ? 0.16 : (0.13 + i * 0.008); // C1 (Atlas) is wider to support skull condyles
-      const h = cStep * 0.65;
-      const bodyGeo = new THREE.CylinderGeometry(r, r * 1.05, h, 18);
-      const bodyMesh = new THREE.Mesh(bodyGeo, BoneMaterial.clone());
-      cVert.add(bodyMesh);
-
-      // Spinous Process (Processus spinosus)
-      const spGeo = new THREE.ConeGeometry(0.045, 0.16 + (i === 6 ? 0.08 : 0), 6);
-      const spMesh = new THREE.Mesh(spGeo, BoneMaterial.clone());
-      spMesh.rotation.x = -Math.PI / 2.3;
-      spMesh.position.set(0, -0.01, -r - 0.05);
-      cVert.add(spMesh);
-
-      // Transverse Processes (Processus transversi) with foramina
-      [-1, 1].forEach(side => {
-        const tpGeo = new THREE.BoxGeometry(0.12, h * 0.6, 0.06);
-        const tpMesh = new THREE.Mesh(tpGeo, BoneMaterial.clone());
-        tpMesh.position.set(side * (r + 0.06), 0, 0);
-        cVert.add(tpMesh);
-      });
-
-      // Intervertebral Disc (Discus intervertebralis)
-      if (i > 0) {
-        const discGeo = new THREE.CylinderGeometry(r * 1.02, r * 1.02, cStep * 0.32, 18);
-        const discMesh = new THREE.Mesh(discGeo, CartilageMaterial.clone());
-        discMesh.position.set(0, h * 0.55, 0);
-        cVert.add(discMesh);
-      }
-
-      cervicalGroup.add(cVert);
-    }
-    compositeGroup.add(cervicalGroup);
-
-    // If spine.glb wasn't loaded, create articulated Thoracic, Lumbar and Pelvic spine fallback
-    if (!spineLoaded) {
-      const backupSpineGroup = new THREE.Group();
-      backupSpineGroup.name = "backup_thoracolumbar_spine";
-      const spineLevels = [
-        { count: 12, startY: 0.44, endY: -0.10, baseR: 0.18, name: 'Thoracic' },
-        { count: 5,  startY: -0.11, endY: -0.42, baseR: 0.24, name: 'Lumbar' }
-      ];
-      spineLevels.forEach(lvl => {
-        const step = (lvl.startY - lvl.endY) / lvl.count;
-        for (let j = 0; j < lvl.count; j++) {
-          const y = lvl.startY - j * step;
-          const v = new THREE.Group();
-          const zCurve = lvl.name === 'Thoracic'
-            ? -0.06 - Math.sin((j / 12) * Math.PI) * 0.04
-            : -0.05 + Math.sin((j / 5) * Math.PI) * 0.03;
-          v.position.set(0, y, zCurve);
-
-          const r = lvl.baseR * (1 + j * 0.02);
-          const h = step * 0.68;
-          const bGeo = new THREE.CylinderGeometry(r, r * 1.05, h, 18);
-          v.add(new THREE.Mesh(bGeo, BoneMaterial.clone()));
-
-          const spGeo = new THREE.ConeGeometry(0.06, 0.22, 6);
-          const spMesh = new THREE.Mesh(spGeo, BoneMaterial.clone());
-          spMesh.rotation.x = -Math.PI / 2.3;
-          spMesh.position.set(0, -0.02, -r - 0.07);
-          v.add(spMesh);
-
-          const dGeo = new THREE.CylinderGeometry(r * 1.02, r * 1.02, step * 0.3, 18);
-          const dMesh = new THREE.Mesh(dGeo, CartilageMaterial.clone());
-          dMesh.position.set(0, h * 0.55, 0);
-          v.add(dMesh);
-
-          backupSpineGroup.add(v);
-        }
-      });
-
-      // Sacrum & Coccyx
-      const sacGeo = new THREE.ConeGeometry(0.32, 0.38, 12);
-      sacGeo.scale(1.0, 1.0, 0.45);
-      const sacMesh = new THREE.Mesh(sacGeo, BoneMaterial.clone());
-      sacMesh.rotation.x = Math.PI * 0.95;
-      sacMesh.position.set(0, -0.60, -0.08);
-      backupSpineGroup.add(sacMesh);
-
-      // Pelvic Hip Bones (Ossa coxae)
-      [-1, 1].forEach(side => {
-        const iliumGeo = new THREE.TorusGeometry(0.28, 0.07, 8, 20, Math.PI * 1.1);
-        const iliumMesh = new THREE.Mesh(iliumGeo, BoneMaterial.clone());
-        iliumMesh.rotation.y = side * 0.35;
-        iliumMesh.rotation.z = side * 0.4;
-        iliumMesh.position.set(side * 0.36, -0.52, -0.05);
-        backupSpineGroup.add(iliumMesh);
-      });
-
-      compositeGroup.add(backupSpineGroup);
-    }
-
-    // 4. CONTINUOUS SPINAL CORD (Medulla spinalis)
-    // From brainstem (Medulla oblongata) to Conus medullaris at L1-L2
-    const cordMaterial = new THREE.MeshStandardMaterial({
-      color: 0xfef9c3,
-      roughness: 0.3,
-      metalness: 0.08,
-      emissive: 0xca8a04,
-      emissiveIntensity: 0.18
-    });
-
-    const spinalCordPoints = [
-      new THREE.Vector3(0, 0.69, -0.055),   // Brainstem junction
-      new THREE.Vector3(0, 0.58, -0.040),   // Cervical enlargement (C5-C6)
-      new THREE.Vector3(0, 0.45, -0.035),   // C7-T1
-      new THREE.Vector3(0, 0.30, -0.055),   // T3 - thoracic kyphosis
-      new THREE.Vector3(0, 0.12, -0.075),   // T7
-      new THREE.Vector3(0, -0.06, -0.055),  // T11
-      new THREE.Vector3(0, -0.18, -0.030),  // L1 - Lumbar enlargement
-      new THREE.Vector3(0, -0.27, -0.015)   // Conus medullaris
-    ];
-    const spinalCordMesh = makeTube(spinalCordPoints, 0.038, 36, 12, cordMaterial);
-    compositeGroup.add(spinalCordMesh);
-
-    // 5. CAUDA EQUINA ("Ot dumi" - Horse's tail)
-    // Bundles of spinal nerve roots descending from conus medullaris through lumbar & sacral canal
-    const caudaGroup = new THREE.Group();
-    caudaGroup.name = "cauda_equina";
-    const caudaCount = 20;
-    for (let c = 0; c < caudaCount; c++) {
-      const angle = (c / caudaCount) * Math.PI * 2;
-      const spreadR = 0.015 + ((c * 17) % 25) * 0.001;
-      const endX = Math.cos(angle) * spreadR * 2.2;
-      const endZ = -0.03 + Math.sin(angle) * spreadR * 1.5;
-      const endY = -0.45 - (c / caudaCount) * 0.32;
-
-      const filamentPts = [
-        new THREE.Vector3(Math.cos(angle) * 0.012, -0.26, -0.015),
-        new THREE.Vector3(endX * 0.6, -0.38, endZ * 0.8),
-        new THREE.Vector3(endX, endY, endZ)
-      ];
-      caudaGroup.add(makeTube(filamentPts, 0.007, 10, 6, NerveMaterial));
-    }
-    // Filum terminale in the median line
-    caudaGroup.add(makeTube([
-      new THREE.Vector3(0, -0.26, -0.015),
-      new THREE.Vector3(0, -0.55, -0.04),
-      new THREE.Vector3(0, -0.74, -0.06)
-    ], 0.006, 12, 6, cordMaterial));
-    compositeGroup.add(caudaGroup);
-
-    // 6. PERIPHERAL NERVOUS SYSTEM (Systema nervosum periphericum)
-    const pnsGroup = new THREE.Group();
-    pnsGroup.name = "peripheral_nerves_network";
-
-    // A. CRANIAL NERVES (Nervi craniales)
-    // Optic Nerves (CN II) exiting forward toward orbits
-    [-1, 1].forEach(side => {
-      const optPts = [
-        new THREE.Vector3(side * 0.02, 0.74, 0.06),
-        new THREE.Vector3(side * 0.09, 0.76, 0.18),
-        new THREE.Vector3(side * 0.18, 0.78, 0.28)
-      ];
-      pnsGroup.add(makeTube(optPts, 0.018, 12, 8, NerveMaterial));
-    });
-
-    // Trigeminal Nerves (CN V) fanning to temples & face
-    [-1, 1].forEach(side => {
-      const trigPts = [
-        new THREE.Vector3(side * 0.06, 0.71, 0.01),
-        new THREE.Vector3(side * 0.16, 0.70, 0.12),
-        new THREE.Vector3(side * 0.28, 0.68, 0.20)
-      ];
-      pnsGroup.add(makeTube(trigPts, 0.016, 12, 8, NerveMaterial));
-    });
-
-    // Vagus Nerves (CN X) descending along neck
-    [-1, 1].forEach(side => {
-      const vagPts = [
-        new THREE.Vector3(side * 0.05, 0.67, -0.02),
-        new THREE.Vector3(side * 0.09, 0.55, 0.01),
-        new THREE.Vector3(side * 0.12, 0.42, 0.02),
-        new THREE.Vector3(side * 0.14, 0.25, 0.00)
-      ];
-      pnsGroup.add(makeTube(vagPts, 0.014, 14, 8, NerveMaterial));
-    });
-
-    // B. BRACHIAL PLEXUS (Plexus brachialis C5-T1)
-    // Major bilateral nerve networks radiating into the shoulders and arms
-    [-1, 1].forEach(side => {
-      const cLevels = [0.56, 0.52, 0.48, 0.44];
-      cLevels.forEach((cy, idx) => {
-        // Root exiting intervertebral foramen
-        const rootPts = [
-          new THREE.Vector3(side * 0.04, cy, -0.04),
-          new THREE.Vector3(side * 0.14, cy - 0.02, -0.01),
-          new THREE.Vector3(side * 0.26, 0.45 - idx * 0.02, 0.04)
-        ];
-        pnsGroup.add(makeTube(rootPts, 0.015, 10, 8, NerveMaterial));
-      });
-
-      // 1. Radial Nerve (Nervus radialis - posterior)
-      const radPts = [
-        new THREE.Vector3(side * 0.26, 0.42, 0.04),
-        new THREE.Vector3(side * 0.42, 0.35, -0.02),
-        new THREE.Vector3(side * 0.58, 0.24, -0.04),
-        new THREE.Vector3(side * 0.74, 0.12, -0.02)
-      ];
-      pnsGroup.add(makeTube(radPts, 0.016, 14, 8, NerveMaterial));
-
-      // 2. Median Nerve (Nervus medianus - anterior)
-      const medPts = [
-        new THREE.Vector3(side * 0.26, 0.42, 0.04),
-        new THREE.Vector3(side * 0.40, 0.32, 0.06),
-        new THREE.Vector3(side * 0.56, 0.22, 0.08),
-        new THREE.Vector3(side * 0.72, 0.10, 0.09)
-      ];
-      pnsGroup.add(makeTube(medPts, 0.016, 14, 8, NerveMaterial));
-
-      // 3. Ulnar Nerve (Nervus ulnaris - medial)
-      const ulnPts = [
-        new THREE.Vector3(side * 0.26, 0.40, 0.02),
-        new THREE.Vector3(side * 0.38, 0.28, 0.02),
-        new THREE.Vector3(side * 0.52, 0.16, 0.01),
-        new THREE.Vector3(side * 0.68, 0.05, 0.02)
-      ];
-      pnsGroup.add(makeTube(ulnPts, 0.014, 14, 8, NerveMaterial));
-    });
-
-    // C. INTERCOSTAL NERVES (Nervi intercostales 12 pairs T1-T12)
-    const tCount = 12;
-    const tStartY = 0.42;
-    const tEndY = -0.08;
-    const tStep = (tStartY - tEndY) / tCount;
-
-    for (let i = 0; i < tCount; i++) {
-      const ty = tStartY - i * tStep;
-      const tz = -0.055 - Math.sin((i / tCount) * Math.PI) * 0.035;
-      const ribW = 0.24 + Math.sin((i / tCount) * Math.PI) * 0.28;
-
-      [-1, 1].forEach(side => {
-        const interPts = [
-          new THREE.Vector3(side * 0.04, ty, tz),
-          new THREE.Vector3(side * (ribW * 0.5), ty - 0.015, tz + 0.08),
-          new THREE.Vector3(side * ribW, ty - 0.03, tz + 0.18),
-          new THREE.Vector3(side * (ribW * 0.8), ty - 0.045, tz + 0.26)
-        ];
-        pnsGroup.add(makeTube(interPts, 0.009, 12, 6, NerveMaterial));
-
-        // Sympathetic trunk ganglion at this level
-        const gGeo = new THREE.SphereGeometry(0.014, 8, 8);
-        const gMat = new THREE.MeshStandardMaterial({
-          color: 0xf59e0b,
-          roughness: 0.3,
-          emissive: 0xd97706,
-          emissiveIntensity: 0.4
-        });
-        const gMesh = new THREE.Mesh(gGeo, gMat);
-        gMesh.position.set(side * 0.065, ty, tz + 0.02);
-        pnsGroup.add(gMesh);
-      });
-    }
-
-    // D. LUMBAR PLEXUS & FEMORAL NERVES (Plexus lumbalis & Nervus femoralis L1-L4)
-    [-1, 1].forEach(side => {
-      const femPts = [
-        new THREE.Vector3(side * 0.05, -0.15, -0.02),
-        new THREE.Vector3(side * 0.16, -0.28, 0.03),
-        new THREE.Vector3(side * 0.28, -0.48, 0.12),
-        new THREE.Vector3(side * 0.32, -0.72, 0.14),
-        new THREE.Vector3(side * 0.34, -0.98, 0.11)
-      ];
-      pnsGroup.add(makeTube(femPts, 0.018, 16, 8, NerveMaterial));
-    });
-
-    // E. SCIATIC NERVE (Nervus ischiadicus L4-S3) - Thickest nerve in the human body!
-    [-1, 1].forEach(side => {
-      // Main sciatic nerve trunk
-      const sciPts = [
-        new THREE.Vector3(side * 0.04, -0.24, -0.02),
-        new THREE.Vector3(side * 0.18, -0.38, -0.08),
-        new THREE.Vector3(side * 0.28, -0.56, -0.14), // Exits greater sciatic notch behind pelvis
-        new THREE.Vector3(side * 0.30, -0.82, -0.13), // Deep in gluteal & posterior thigh
-        new THREE.Vector3(side * 0.31, -1.05, -0.11)  // Popliteal fossa
-      ];
-      pnsGroup.add(makeTube(sciPts, 0.026, 18, 10, NerveMaterial));
-
-      // Bifurcation into Tibial Nerve (Nervus tibialis)
-      const tibPts = [
-        new THREE.Vector3(side * 0.31, -1.05, -0.11),
-        new THREE.Vector3(side * 0.30, -1.22, -0.09),
-        new THREE.Vector3(side * 0.29, -1.40, -0.07)
-      ];
-      pnsGroup.add(makeTube(tibPts, 0.016, 12, 8, NerveMaterial));
-
-      // Bifurcation into Common Fibular / Peroneal Nerve (Nervus fibularis communis)
-      const fibPts = [
-        new THREE.Vector3(side * 0.31, -1.05, -0.11),
-        new THREE.Vector3(side * 0.38, -1.22, -0.06),
-        new THREE.Vector3(side * 0.42, -1.40, -0.03)
-      ];
-      pnsGroup.add(makeTube(fibPts, 0.014, 12, 8, NerveMaterial));
-    });
-
-    // Sympathetic Trunks (Truncus sympathicus) - longitudinal cords connecting ganglia
-    [-1, 1].forEach(side => {
-      const symPts = [
-        new THREE.Vector3(side * 0.065, 0.58, -0.02),
-        new THREE.Vector3(side * 0.065, 0.35, -0.04),
-        new THREE.Vector3(side * 0.065, 0.05, -0.06),
-        new THREE.Vector3(side * 0.065, -0.22, -0.03),
-        new THREE.Vector3(side * 0.05,  -0.55, -0.05)
-      ];
-      pnsGroup.add(makeTube(symPts, 0.007, 16, 6, NerveMaterial));
-    });
-
-    compositeGroup.add(pnsGroup);
-
-    // 7. NORMALIZE & CENTER UNIFIED NERVOUS SYSTEM
-    compositeGroup.updateMatrixWorld(true);
-    const fullBbox = new THREE.Box3().setFromObject(compositeGroup);
-    const fullSize = fullBbox.getSize(new THREE.Vector3());
-    const fullCenter = fullBbox.getCenter(new THREE.Vector3());
-
-    const maxDim = Math.max(fullSize.x, fullSize.y, fullSize.z) || 1.0;
-    const targetScale = 2.45;
-    const scale = targetScale / maxDim;
-    compositeGroup.scale.set(scale, scale, scale);
-
-    compositeGroup.position.set(
-      -fullCenter.x * scale,
-      -fullCenter.y * scale,
-      -fullCenter.z * scale
-    );
-
-    const pivotGroup = new THREE.Group();
-    pivotGroup.name = "nervous_system_pivot";
-    pivotGroup.add(compositeGroup);
-
-    return pivotGroup;
   }
 
   /**
@@ -966,35 +561,35 @@ export class Real3DSceneManager {
       // Cardiology: Aorta arterial red, Pulmonary trunk cyan-blue, Myocardium rich crimson, Valves pearl white
       group.traverse((child) => {
         if (child.isMesh && child.material) {
-          const matName = child.material.name || '';
-          const nodeName = child.name.toLowerCase();
+          const matName = (child.material.name || '').toLowerCase();
+          const nodeName = (child.name || '').toLowerCase();
 
-          if (matName === 'Artery' || nodeName.includes('aorta') || nodeName.includes('artery')) {
+          if (matName.includes('artery') || nodeName.includes('aorta') || nodeName.includes('artery') || nodeName.includes('coronary')) {
             child.material = new THREE.MeshStandardMaterial({
-              color: 0xdc2626, // Arterial red
+              color: 0xdc2626, // Arterial scarlet red
               roughness: 0.28,
-              metalness: 0.1,
-              side: THREE.DoubleSide
-            });
-          } else if (matName === 'Pulmonary artery' || nodeName.includes('pulmonary')) {
-            child.material = new THREE.MeshStandardMaterial({
-              color: 0x0284c7, // Cyan-blue
-              roughness: 0.3,
-              metalness: 0.1,
-              side: THREE.DoubleSide
-            });
-          } else if (matName === 'Trapezius.001' || nodeName.includes('ventricle') || nodeName.includes('atrium')) {
-            child.material = new THREE.MeshStandardMaterial({
-              color: 0x991b1b, // Rich Myocardium crimson
-              roughness: 0.35,
               metalness: 0.08,
               side: THREE.DoubleSide
             });
-          } else if (matName === 'Ligament.002' || matName === 'Cartilage.002' || nodeName.includes('valve') || nodeName.includes('leaflet')) {
+          } else if (matName.includes('pulmonary') || nodeName.includes('pulmonary')) {
+            child.material = new THREE.MeshStandardMaterial({
+              color: 0x0284c7, // Pulmonary cyan-blue
+              roughness: 0.3,
+              metalness: 0.08,
+              side: THREE.DoubleSide
+            });
+          } else if (matName.includes('trapezius') || nodeName.includes('ventricle') || nodeName.includes('atrium') || nodeName.includes('sulcus') || nodeName.includes('surface') || nodeName.includes('apex') || nodeName.includes('border') || nodeName.includes('base')) {
+            child.material = new THREE.MeshStandardMaterial({
+              color: 0x991b1b, // Rich Myocardium crimson
+              roughness: 0.35,
+              metalness: 0.06,
+              side: THREE.DoubleSide
+            });
+          } else if (matName.includes('ligament') || matName.includes('cartilage') || nodeName.includes('valve') || nodeName.includes('leaflet')) {
             child.material = new THREE.MeshStandardMaterial({
               color: 0xf8fafc, // Pearl white valve leaflets
               roughness: 0.25,
-              metalness: 0.05,
+              metalness: 0.04,
               side: THREE.DoubleSide
             });
           } else {
@@ -1003,6 +598,224 @@ export class Real3DSceneManager {
           }
           child.castShadow = true;
           child.receiveShadow = true;
+        }
+      });
+    } else if (key === 'circulatory_system') {
+      // Full Human Circulatory System: 676 meshes (Arteries, Veins, Heart, Cartilage)
+      group.traverse((child) => {
+        if (child.isMesh && child.material) {
+          const matName = (child.material.name || '').toLowerCase();
+          const nodeName = (child.name || '').toLowerCase();
+
+          if (matName.includes('artery') || nodeName.includes('artery') || nodeName.includes('aorta') || nodeName.includes('trunk')) {
+            child.material = new THREE.MeshStandardMaterial({
+              color: 0xdc2626, // Arterial oxygenated bright red
+              roughness: 0.28,
+              metalness: 0.08,
+              side: THREE.DoubleSide
+            });
+          } else if (matName.includes('vein') || nodeName.includes('vein') || nodeName.includes('vena') || nodeName.includes('sinus')) {
+            child.material = new THREE.MeshStandardMaterial({
+              color: 0x2563eb, // Venous deoxygenated royal blue
+              roughness: 0.28,
+              metalness: 0.08,
+              side: THREE.DoubleSide
+            });
+          } else if (matName.includes('heart') || nodeName.includes('heart') || nodeName.includes('cardiac')) {
+            child.material = new THREE.MeshStandardMaterial({
+              color: 0x991b1b, // Cardiac pump myocardium crimson
+              roughness: 0.32,
+              metalness: 0.06,
+              side: THREE.DoubleSide
+            });
+          } else if (matName.includes('cartilage') || nodeName.includes('cartilage')) {
+            child.material = new THREE.MeshStandardMaterial({
+              color: 0xe2e8f0, // Pearly costal cartilage
+              roughness: 0.35,
+              metalness: 0.04,
+              side: THREE.DoubleSide
+            });
+          } else {
+            child.material.side = THREE.DoubleSide;
+            child.material.roughness = 0.32;
+          }
+          child.castShadow = true;
+          child.receiveShadow = true;
+        }
+      });
+    } else if (key === 'nervous_system') {
+      // Full Human Nervous System: 582 meshes (Brain, Spinal Cord, Cranial & Peripheral Nerves, CSF)
+      group.traverse((child) => {
+        if (child.isMesh && child.material) {
+          const matName = (child.material.name || '').toLowerCase();
+          const nodeName = (child.name || '').toLowerCase();
+
+          if (matName.includes('nerve') || nodeName.includes('nerve') || nodeName.includes('plexus') || nodeName.includes('ganglion') || nodeName.includes('tract') || nodeName.includes('rami') || nodeName.includes('funiculus') || nodeName.includes('fasciculus')) {
+            // Radiant golden peripheral & central nerve fibers
+            child.material = new THREE.MeshStandardMaterial({
+              color: 0xfacc15,
+              emissive: 0xca8a04,
+              emissiveIntensity: 0.28,
+              roughness: 0.26,
+              metalness: 0.08,
+              side: THREE.DoubleSide
+            });
+          } else if (matName.includes('brain') || nodeName.includes('brain') || nodeName.includes('cortex') || nodeName.includes('cerebell') || nodeName.includes('thalamus') || nodeName.includes('forebrain') || nodeName.includes('amygdal')) {
+            // Cerebral cortex & cerebellum soft neural peach-ivory
+            child.material = new THREE.MeshStandardMaterial({
+              color: 0xfecdd3,
+              roughness: 0.36,
+              metalness: 0.04,
+              side: THREE.DoubleSide
+            });
+          } else if (matName.includes('csf') || nodeName.includes('csf') || nodeName.includes('ventricle')) {
+            // Cerebrospinal fluid translucent glowing aqua
+            child.material = new THREE.MeshStandardMaterial({
+              color: 0x38bdf8,
+              transparent: true,
+              opacity: 0.45,
+              depthWrite: false,
+              roughness: 0.15,
+              metalness: 0.0,
+              side: THREE.DoubleSide
+            });
+            child.userData.isGlass = true;
+            child.userData.defaultOpacity = 0.45;
+            child.userData.defaultDepthWrite = false;
+          } else if (matName.includes('eye') || nodeName.includes('eye') || nodeName.includes('eyeball')) {
+            child.material = new THREE.MeshStandardMaterial({
+              color: 0xf8fafc,
+              roughness: 0.2,
+              metalness: 0.02,
+              side: THREE.DoubleSide
+            });
+          } else if (matName.includes('artery') || nodeName.includes('artery')) {
+            child.material = new THREE.MeshStandardMaterial({
+              color: 0xdc2626,
+              roughness: 0.28,
+              metalness: 0.08,
+              side: THREE.DoubleSide
+            });
+          } else if (matName.includes('muscle') || nodeName.includes('muscle')) {
+            child.material = new THREE.MeshStandardMaterial({
+              color: 0x881337,
+              roughness: 0.4,
+              metalness: 0.05,
+              side: THREE.DoubleSide
+            });
+          } else {
+            // Bones, ligaments, cartilage reference frame
+            child.material = new THREE.MeshStandardMaterial({
+              color: 0xe2e8f0,
+              roughness: 0.42,
+              metalness: 0.05,
+              side: THREE.DoubleSide
+            });
+          }
+          child.castShadow = true;
+          child.receiveShadow = true;
+        }
+      });
+    } else if (key === 'urinary_system') {
+      // Urinary System: Kidneys, Ureters, Bladder, Renal vessels & Skeleton
+      group.traverse((child) => {
+        if (child.isMesh && child.material) {
+          const nodeName = (child.name || '').toLowerCase();
+          const parentName = (child.parent?.name || '').toLowerCase();
+
+          if (nodeName.includes('skeleton') || parentName.includes('skeleton') || child.name === 'Object_8') {
+            // Skeletal cage reference frame: semi-translucent anatomical bone ivory
+            child.material = new THREE.MeshStandardMaterial({
+              color: 0xf1f5f9,
+              roughness: 0.45,
+              metalness: 0.05,
+              transparent: true,
+              opacity: 0.42,
+              depthWrite: true,
+              side: THREE.DoubleSide
+            });
+            child.userData.isGlass = true;
+            child.userData.defaultOpacity = 0.42;
+            child.userData.defaultDepthWrite = true;
+          } else if (child.material.map) {
+            // Urinary organs (Kidneys, Ureters, Urinary Bladder, Renal Artery & Vein)
+            child.material.roughness = 0.32;
+            child.material.metalness = 0.05;
+            child.material.side = THREE.DoubleSide;
+            if (child.material.color) {
+              child.material.color.setHex(0xffffff);
+            }
+            child.material.needsUpdate = true;
+          } else {
+            child.material.roughness = 0.35;
+            child.material.side = THREE.DoubleSide;
+          }
+          child.castShadow = true;
+          child.receiveShadow = true;
+        }
+      });
+    } else if (key === 'endocrine_system') {
+      // Endocrine System: Pituitary, Thyroid, Parathyroid, Adrenals, Pancreas, Gonads
+      group.traverse((child) => {
+        if (child.isMesh && child.material) {
+          const nodeName = (child.name || '').toLowerCase();
+          const parentName = (child.parent?.name || '').toLowerCase();
+
+          if (nodeName.includes('skin') || parentName.includes('skin') || child.name === 'Object_12') {
+            // Elegant holographic human body silhouette so all internal endocrine glands are clearly visible
+            child.material = new THREE.MeshStandardMaterial({
+              color: 0x38bdf8,
+              transparent: true,
+              opacity: 0.12,
+              roughness: 0.25,
+              metalness: 0.05,
+              depthWrite: false,
+              side: THREE.DoubleSide
+            });
+            child.userData.isGlass = true;
+            child.userData.defaultOpacity = 0.12;
+            child.userData.defaultDepthWrite = false;
+          } else if (nodeName.includes('skeleton') || parentName.includes('skeleton') || child.name === 'Object_9') {
+            // Skeletal reference frame: translucent bone ivory
+            child.material = new THREE.MeshStandardMaterial({
+              color: 0xf1f5f9,
+              roughness: 0.45,
+              metalness: 0.05,
+              transparent: true,
+              opacity: 0.38,
+              depthWrite: true,
+              side: THREE.DoubleSide
+            });
+            child.userData.isGlass = true;
+            child.userData.defaultOpacity = 0.38;
+            child.userData.defaultDepthWrite = true;
+          } else if (child.material.map) {
+            // Endocrine glands (Pituitary, Thyroid, Thymus, Adrenals, Pancreas, Ovaries/Testes)
+            child.material.roughness = 0.28;
+            child.material.metalness = 0.04;
+            child.material.side = THREE.DoubleSide;
+            if (child.material.color) {
+              child.material.color.setHex(0xffffff);
+            }
+            child.material.needsUpdate = true;
+          } else {
+            child.material.roughness = 0.32;
+            child.material.side = THREE.DoubleSide;
+          }
+          child.castShadow = true;
+          child.receiveShadow = true;
+        }
+      });
+    } else if (key === 'gallbladder') {
+      // Gallbladder & Biliary Tree: Fundus, Corpus, Collum, Heister valve, Duodenum C-loop, Calot's triangle vessels
+      group.traverse((child) => {
+        if (child.isMesh && child.material) {
+          child.castShadow = true;
+          child.receiveShadow = true;
+          child.material.side = THREE.DoubleSide;
+          child.material.roughness = 0.22;
+          child.material.metalness = 0.05;
+          child.material.needsUpdate = true;
         }
       });
     } else if (key === 'oral_cavity') {
@@ -1156,15 +969,15 @@ export class Real3DSceneManager {
 
     this.currentModelGroup.traverse((child) => {
       if (child.isMesh && child.material) {
-        const isGlass = (child.material.name || '').toLowerCase().includes('glass') || child.name.toLowerCase().includes('glass');
+        const isGlass = child.userData?.isGlass || (child.material.name || '').toLowerCase().includes('glass') || child.name.toLowerCase().includes('glass');
         if (this.isXRay) {
           child.material.transparent = true;
           child.material.opacity = 0.45;
           child.material.depthWrite = false;
         } else {
           child.material.transparent = isGlass ? true : false;
-          child.material.opacity = isGlass ? 0.14 : 1.0;
-          child.material.depthWrite = isGlass ? false : true;
+          child.material.opacity = isGlass ? (child.userData?.defaultOpacity ?? 0.14) : 1.0;
+          child.material.depthWrite = isGlass ? (child.userData?.defaultDepthWrite ?? false) : true;
         }
         child.material.needsUpdate = true;
       }
@@ -1213,7 +1026,7 @@ export class Real3DSceneManager {
 
     // Rhythmic organic animations
     if (this.currentModelGroup && this.isPulsing) {
-      if (this.currentModelKey === 'heart' || this.currentModelKey === 'circulatory_system') {
+      if (this.currentModelKey === 'heart') {
         // Anatomical dual-phase heartbeat (Lub-Dub rhythm at ~72 bpm)
         const cycle = (elapsedTime * 1.2) % 1.0;
         let heartPulse = 1.0;
@@ -1221,9 +1034,13 @@ export class Real3DSceneManager {
           heartPulse = 1.0 + Math.sin((cycle / 0.14) * Math.PI) * 0.05;
         } else if (cycle > 0.18 && cycle < 0.44) {
           const vProg = (cycle - 0.18) / 0.26;
-          heartPulse = 1.0 + Math.sin(vProg * Math.PI) * 0.09;
+          heartPulse = 1.0 + Math.sin(vProg * Math.PI) * 0.08;
         }
         this.currentModelGroup.scale.set(heartPulse, heartPulse, heartPulse);
+      } else if (this.currentModelKey === 'circulatory_system') {
+        // Gentle systemic vascular pressure pulse
+        const vascularPulse = 1.0 + Math.sin(elapsedTime * 4.2) * 0.012;
+        this.currentModelGroup.scale.set(vascularPulse, vascularPulse, vascularPulse);
       } else if (this.currentModelKey === 'lung' || this.currentModelKey === 'respiratory_system') {
         // Natural thoracic respiration
         const breath = 1.0 + Math.sin(elapsedTime * 1.8) * 0.045;
