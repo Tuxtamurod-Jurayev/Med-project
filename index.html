@@ -2,9 +2,9 @@
 <html lang="uz">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>MedAnatomy 3D — Interaktiv Anatomiya Atlasi</title>
-  <meta name="description" content="Tibbiyot talabalari uchun 3D va AR interaktiv anatomiya platformasi" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>MedAnatomy 3D — Interaktiv Anatomiya & AR Atlasi</title>
+  <meta name="description" content="Tibbiyot talabalari uchun kamera, rasm va 3D anatomiya platformasi" />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -13,250 +13,272 @@
 </head>
 <body>
 
-  <!-- APP SHELL -->
-  <div class="app-layout">
+  <div class="app-container">
 
-    <!-- TOP HEADER -->
-    <header class="top-nav">
-      <div class="nav-left">
-        <div class="brand">
-          <div class="brand-icon">
+    <!-- TOP APP BAR -->
+    <header class="app-header">
+      <div class="header-left">
+        <div class="app-logo">
+          <div class="logo-badge">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
               <path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
             </svg>
           </div>
-          <div class="brand-text">
-            <div class="brand-title">
+          <div>
+            <div class="logo-title">
               <span>MedAnatomy</span>
-              <span class="badge-3d">3D • AR</span>
+              <span class="chip-3d">3D • AR</span>
             </div>
-            <span class="brand-sub">Tibbiyot talabalari uchun atlas</span>
+            <span class="logo-subtitle">Tibbiyot talabalari atlasi</span>
           </div>
         </div>
       </div>
 
-      <!-- Quick organ switcher directly in header for fast navigation -->
-      <nav class="nav-organ-tabs">
-        <button class="nav-tab active" data-model="skull">
-          <span class="tab-emoji">💀</span>
-          <span class="tab-title">Bosh suyagi</span>
-        </button>
-        <button class="nav-tab" data-model="heart">
-          <span class="tab-emoji">❤️</span>
-          <span class="tab-title">Yurak</span>
-        </button>
-        <button class="nav-tab" data-model="arm_hand">
-          <span class="tab-emoji">🦴</span>
-          <span class="tab-title">Qo'l panjasi</span>
-        </button>
-        <button class="nav-tab" data-model="ribcage_lungs">
-          <span class="tab-emoji">🫁</span>
-          <span class="tab-title">Ko'krak & O'pka</span>
-        </button>
-        <button class="nav-tab" data-model="spine">
-          <span class="tab-emoji">🧬</span>
-          <span class="tab-title">Umurtqa</span>
-        </button>
-      </nav>
+      <!-- MAIN MODE SELECTOR (Studio / Kamera / Rasm) -->
+      <div class="mode-switch-wrapper">
+        <div class="mode-switch">
+          <button class="mode-btn active" data-mode="studio">
+            <span class="m-icon">🏛️</span>
+            <span class="m-text">3D Studio</span>
+          </button>
+          <button class="mode-btn" data-mode="camera">
+            <span class="m-icon">📷</span>
+            <span class="m-text">Kamera (AR)</span>
+          </button>
+          <button class="mode-btn" data-mode="image">
+            <span class="m-icon">🖼️</span>
+            <span class="m-text">Rasm & 3D</span>
+          </button>
+        </div>
+      </div>
 
-      <!-- Nav actions -->
-      <div class="nav-actions">
-        <!-- AR Camera Toggle -->
-        <button id="toggleCameraBtn" class="btn btn-camera">
-          <span class="camera-pulse"></span>
-          <span id="cameraBtnText">AR Kamera</span>
-        </button>
-
-        <!-- Audio pronunciation -->
-        <button id="speakNameBtn" class="btn-icon" title="Lotincha nomini talaffuz qilish">
+      <!-- HEADER ACTIONS -->
+      <div class="header-right">
+        <!-- Latin Pronunciation Audio -->
+        <button id="speakNameBtn" class="action-btn" title="Lotincha nomini talaffuz qilish">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
           </svg>
         </button>
 
-        <!-- Fullscreen -->
-        <button id="fullscreenBtn" class="btn-icon btn-desktop-only" title="To'liq ekran">
+        <!-- Fullscreen Button -->
+        <button id="fullscreenBtn" class="action-btn desktop-only" title="To'liq ekran">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
-          </svg>
-        </button>
-
-        <!-- Sidebar Toggle (Mobile) -->
-        <button id="toggleSidebarBtn" class="btn-icon btn-menu" title="Ma'lumotlar paneli">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
           </svg>
         </button>
       </div>
     </header>
 
-    <!-- WORKSPACE (VIEWPORT + SIDEBAR) -->
-    <div class="workspace">
+    <!-- MAIN BODY -->
+    <main class="main-content">
 
-      <!-- 3D VIEWPORT CONTAINER -->
-      <section class="viewport-area" id="viewportContainer">
+      <!-- 3D VIEWPORT -->
+      <section class="viewport-box" id="viewportContainer">
 
-        <!-- Live Camera Feed for AR -->
-        <video id="cameraFeed" class="camera-video" autoplay playsinline muted></video>
+        <!-- LAYER 1: LIVE VIDEO CAMERA FEED -->
+        <video id="cameraFeed" class="bg-feed-video" autoplay playsinline muted></video>
 
-        <!-- AR Reticle Target Guide -->
-        <div id="arReticle" class="ar-guide hidden">
-          <div class="ar-box">
-            <div class="ar-center-dot"></div>
-            <span class="ar-guide-text">Tana yoki rasm ustiga to'g'irlang</span>
+        <!-- LAYER 2: TARGET IMAGE FEED (When Image Mode is active) -->
+        <div id="imageFeedContainer" class="bg-feed-image hidden">
+          <img id="targetImageDisplay" src="" alt="Belgilangan rasm" />
+          <div class="image-scan-laser"></div>
+          <div class="image-watermark">
+            <span id="targetImageLabel">Belgilangan anatomik rasm</span>
           </div>
         </div>
 
-        <!-- Three.js Canvas -->
-        <div id="canvasContainer" class="canvas-layer"></div>
+        <!-- LAYER 3: AR RETICLE & ALIGNMENT GUIDE -->
+        <div id="arReticle" class="ar-reticle-overlay hidden">
+          <div class="reticle-frame">
+            <div class="reticle-crosshair"></div>
+            <span class="reticle-label">Anatomik ob'ektni doira ichiga to'g'irlang</span>
+          </div>
+        </div>
 
-        <!-- 3D Floating Control Dock -->
-        <div class="floating-dock">
-          <button id="resetCamBtn" class="dock-btn" title="Kamerani qaytarish">
+        <!-- LAYER 4: THREE.JS 3D CANVAS -->
+        <div id="canvasContainer" class="canvas-3d-wrapper"></div>
+
+        <!-- FLOATING 3D TOOLS (LEFT) -->
+        <div class="floating-tools">
+          <button id="resetCamBtn" class="tool-btn" title="Kamerani boshlang'ich holatga qaytarish">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
             </svg>
-            <span>Qaytarish</span>
+            <span class="t-label">Qaytarish</span>
           </button>
 
-          <button id="xrayBtn" class="dock-btn" title="Rentgen (Shaffof) rejimi">
+          <button id="xrayBtn" class="tool-btn" title="Rentgen (Shaffof) ko'rinish">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
               <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
             </svg>
-            <span>Rentgen</span>
+            <span class="t-label">Rentgen</span>
           </button>
 
-          <button id="wireframeBtn" class="dock-btn" title="To'r (Wireframe)">
+          <button id="wireframeBtn" class="tool-btn" title="3D To'r (Wireframe)">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
             </svg>
-            <span>To'r</span>
+            <span class="t-label">To'r</span>
           </button>
 
-          <button id="autoRotateBtn" class="dock-btn" title="360° Aylanish">
+          <button id="autoRotateBtn" class="tool-btn" title="360° Avtomatik aylanma">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <span>360°</span>
+            <span class="t-label">360°</span>
           </button>
 
-          <button id="snapshotBtn" class="dock-btn" title="Surat yuklab olish">
+          <button id="snapshotBtn" class="tool-btn" title="Surat yuklab olish">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
               <path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
             </svg>
-            <span>Surat</span>
+            <span class="t-label">Surat</span>
           </button>
         </div>
 
-        <!-- Floating AR Controls (when camera active) -->
-        <div id="arControlsBar" class="ar-controls-bar hidden">
-          <span class="ar-label">Shaffoflik:</span>
-          <input type="range" id="arOpacitySlider" min="0.2" max="1" step="0.05" value="0.85" class="ar-slider" />
-          <button id="switchCameraBtn" class="btn-icon-sm" title="Kamerani almashtirish">
+        <!-- IMAGE SELECTION DRAWER / BAR (When Image Mode is active) -->
+        <div id="imageSelectDock" class="image-select-dock hidden">
+          <div class="dock-header">
+            <span>🖼️ Belgilanadigan rasmni tanlang yoki yuklang:</span>
+            <label class="btn-upload">
+              <input type="file" id="imageFileInput" accept="image/*" hidden />
+              <span>📁 O'z rasmingizni yuklang</span>
+            </label>
+          </div>
+          <div class="sample-cards-row">
+            <button class="sample-card active" data-img-key="skull">
+              <span>💀 Kalla suyagi</span>
+            </button>
+            <button class="sample-card" data-img-key="heart">
+              <span>❤️ Yurak sxemasi</span>
+            </button>
+            <button class="sample-card" data-img-key="arm_hand">
+              <span>🦴 Qo'l rentgen</span>
+            </button>
+            <button class="sample-card" data-img-key="ribcage_lungs">
+              <span>🫁 Ko'krak qafasi</span>
+            </button>
+            <button class="sample-card" data-img-key="spine">
+              <span>🧬 Umurtqa MRT</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- CAMERA CONTROLS BAR (When Camera Mode is active) -->
+        <div id="cameraControlsDock" class="camera-controls-dock hidden">
+          <span class="ctrl-label">Shaffoflik:</span>
+          <input type="range" id="arOpacitySlider" min="0.2" max="1" step="0.05" value="0.85" class="range-slider" />
+          <button id="switchCameraBtn" class="btn-mini" title="Kamerani almashtirish (Old/Orqa)">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
             </svg>
           </button>
         </div>
 
-        <!-- Interaction Helper Hint -->
-        <div class="interaction-hint">
-          <span>💡 Modelni aylantirish uchun suring • Qismini tanlash uchun bosing</span>
+        <!-- TOUCH GESTURE HINT -->
+        <div class="touch-hint">
+          <span>👆 3D modelni aylantirish uchun bosing va suring</span>
         </div>
 
       </section>
 
-      <!-- RIGHT SIDEBAR: MEDICAL ATLAS & QUIZ -->
-      <aside class="sidebar-panel" id="infoSidebar">
+      <!-- RIGHT SIDEBAR (DESKTOP) / BOTTOM DRAWER (MOBILE) -->
+      <aside class="info-sidebar" id="infoSidebar">
+
+        <!-- Drag handle for mobile drawer -->
+        <div class="drawer-handle" id="drawerHandle">
+          <div class="handle-bar"></div>
+        </div>
 
         <!-- Sidebar Header -->
         <div class="sidebar-header">
-          <div class="sidebar-title-row">
+          <div class="sidebar-title-wrap">
             <div>
-              <span id="organCategory" class="badge-category">Aksial skelet</span>
-              <h2 id="organNameUz" class="organ-title">Bosh suyagi</h2>
-              <p id="organNameLat" class="organ-latin">Cranium • Human Skull</p>
+              <span id="organCategory" class="category-chip">Aksial skelet</span>
+              <h2 id="organNameUz" class="organ-heading">Bosh suyagi</h2>
+              <p id="organNameLat" class="organ-latin-sub">Cranium • Human Skull</p>
             </div>
-            <button id="closeSidebarMobile" class="btn-icon btn-close-mobile">
+            <button id="closeSidebarBtn" class="btn-close-drawer">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
           </div>
 
-          <!-- Quick Stats Cards -->
-          <div class="stats-grid">
-            <div class="stat-card">
-              <span class="stat-label">Tizim</span>
-              <span id="organSystem" class="stat-value">Skelet tizimi</span>
+          <!-- Quick Stat Cards -->
+          <div class="stats-row">
+            <div class="stat-box">
+              <span class="s-label">Tizim</span>
+              <span id="organSystem" class="s-val">Skelet tizimi</span>
             </div>
-            <div class="stat-card">
-              <span class="stat-label">Suyaklar / Og'irlik</span>
-              <span id="organSpecs" class="stat-value">22 ta suyak</span>
+            <div class="stat-box">
+              <span class="s-label">Suyaklar / Og'irlik</span>
+              <span id="organSpecs" class="s-val">22 ta suyak</span>
             </div>
           </div>
         </div>
 
-        <!-- Sidebar Navigation Tabs -->
-        <div class="sidebar-tabs">
-          <button class="s-tab active" data-tab="parts">Tuzilishi</button>
-          <button class="s-tab" data-tab="functions">Vazifasi</button>
-          <button class="s-tab" data-tab="clinical">Klinika</button>
-          <button class="s-tab tab-quiz-highlight" data-tab="quiz">Test 🏆</button>
-        </div>
+        <!-- Tabs -->
+        <nav class="sidebar-tabs-nav">
+          <button class="nav-s-tab active" data-tab="parts">Tuzilishi</button>
+          <button class="nav-s-tab" data-tab="functions">Vazifasi</button>
+          <button class="nav-s-tab" data-tab="clinical">Klinika</button>
+          <button class="nav-s-tab tab-quiz-glow" data-tab="quiz">Test 🏆</button>
+        </nav>
 
-        <!-- Sidebar Body (Scrollable) -->
-        <div class="sidebar-body custom-scrollbar">
+        <!-- Tab Body -->
+        <div class="sidebar-scroll-body custom-scrollbar">
 
-          <!-- TAB 1: TUZILISHI -->
-          <div id="tabParts" class="tab-view active">
-            <div class="desc-card">
+          <!-- TAB 1: TUZILISHI & QISMLARI -->
+          <div id="tabParts" class="tab-panel active">
+            <div class="description-card">
               <p id="organDescription">Bosh suyagi inson bosh skeleti bo'lib...</p>
             </div>
 
-            <div class="section-title-row">
-              <span class="section-title">Anatomik Qismlar</span>
-              <span class="section-sub">3D-da ko'rish uchun tanlang</span>
+            <div class="panel-section-title">
+              <span>Anatomik Qismlar</span>
+              <span class="sub-tip">3D-da ko'rish uchun bosing</span>
             </div>
 
-            <div id="partsList" class="parts-list">
+            <div id="partsList" class="parts-grid">
               <!-- Dynamically populated -->
             </div>
           </div>
 
           <!-- TAB 2: VAZIFALARI -->
-          <div id="tabFunctions" class="tab-view hidden">
-            <h3 class="section-title">Fiziologik Vazifalari</h3>
-            <ul id="functionsList" class="info-list">
+          <div id="tabFunctions" class="tab-panel hidden">
+            <div class="panel-section-title">Fiziologik Vazifalari</div>
+            <ul id="functionsList" class="detail-list">
               <!-- Dynamically populated -->
             </ul>
           </div>
 
           <!-- TAB 3: KLINIKA -->
-          <div id="tabClinical" class="tab-view hidden">
-            <h3 class="section-title title-warning">Klinik Ahamiyat & Kasalliklar</h3>
-            <ul id="clinicalList" class="info-list warning-list">
+          <div id="tabClinical" class="tab-panel hidden">
+            <div class="panel-section-title title-amber">Klinik Ahamiyat & Kasalliklar</div>
+            <ul id="clinicalList" class="detail-list warning-list">
               <!-- Dynamically populated -->
             </ul>
           </div>
 
           <!-- TAB 4: QUIZ (BILIMNI SINASH) -->
-          <div id="tabQuiz" class="tab-view hidden">
-            <div class="quiz-hero">
-              <div class="quiz-hero-header">
-                <span class="quiz-hero-title">🧠 Bilimingizni sinang</span>
-                <span id="quizScoreBadge" class="quiz-badge">Ball: 0/3</span>
+          <div id="tabQuiz" class="tab-panel hidden">
+            <div class="quiz-banner">
+              <div class="quiz-banner-top">
+                <span class="quiz-title">🧠 Bilimingizni sinang</span>
+                <span id="quizScoreBadge" class="quiz-pill">Ball: 0/3</span>
               </div>
-              <p class="quiz-hero-sub">Ushbu bo'lim bo'yicha talabalik bilimingizni tekshirib ko'ring!</p>
+              <p class="quiz-desc">Ushbu bo'lim bo'yicha talabalik bilimingizni tekshirib ko'ring!</p>
             </div>
 
-            <div id="quizContainer" class="quiz-stack">
+            <div id="quizContainer" class="quiz-container">
               <!-- Dynamically populated -->
             </div>
 
-            <button id="resetQuizBtn" class="btn btn-secondary w-full">
+            <button id="resetQuizBtn" class="btn-reset-quiz">
               Testni qaytadan boshlash
             </button>
           </div>
@@ -265,15 +287,75 @@
 
         <!-- Sidebar Footer -->
         <div class="sidebar-footer">
-          <div id="cameraStatusIndicator" class="status-indicator">
-            <span class="dot dot-idle"></span>
+          <div id="cameraStatusIndicator" class="footer-status">
+            <span class="status-dot"></span>
             <span>3D Studio Rejimi</span>
           </div>
-          <span class="version-tag">MedTech v1.0</span>
+          <span class="footer-ver">MedTech Pro</span>
         </div>
 
       </aside>
 
+    </main>
+
+    <!-- MOBILE BOTTOM NAVIGATION BAR -->
+    <nav class="mobile-bottom-bar">
+      <button class="m-nav-item active" id="mNavOrgan">
+        <span class="m-nav-icon">🦴</span>
+        <span class="m-nav-label">Organlar</span>
+      </button>
+
+      <button class="m-nav-item" id="mNavMode">
+        <span class="m-nav-icon">📷</span>
+        <span class="m-nav-label">Kamera / Rasm</span>
+      </button>
+
+      <button class="m-nav-item" id="mNavInfo">
+        <span class="m-nav-icon">📖</span>
+        <span class="m-nav-label">Ma'lumot</span>
+      </button>
+
+      <button class="m-nav-item" id="mNavQuiz">
+        <span class="m-nav-icon">🏆</span>
+        <span class="m-nav-label">Test</span>
+      </button>
+    </nav>
+
+    <!-- MOBILE ORGAN SELECTOR POPUP MODAL -->
+    <div id="mobileOrganModal" class="modal-backdrop hidden">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h3>Anatomik a'zoni tanlang:</h3>
+          <button id="closeOrganModal" class="btn-close-modal">✕</button>
+        </div>
+        <div class="modal-organ-grid">
+          <button class="m-organ-choice active" data-model="skull">
+            <span class="m-o-emoji">💀</span>
+            <span class="m-o-name">Bosh suyagi</span>
+            <span class="m-o-lat">Cranium</span>
+          </button>
+          <button class="m-organ-choice" data-model="heart">
+            <span class="m-o-emoji">❤️</span>
+            <span class="m-o-name">Inson yuragi</span>
+            <span class="m-o-lat">Cor</span>
+          </button>
+          <button class="m-organ-choice" data-model="arm_hand">
+            <span class="m-o-emoji">🦴</span>
+            <span class="m-o-name">Qo'l panjasi</span>
+            <span class="m-o-lat">Ossa manus</span>
+          </button>
+          <button class="m-organ-choice" data-model="ribcage_lungs">
+            <span class="m-o-emoji">🫁</span>
+            <span class="m-o-name">Ko'krak & O'pka</span>
+            <span class="m-o-lat">Thorax</span>
+          </button>
+          <button class="m-organ-choice" data-model="spine">
+            <span class="m-o-emoji">🧬</span>
+            <span class="m-o-name">Umurtqa</span>
+            <span class="m-o-lat">Columna vert.</span>
+          </button>
+        </div>
+      </div>
     </div>
 
   </div>
