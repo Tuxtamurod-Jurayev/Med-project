@@ -13,16 +13,16 @@ const SYSTEM_ORGANS_MAP = {
   nervous: {
     title: 'Nerv sistemasi',
     organs: [
+      { id: 'nervous_system', label: 'Yaxlit asab tizimi, umurtqa va orqa miya' },
       { id: 'brain', label: 'Bosh miya (Rangli bo\'laklar)' },
-      { id: 'nervous_system', label: 'Yaxlit asab tizimi' },
-      { id: 'spine', label: 'Umurtqa va orqa miya' }
+      { id: 'spine', label: 'Umurtqa pog\'onasi' }
     ]
   },
   circulatory: {
     title: 'Qon aylanish',
     organs: [
-      { id: 'heart', label: 'Inson yuragi (Optimallashtirilgan)' },
-      { id: 'circulatory_system', label: 'Yaxlit qon aylanish tizimi' }
+      { id: 'circulatory_system', label: 'Yaxlit qon aylanish tizimi' },
+      { id: 'heart', label: 'Inson yuragi (3D kardiologiya)' }
     ]
   },
   respiratory: {
@@ -36,40 +36,41 @@ const SYSTEM_ORGANS_MAP = {
     title: 'Ovqat hazm',
     organs: [
       { id: 'digestive_system', label: 'Hazm trakt (Yaxlit)' },
+      { id: 'stomach', label: 'Oshqozon' },
+      { id: 'liver', label: 'Jigar' },
       { id: 'gallbladder', label: 'O\'t pufagi va yo\'llari' },
       { id: 'pancreas', label: 'Oshqozon osti bezi' },
-      { id: 'oral_cavity', label: 'Og\'iz bo\'shlig\'i (Tishlar, Til)' },
-      { id: 'stomach', label: 'Oshqozon' },
-      { id: 'liver', label: 'Jigar' }
+      { id: 'oral_cavity', label: 'Og\'iz bo\'shlig\'i (Tishlar, Til)' }
     ]
   },
   musculoskeletal: {
     title: 'Tayanch-harakat',
     organs: [
-      { id: 'skull', label: 'Bosh suyagi' },
-      { id: 'hand_fingers', label: 'Barmoqlar va panja tuzilishi' },
       { id: 'musculoskeletal_system', label: 'Skelet va mushaklar' },
-      { id: 'spine', label: 'Umurtqa pog\'onasi' }
+      { id: 'skull', label: 'Bosh suyagi' },
+      { id: 'spine', label: 'Umurtqa pog\'onasi' },
+      { id: 'hand_fingers', label: 'Barmoqlar va panja tuzilishi' }
     ]
   },
   urinary: {
     title: 'Siydik chiqarish',
     organs: [
-      { id: 'urinary_system', label: 'Siydik ayirish tizimi' },
-      { id: 'kidney', label: 'Buyraklar' }
+      { id: 'urinary_system', label: 'Siydik chiqarish sistemasi' },
+      { id: 'kidney', label: 'Buyraklar (3D tuzilishi)' }
     ]
   },
   endocrine: {
     title: 'Endokrin',
     organs: [
-      { id: 'endocrine_system', label: 'Endokrin sistema' },
+      { id: 'endocrine_system', label: 'Endokrin sistema (Ichki sekretsiya bezlari)' },
       { id: 'pancreas', label: 'Oshqozon osti bezi' }
     ]
   },
   sensory: {
     title: 'Sezgi a\'zolari',
     organs: [
-      { id: 'eye', label: 'Ko\'z to\'qimalari va olmasi' }
+      { id: 'eye', label: 'Ko\'z to\'qimalari va olmasi' },
+      { id: 'eye_tissues', label: 'Ko\'z olmasi ichki qatlamlari' }
     ]
   }
 };
@@ -176,12 +177,11 @@ systemsTabsList.addEventListener('click', (e) => {
   activeSystemKey = sysKey;
   updateSystemsTabsUI();
 
-  // Load first organ of that system if current organ is not in it
   const sysConfig = SYSTEM_ORGANS_MAP[sysKey];
   if (sysConfig && sysConfig.organs.length > 0) {
-    const isCurrentInSystem = sysConfig.organs.some(o => o.id === currentModelKey);
-    if (!isCurrentInSystem) {
-      selectOrgan(sysConfig.organs[0].id);
+    const primaryOrganId = sysConfig.organs[0].id;
+    if (currentModelKey !== primaryOrganId) {
+      selectOrgan(primaryOrganId);
     } else {
       renderSubOrgansBar();
     }

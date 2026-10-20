@@ -343,76 +343,182 @@ export function createEyeTissuesModel() {
   const group = new THREE.Group();
   group.name = "eye_tissues";
 
-  // Sclera (Pearlescent White Outer Tunic)
-  const scleraGeo = new THREE.SphereGeometry(1.2, 32, 28);
+  // 1. Sclera (Pearlescent White Outer Fibrous Tunic)
+  const scleraGeo = new THREE.SphereGeometry(1.22, 36, 32);
   const scleraMesh = new THREE.Mesh(scleraGeo, ScleraMaterial);
   group.add(scleraMesh);
 
-  // Cornea (Transparent Glass Dome)
-  const corneaGeo = new THREE.SphereGeometry(0.72, 32, 20, 0, Math.PI * 2, 0, Math.PI * 0.42);
-  const corneaMesh = new THREE.Mesh(corneaGeo, CorneaGlassMaterial);
-  corneaMesh.position.set(0, 0, 0.95);
+  // Episcleral Microvascular Network (Fine branched capillary vessels on sclera)
+  for (let i = 0; i < 14; i++) {
+    const angle = (i / 14) * Math.PI * 2;
+    const rStart = 1.23;
+    const vCurve = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(Math.cos(angle) * 0.95, Math.sin(angle) * 0.95, 0.72),
+      new THREE.Vector3(Math.cos(angle + 0.1) * 1.15, Math.sin(angle + 0.1) * 1.15, 0.35),
+      new THREE.Vector3(Math.cos(angle - 0.08) * 1.21, Math.sin(angle - 0.08) * 1.21, -0.2)
+    ]);
+    const vTube = makeTube(vCurve.points, 0.018, 14, 6, AortaMaterial);
+    group.add(vTube);
+  }
+
+  // 2. Cornea (Optically Accurate Crystal Clear Glass Dome)
+  const corneaGeo = new THREE.SphereGeometry(0.74, 36, 24, 0, Math.PI * 2, 0, Math.PI * 0.44);
+  const corneaMesh = new THREE.Mesh(corneaGeo, new THREE.MeshPhysicalMaterial({
+    color: 0xffffff,
+    transparent: true,
+    opacity: 0.18,
+    roughness: 0.03,
+    transmission: 0.96,
+    ior: 1.376,
+    depthWrite: false,
+    side: THREE.FrontSide
+  }));
+  corneaMesh.position.set(0, 0, 0.96);
   group.add(corneaMesh);
 
-  // Iris (Vibrant Deep Blue & Hazel concentric rings)
-  const irisGeo = new THREE.RingGeometry(0.24, 0.62, 32);
-  const irisMat = new THREE.MeshStandardMaterial({
-    color: 0x0284c7,
-    roughness: 0.3,
-    metalness: 0.1,
+  // Corneoscleral Limbus (Delicate transition ring)
+  const limbusGeo = new THREE.TorusGeometry(0.66, 0.03, 16, 48);
+  const limbusMat = new THREE.MeshStandardMaterial({ color: 0x475569, roughness: 0.3 });
+  const limbusMesh = new THREE.Mesh(limbusGeo, limbusMat);
+  limbusMesh.position.set(0, 0, 0.96);
+  group.add(limbusMesh);
+
+  // 3. Iris (Multi-layered hazel-cerulean blue stroma with radial ridges)
+  const irisOuterGeo = new THREE.RingGeometry(0.24, 0.65, 48);
+  const irisOuterMat = new THREE.MeshStandardMaterial({
+    color: 0x0284c7, // Vibrant azure blue
+    roughness: 0.28,
+    metalness: 0.05,
     side: THREE.DoubleSide
   });
-  const irisMesh = new THREE.Mesh(irisGeo, irisMat);
-  irisMesh.position.set(0, 0, 1.15);
-  group.add(irisMesh);
+  const irisOuterMesh = new THREE.Mesh(irisOuterGeo, irisOuterMat);
+  irisOuterMesh.position.set(0, 0, 1.15);
+  group.add(irisOuterMesh);
 
-  // Pupil (Deep Black Velvet Center)
-  const pupilGeo = new THREE.CircleGeometry(0.24, 32);
-  const pupilMat = new THREE.MeshBasicMaterial({ color: 0x050505 });
+  // Inner Pupillary Ring / Sphincter
+  const irisInnerGeo = new THREE.RingGeometry(0.23, 0.38, 48);
+  const irisInnerMat = new THREE.MeshStandardMaterial({
+    color: 0x0369a1, // Deep cerulean
+    roughness: 0.35,
+    side: THREE.DoubleSide
+  });
+  const irisInnerMesh = new THREE.Mesh(irisInnerGeo, irisInnerMat);
+  irisInnerMesh.position.set(0, 0, 1.155);
+  group.add(irisInnerMesh);
+
+  // 4. Pupil (Apertura pupillae - Deep velvet black light absorber)
+  const pupilGeo = new THREE.CircleGeometry(0.23, 36);
+  const pupilMat = new THREE.MeshBasicMaterial({ color: 0x020617 });
   const pupilMesh = new THREE.Mesh(pupilGeo, pupilMat);
-  pupilMesh.position.set(0, 0, 1.152);
+  pupilMesh.position.set(0, 0, 1.156);
   group.add(pupilMesh);
 
-  // Crystalline Lens (Biconvex Transparent Disc)
-  const lensGeo = new THREE.SphereGeometry(0.48, 24, 20);
-  lensGeo.scale(1.0, 1.0, 0.45);
+  // 5. Crystalline Lens (Biconvex Transparent Optical Lens)
+  const lensGeo = new THREE.SphereGeometry(0.48, 28, 24);
+  lensGeo.scale(1.0, 1.0, 0.42);
   const lensMat = new THREE.MeshPhysicalMaterial({
-    color: 0xf0fdf4,
+    color: 0xf8fafc,
     transparent: true,
-    opacity: 0.75,
-    roughness: 0.1
+    opacity: 0.85,
+    roughness: 0.08,
+    transmission: 0.88,
+    ior: 1.41
   });
   const lensMesh = new THREE.Mesh(lensGeo, lensMat);
   lensMesh.position.set(0, 0, 0.88);
   group.add(lensMesh);
 
-  // Optic Nerve (Nervus opticus - Golden-Ivory Cord)
+  // Zonule of Zinn (Ciliary suspensory ligaments around lens)
+  const zonuleGeo = new THREE.TorusGeometry(0.52, 0.02, 12, 36);
+  const zonuleMat = new THREE.MeshBasicMaterial({ color: 0x93c5fd, transparent: true, opacity: 0.6 });
+  const zonuleMesh = new THREE.Mesh(zonuleGeo, zonuleMat);
+  zonuleMesh.position.set(0, 0, 0.88);
+  group.add(zonuleMesh);
+
+  // 6. Optic Nerve (Nervus opticus / II cranial nerve - Dural Sheath)
   const nerveCurve = new THREE.CatmullRomCurve3([
-    new THREE.Vector3(0, 0, -1.18),
-    new THREE.Vector3(0.08, -0.1, -1.7),
-    new THREE.Vector3(0.18, -0.22, -2.3)
+    new THREE.Vector3(0, 0, -1.2),
+    new THREE.Vector3(0.08, -0.1, -1.75),
+    new THREE.Vector3(0.18, -0.24, -2.45)
   ]);
-  const nerveMesh = makeTube(nerveCurve.points, 0.22, 20, 16, NerveMaterial);
+  const nerveMesh = makeTube(nerveCurve.points, 0.23, 24, 16, BoneMaterial);
   group.add(nerveMesh);
 
-  // 4 Rectus Extraocular Muscles (Musculi recti - Striated Muscle Crimson)
-  const muscleConfigs = [
-    { name: "Superior Rectus", rot: [0.65, 0, 0], pos: [0, 1.08, -0.2] },
-    { name: "Inferior Rectus", rot: [-0.65, 0, 0], pos: [0, -1.08, -0.2] },
-    { name: "Medial Rectus", rot: [0, 0.65, 0], pos: [1.08, 0, -0.2] },
-    { name: "Lateral Rectus", rot: [0, -0.65, 0], pos: [-1.08, 0, -0.2] }
+  // Central Retinal Artery (Red) & Vein (Blue) within Optic Nerve
+  const craCurve = new THREE.CatmullRomCurve3([
+    new THREE.Vector3(0.04, 0.02, -1.21),
+    new THREE.Vector3(0.1, -0.08, -1.75),
+    new THREE.Vector3(0.2, -0.22, -2.45)
+  ]);
+  group.add(makeTube(craCurve.points, 0.045, 18, 8, AortaMaterial));
+
+  const crvCurve = new THREE.CatmullRomCurve3([
+    new THREE.Vector3(-0.04, -0.02, -1.21),
+    new THREE.Vector3(0.05, -0.12, -1.75),
+    new THREE.Vector3(0.15, -0.26, -2.45)
+  ]);
+  group.add(makeTube(crvCurve.points, 0.05, 18, 8, VeinMaterial));
+
+  // 7. Extraocular Muscles (All 6 Oculomotor Muscles)
+  // 4 Rectus Muscles: Superior, Inferior, Medial, Lateral
+  const rectusConfigs = [
+    { name: "Superior Rectus", rot: [0.65, 0, 0], pos: [0, 1.1, -0.22] },
+    { name: "Inferior Rectus", rot: [-0.65, 0, 0], pos: [0, -1.1, -0.22] },
+    { name: "Medial Rectus", rot: [0, 0.65, 0], pos: [1.1, 0, -0.22] },
+    { name: "Lateral Rectus", rot: [0, -0.65, 0], pos: [-1.1, 0, -0.22] }
   ];
 
-  muscleConfigs.forEach(cfg => {
-    const mGeo = new THREE.CylinderGeometry(0.18, 0.25, 1.6, 12);
+  rectusConfigs.forEach(cfg => {
+    const mGeo = new THREE.CylinderGeometry(0.16, 0.24, 1.75, 14);
     const mMesh = new THREE.Mesh(mGeo, MuscleMaterial);
     mMesh.rotation.x = cfg.rot[0] || (Math.PI / 2);
     mMesh.rotation.y = cfg.rot[1] || 0;
     mMesh.position.set(cfg.pos[0], cfg.pos[1], cfg.pos[2]);
     group.add(mMesh);
+
+    // Glistening white tendon insertion into sclera
+    const tendonGeo = new THREE.CylinderGeometry(0.14, 0.16, 0.35, 12);
+    const tendonMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.25 });
+    const tendonMesh = new THREE.Mesh(tendonGeo, tendonMat);
+    tendonMesh.rotation.x = cfg.rot[0] || (Math.PI / 2);
+    tendonMesh.rotation.y = cfg.rot[1] || 0;
+    tendonMesh.position.set(cfg.pos[0] * 0.9, cfg.pos[1] * 0.9, cfg.pos[2] + 0.6);
+    group.add(tendonMesh);
   });
 
-  group.scale.set(1.3, 1.3, 1.3);
+  // 2 Oblique Muscles: Superior Oblique (via Trochlea) & Inferior Oblique
+  const soCurve = new THREE.CatmullRomCurve3([
+    new THREE.Vector3(0.18, 0.3, -2.1),
+    new THREE.Vector3(0.72, 1.15, -0.1),
+    new THREE.Vector3(0.55, 1.25, 0.3),
+    new THREE.Vector3(0, 1.15, 0.2)
+  ]);
+  group.add(makeTube(soCurve.points, 0.12, 24, 8, MuscleMaterial));
+
+  // Trochlea (Cartilaginous pulley loop)
+  const trochleaGeo = new THREE.TorusGeometry(0.14, 0.04, 8, 16);
+  const trochleaMesh = new THREE.Mesh(trochleaGeo, CartilageMaterial);
+  trochleaMesh.position.set(0.68, 1.25, 0.25);
+  group.add(trochleaMesh);
+
+  // Inferior Oblique
+  const ioCurve = new THREE.CatmullRomCurve3([
+    new THREE.Vector3(0.75, -1.0, 0.3),
+    new THREE.Vector3(0.2, -1.2, 0.1),
+    new THREE.Vector3(-0.85, -0.9, -0.3)
+  ]);
+  group.add(makeTube(ioCurve.points, 0.13, 20, 8, MuscleMaterial));
+
+  // 8. Lacrimal Gland (Glandula lacrimalis - superolateral orbit)
+  const lacGeo = new THREE.SphereGeometry(0.32, 16, 14);
+  lacGeo.scale(1.4, 0.8, 0.6);
+  const lacMat = new THREE.MeshStandardMaterial({ color: 0xf472b6, roughness: 0.42 });
+  const lacMesh = new THREE.Mesh(lacGeo, lacMat);
+  lacMesh.position.set(-0.88, 0.92, 0.3);
+  lacMesh.rotation.z = 0.4;
+  group.add(lacMesh);
+
+  group.scale.set(1.25, 1.25, 1.25);
   return group;
 }
 
@@ -765,170 +871,469 @@ export function createHandFingersModel() {
 }
 
 // -------------------------------------------------------------
-// 8. NERVOUS SYSTEM MODEL (Systema nervosum)
+// 8. NERVOUS SYSTEM MODEL (Systema nervosum, Columna vertebralis et Medulla spinalis)
 // -------------------------------------------------------------
 export function createNervousSystemModel() {
   const group = new THREE.Group();
   group.name = "nervous_system";
 
-  // Glowing Brain at Top
-  const brainGeo = new THREE.SphereGeometry(0.75, 28, 24);
-  brainGeo.scale(0.9, 1.1, 1.0);
-  const brainMat = new THREE.MeshStandardMaterial({
-    color: 0x38bdf8,
-    emissive: 0x0284c7,
-    emissiveIntensity: 0.45,
-    roughness: 0.3
+  // 1. BRAIN (Encephalon - Anatomical Lobes, Cerebellum & Brainstem)
+  const brainGroup = new THREE.Group();
+  brainGroup.position.set(0, 2.25, 0);
+
+  // Left & Right Cerebral Hemispheres with distinct anatomical lobes
+  [-1, 1].forEach(side => {
+    // Frontal Lobe (Peshona bo'lagi - Sky Blue)
+    const frontGeo = new THREE.SphereGeometry(0.42, 20, 18);
+    frontGeo.scale(0.85, 0.95, 1.15);
+    const frontMat = new THREE.MeshStandardMaterial({ color: 0x38bdf8, roughness: 0.38 });
+    const frontMesh = new THREE.Mesh(frontGeo, frontMat);
+    frontMesh.position.set(side * 0.32, 0.18, 0.28);
+    brainGroup.add(frontMesh);
+
+    // Parietal Lobe (Tepa bo'lagi - Emerald Green)
+    const pariGeo = new THREE.SphereGeometry(0.4, 18, 16);
+    pariGeo.scale(0.85, 1.05, 1.0);
+    const pariMat = new THREE.MeshStandardMaterial({ color: 0x34d399, roughness: 0.38 });
+    const pariMesh = new THREE.Mesh(pariGeo, pariMat);
+    pariMesh.position.set(side * 0.34, 0.28, -0.15);
+    brainGroup.add(pariMesh);
+
+    // Occipital Lobe (Ensa bo'lagi - Amber Gold)
+    const occGeo = new THREE.SphereGeometry(0.32, 16, 14);
+    occGeo.scale(0.8, 0.85, 0.95);
+    const occMat = new THREE.MeshStandardMaterial({ color: 0xfbbf24, roughness: 0.38 });
+    const occMesh = new THREE.Mesh(occGeo, occMat);
+    occMesh.position.set(side * 0.28, 0.05, -0.48);
+    brainGroup.add(occMesh);
+
+    // Temporal Lobe (Chakka bo'lagi - Lavender Purple)
+    const tempGeo = new THREE.SphereGeometry(0.35, 18, 14);
+    tempGeo.scale(0.75, 0.8, 1.1);
+    const tempMat = new THREE.MeshStandardMaterial({ color: 0xa78bfa, roughness: 0.38 });
+    const tempMesh = new THREE.Mesh(tempGeo, tempMat);
+    tempMesh.position.set(side * 0.42, -0.12, 0.05);
+    brainGroup.add(tempMesh);
+
+    // Cerebellar Hemisphere (Miyacha yarimshari - Coral Red with folia)
+    const cereGeo = new THREE.SphereGeometry(0.32, 18, 16);
+    cereGeo.scale(0.9, 0.8, 0.85);
+    const cereMat = new THREE.MeshStandardMaterial({ color: 0xf87171, roughness: 0.42 });
+    const cereMesh = new THREE.Mesh(cereGeo, cereMat);
+    cereMesh.position.set(side * 0.24, -0.32, -0.35);
+    brainGroup.add(cereMesh);
   });
-  const brainMesh = new THREE.Mesh(brainGeo, brainMat);
-  brainMesh.position.set(0, 2.2, 0);
-  group.add(brainMesh);
 
-  // Cerebellum (Red/Violet lower mass)
-  const cereGeo = new THREE.SphereGeometry(0.38, 20, 20);
-  const cereMat = new THREE.MeshStandardMaterial({ color: 0xef4444, roughness: 0.4 });
-  const cereMesh = new THREE.Mesh(cereGeo, cereMat);
-  cereMesh.position.set(0, 1.7, -0.32);
-  group.add(cereMesh);
-
-  // Spinal Cord (Medulla spinalis - Glowing Golden Core)
-  const spinalCurve = new THREE.CatmullRomCurve3([
-    new THREE.Vector3(0, 1.8, -0.1),
-    new THREE.Vector3(0, 1.1, -0.05),
-    new THREE.Vector3(0, 0.2, -0.08),
-    new THREE.Vector3(0, -0.7, -0.04),
-    new THREE.Vector3(0, -1.6, -0.08)
+  // Brainstem (Miya ustuni: Midbrain, Pons & Medulla oblongata - Ivory)
+  const stemCurve = new THREE.CatmullRomCurve3([
+    new THREE.Vector3(0, -0.1, -0.05),
+    new THREE.Vector3(0, -0.35, -0.1),
+    new THREE.Vector3(0, -0.65, -0.15)
   ]);
-  const spinalMesh = makeTube(spinalCurve.points, 0.12, 32, 12, NerveMaterial);
-  group.add(spinalMesh);
+  const stemMat = new THREE.MeshStandardMaterial({ color: 0xf5eee6, roughness: 0.35 });
+  brainGroup.add(makeTube(stemCurve.points, 0.14, 16, 12, stemMat));
 
-  // 12 Pairs of Cranial Nerves & Spinal Nerve Roots
-  for (let i = 0; i < 18; i++) {
-    const y = 1.3 - i * 0.15;
-    const width = 0.6 + Math.sin(i * 0.25) * 0.45;
+  group.add(brainGroup);
+
+  // 2. VERTEBRAL COLUMN (Columna vertebralis - Complete 24 Vertebrae, Discs, Sacrum & Coccyx)
+  const spineGroup = new THREE.Group();
+  const vertSections = [
+    { count: 7, scale: 0.72, id: 'cervical' },
+    { count: 12, scale: 0.96, id: 'thoracic' },
+    { count: 5, scale: 1.25, id: 'lumbar' }
+  ];
+
+  let currentVertY = 1.6;
+  vertSections.forEach(sec => {
+    for (let i = 0; i < sec.count; i++) {
+      const vUnit = new THREE.Group();
+
+      // Vertebral Body (Corpus vertebrae)
+      const bodyGeo = new THREE.CylinderGeometry(0.22 * sec.scale, 0.24 * sec.scale, 0.09 * sec.scale, 16);
+      const bodyMesh = new THREE.Mesh(bodyGeo, BoneMaterial.clone());
+      bodyMesh.position.set(0, 0, 0.12 * sec.scale);
+      vUnit.add(bodyMesh);
+
+      // Spinous Process (Processus spinosus)
+      const spGeo = new THREE.ConeGeometry(0.06 * sec.scale, 0.38 * sec.scale, 6);
+      const spMesh = new THREE.Mesh(spGeo, BoneMaterial.clone());
+      spMesh.rotation.x = -Math.PI / 2.25;
+      spMesh.position.set(0, -0.04, -0.28 * sec.scale);
+      vUnit.add(spMesh);
+
+      // Transverse Processes (Processus transversi)
+      [-1, 1].forEach(side => {
+        const trGeo = new THREE.BoxGeometry(0.28 * sec.scale, 0.06 * sec.scale, 0.09 * sec.scale);
+        const trMesh = new THREE.Mesh(trGeo, BoneMaterial.clone());
+        trMesh.position.set(side * 0.26 * sec.scale, 0, 0);
+        vUnit.add(trMesh);
+      });
+
+      // Intervertebral Disc (Discus intervertebralis - Cartilage)
+      const discGeo = new THREE.CylinderGeometry(0.23 * sec.scale, 0.23 * sec.scale, 0.035 * sec.scale, 16);
+      const discMesh = new THREE.Mesh(discGeo, CartilageMaterial.clone());
+      discMesh.position.set(0, -0.065 * sec.scale, 0.12 * sec.scale);
+      vUnit.add(discMesh);
+
+      let zCurve = 0;
+      if (sec.id === 'cervical') zCurve = 0.04;
+      else if (sec.id === 'thoracic') zCurve = -0.12 * Math.sin((i / 12) * Math.PI);
+      else if (sec.id === 'lumbar') zCurve = 0.1 * Math.sin((i / 5) * Math.PI);
+
+      vUnit.position.set(0, currentVertY, zCurve);
+      spineGroup.add(vUnit);
+      currentVertY -= 0.13 * sec.scale;
+    }
+  });
+
+  // Sacrum & Coccyx
+  const sacrumGeo = new THREE.ConeGeometry(0.48, 0.72, 6);
+  sacrumGeo.scale(1.15, 1, 0.6);
+  const sacrumMesh = new THREE.Mesh(sacrumGeo, BoneMaterial.clone());
+  sacrumMesh.rotation.x = 0.32;
+  sacrumMesh.position.set(0, currentVertY - 0.3, -0.06);
+  spineGroup.add(sacrumMesh);
+
+  group.add(spineGroup);
+
+  // 3. SPINAL CORD (Medulla spinalis - Luminous Golden Core with Enlargements & Cauda Equina)
+  const cordCurve = new THREE.CatmullRomCurve3([
+    new THREE.Vector3(0, 1.7, -0.15),
+    new THREE.Vector3(0, 1.25, -0.1),  // Cervical enlargement
+    new THREE.Vector3(0, 0.4, -0.18),   // Thoracic cord
+    new THREE.Vector3(0, -0.3, -0.08),  // Lumbar enlargement
+    new THREE.Vector3(0, -0.7, -0.05)   // Conus medullaris at L1-L2
+  ]);
+  const cordMesh = makeTube(cordCurve.points, 0.09, 36, 12, NerveMaterial);
+  group.add(cordMesh);
+
+  // Cauda Equina ("Ot dumi" - Dense descending filaments in lumbosacral canal)
+  for (let c = 0; c < 16; c++) {
+    const spread = (c - 7.5) * 0.022;
+    const caudaCurve = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(0, -0.65, -0.05),
+      new THREE.Vector3(spread * 0.7, -1.2, -0.06 + Math.abs(spread) * 0.2),
+      new THREE.Vector3(spread * 1.2, -1.8, -0.08)
+    ]);
+    group.add(makeTube(caudaCurve.points, 0.018, 18, 6, NerveMaterial));
+  }
+
+  // 4. CRANIAL NERVES (12 pairs emerging from brainstem)
+  [-1, 1].forEach(side => {
+    // Optic Nerves (II) with Optic Chiasm
+    const opticCurve = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(0, 1.95, 0.05),
+      new THREE.Vector3(side * 0.15, 1.98, 0.22),
+      new THREE.Vector3(side * 0.35, 2.05, 0.48)
+    ]);
+    group.add(makeTube(opticCurve.points, 0.04, 14, 6, NerveMaterial));
+
+    // Trigeminal Nerve (V - thick root)
+    const trigemCurve = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(side * 0.12, 1.82, -0.08),
+      new THREE.Vector3(side * 0.42, 1.78, 0.08),
+      new THREE.Vector3(side * 0.65, 1.72, 0.28)
+    ]);
+    group.add(makeTube(trigemCurve.points, 0.042, 14, 6, NerveMaterial));
+
+    // Vagus Nerve (X - long descending parasympathetic trunk)
+    const vagusCurve = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(side * 0.14, 1.68, -0.12),
+      new THREE.Vector3(side * 0.24, 1.15, -0.04),
+      new THREE.Vector3(side * 0.28, 0.45, 0.02),
+      new THREE.Vector3(side * 0.22, -0.2, 0.05)
+    ]);
+    group.add(makeTube(vagusCurve.points, 0.038, 24, 6, NerveMaterial));
+  });
+
+  // 5. 31 PAIRS OF SPINAL NERVES (With Dorsal Root Ganglia)
+  for (let i = 0; i < 24; i++) {
+    const y = 1.55 - i * 0.095;
+    const isThoracic = (i >= 7 && i < 19);
+    const ribWidth = isThoracic ? 0.75 + Math.sin(((i - 7) / 12) * Math.PI) * 0.45 : 0.45;
+
     [-1, 1].forEach(side => {
+      // Intervertebral nerve root
       const nerveRib = new THREE.CatmullRomCurve3([
-        new THREE.Vector3(side * 0.08, y, -0.06),
-        new THREE.Vector3(side * (width * 0.5), y - 0.05, 0.05),
-        new THREE.Vector3(side * width, y - 0.12, 0.2)
+        new THREE.Vector3(side * 0.07, y, -0.1),
+        new THREE.Vector3(side * (ribWidth * 0.5), y - 0.04, 0.02),
+        new THREE.Vector3(side * ribWidth, y - 0.1, 0.18)
       ]);
-      group.add(makeTube(nerveRib.points, 0.035, 12, 6, NerveMaterial));
+      group.add(makeTube(nerveRib.points, 0.028, 14, 6, NerveMaterial));
+
+      // Dorsal Root Ganglion (Spinal ganglion nodule)
+      const drgGeo = new THREE.SphereGeometry(0.042, 8, 8);
+      const drgMesh = new THREE.Mesh(drgGeo, NerveMaterial);
+      drgMesh.position.set(side * 0.16, y - 0.015, -0.08);
+      group.add(drgMesh);
     });
   }
 
-  // Brachial Plexus & Arm Nerves (Both arms)
+  // 6. BRACHIAL PLEXUS & ARM NERVES (Median, Ulnar, Radial, Musculocutaneous)
   [-1, 1].forEach(side => {
-    const armNerve = new THREE.CatmullRomCurve3([
-      new THREE.Vector3(side * 0.15, 1.2, 0),
-      new THREE.Vector3(side * 0.8, 1.05, 0.05),
-      new THREE.Vector3(side * 1.4, 0.6, 0),
-      new THREE.Vector3(side * 1.8, -0.1, 0),
-      new THREE.Vector3(side * 2.1, -0.8, 0)
+    // Brachial Plexus Root
+    const trunkCurve = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(side * 0.16, 1.35, -0.08),
+      new THREE.Vector3(side * 0.48, 1.25, 0.02),
+      new THREE.Vector3(side * 0.85, 1.05, 0.05)
     ]);
-    group.add(makeTube(armNerve.points, 0.06, 24, 8, NerveMaterial));
+    group.add(makeTube(trunkCurve.points, 0.065, 16, 8, NerveMaterial));
+
+    // Median & Ulnar Nerves down forearm to hand
+    const medianArm = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(side * 0.85, 1.05, 0.05),
+      new THREE.Vector3(side * 1.35, 0.55, 0.02),
+      new THREE.Vector3(side * 1.75, -0.05, 0.03),
+      new THREE.Vector3(side * 2.05, -0.65, 0.05)
+    ]);
+    group.add(makeTube(medianArm.points, 0.048, 22, 6, NerveMaterial));
+
+    const radialArm = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(side * 0.85, 1.05, 0.05),
+      new THREE.Vector3(side * 1.28, 0.6, -0.05),
+      new THREE.Vector3(side * 1.82, -0.02, -0.04),
+      new THREE.Vector3(side * 2.12, -0.62, 0.0)
+    ]);
+    group.add(makeTube(radialArm.points, 0.042, 22, 6, NerveMaterial));
   });
 
-  // Lumbosacral Plexus & Massive Sciatic Nerves (Both legs)
+  // 7. LUMBOSACRAL PLEXUS & SCIATIC NERVES (Nervus ischiadicus - Thicker nerve trunks)
   [-1, 1].forEach(side => {
-    const legNerve = new THREE.CatmullRomCurve3([
-      new THREE.Vector3(side * 0.18, -1.4, -0.05),
-      new THREE.Vector3(side * 0.55, -1.8, -0.08),
-      new THREE.Vector3(side * 0.65, -2.5, -0.05),
-      new THREE.Vector3(side * 0.68, -3.3, 0),
-      new THREE.Vector3(side * 0.72, -4.2, 0.05)
+    // Sciatic Nerve Trunk (Main motor/sensory highway to lower limb)
+    const sciatic = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(side * 0.22, -0.75, -0.05),
+      new THREE.Vector3(side * 0.52, -1.35, -0.12),
+      new THREE.Vector3(side * 0.65, -2.1, -0.08),
+      new THREE.Vector3(side * 0.68, -2.85, -0.05)
     ]);
-    group.add(makeTube(legNerve.points, 0.08, 30, 8, NerveMaterial));
+    group.add(makeTube(sciatic.points, 0.08, 24, 8, NerveMaterial));
+
+    // Bifurcation into Tibial & Common Peroneal Nerves
+    const tibial = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(side * 0.68, -2.85, -0.05),
+      new THREE.Vector3(side * 0.66, -3.55, -0.02),
+      new THREE.Vector3(side * 0.68, -4.2, 0.05)
+    ]);
+    group.add(makeTube(tibial.points, 0.05, 20, 6, NerveMaterial));
+
+    const peroneal = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(side * 0.68, -2.85, -0.05),
+      new THREE.Vector3(side * 0.78, -3.45, 0.05),
+      new THREE.Vector3(side * 0.76, -4.15, 0.12)
+    ]);
+    group.add(makeTube(peroneal.points, 0.042, 20, 6, NerveMaterial));
   });
 
-  group.scale.set(0.9, 0.9, 0.9);
-  group.position.y = 0.6;
+  group.scale.set(0.92, 0.92, 0.92);
+  group.position.y = 0.5;
   return group;
 }
 
 // -------------------------------------------------------------
-// 9. CIRCULATORY SYSTEM MODEL (Systema cardiovasculare)
+// 9. CIRCULATORY SYSTEM MODEL (Systema cardiovasculare - Real Anatomical Tree)
 // -------------------------------------------------------------
 export function createCirculatorySystemModel() {
   const group = new THREE.Group();
   group.name = "circulatory_system";
 
-  // Central Beating Heart
+  // 1. ANATOMICAL BEATING HEART IN CENTER
   const heartSub = createHeartModel();
-  heartSub.scale.set(0.48, 0.48, 0.48);
-  heartSub.position.set(0, 0.6, 0.1);
+  heartSub.scale.set(0.55, 0.55, 0.55);
+  heartSub.position.set(0, 0.62, 0.1);
   group.add(heartSub);
 
-  // Aorta & Descending Arterial Tree (Red)
-  const aortaDownCurve = new THREE.CatmullRomCurve3([
-    new THREE.Vector3(0, 0.8, 0),
-    new THREE.Vector3(0.04, 0.2, -0.1),
-    new THREE.Vector3(0.05, -0.5, -0.1),
-    new THREE.Vector3(0.06, -1.3, -0.08)
+  // 2. ARTERIAL SYSTEM (High-Gloss Arterial Crimson: #dc2626)
+  // Aortic Arch & Descending Thoracic / Abdominal Aorta
+  const aortaCurve = new THREE.CatmullRomCurve3([
+    new THREE.Vector3(-0.06, 0.82, 0.12),
+    new THREE.Vector3(-0.04, 1.25, 0.14), // Ascending aorta
+    new THREE.Vector3(0.06, 1.42, 0.0),    // Arcus aortae
+    new THREE.Vector3(0.18, 1.28, -0.15),  // Arch curve
+    new THREE.Vector3(0.08, 0.7, -0.12),   // Descending thoracic aorta
+    new THREE.Vector3(0.06, 0.0, -0.1),    // Diaphragm level
+    new THREE.Vector3(0.05, -0.65, -0.08), // Abdominal aorta
+    new THREE.Vector3(0.04, -1.35, -0.06)  // Bifurcation at L4
   ]);
-  group.add(makeTube(aortaDownCurve.points, 0.14, 24, 12, AortaMaterial));
+  group.add(makeTube(aortaCurve.points, 0.12, 36, 14, AortaMaterial));
 
-  // Inferior Vena Cava (Blue)
-  const ivcDownCurve = new THREE.CatmullRomCurve3([
-    new THREE.Vector3(0.18, 0.5, -0.08),
-    new THREE.Vector3(0.18, -0.5, -0.08),
-    new THREE.Vector3(0.18, -1.3, -0.06)
+  // 3 Aortic Arch Branches:
+  // 1) Brachiocephalic Trunk -> Right Subclavian & Right Carotid
+  const brachioCurve = new THREE.CatmullRomCurve3([
+    new THREE.Vector3(0.04, 1.38, 0.05),
+    new THREE.Vector3(0.2, 1.62, 0.05)
   ]);
-  group.add(makeTube(ivcDownCurve.points, 0.16, 24, 12, VeinMaterial));
+  group.add(makeTube(brachioCurve.points, 0.065, 12, 8, AortaMaterial));
 
-  // Carotid Arteries & Jugular Veins (To Head)
+  // 2) Left Common Carotid Artery (To Head)
+  // 3) Left Subclavian Artery (To Left Arm)
   [-1, 1].forEach(side => {
+    // Common Carotid Arteries -> Internal & External Carotids
     const carotid = new THREE.CatmullRomCurve3([
-      new THREE.Vector3(side * 0.12, 1.0, 0),
-      new THREE.Vector3(side * 0.22, 1.6, 0.05),
-      new THREE.Vector3(side * 0.28, 2.2, 0.08)
+      new THREE.Vector3(side * 0.12, 1.5, 0.04),
+      new THREE.Vector3(side * 0.18, 1.95, 0.06),
+      new THREE.Vector3(side * 0.22, 2.35, 0.08) // Base of skull
     ]);
+    group.add(makeTube(carotid.points, 0.055, 18, 8, AortaMaterial));
+
+    // Circle of Willis (Circulus arteriosus cerebri) at skull base
+    const circleCurve = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(side * 0.22, 2.35, 0.08),
+      new THREE.Vector3(side * 0.28, 2.55, 0.14),
+      new THREE.Vector3(side * 0.12, 2.65, 0.2)
+    ]);
+    group.add(makeTube(circleCurve.points, 0.035, 14, 6, AortaMaterial));
+
+    // Subclavian, Axillary, Brachial, Radial and Ulnar Arteries
+    const armArtery = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(side * 0.22, 1.45, 0.02),
+      new THREE.Vector3(side * 0.75, 1.25, 0.02), // Subclavian / Axillary
+      new THREE.Vector3(side * 1.35, 0.75, 0.0),  // Brachial artery
+      new THREE.Vector3(side * 1.78, 0.15, 0.02), // Cubital fossa
+      new THREE.Vector3(side * 2.1, -0.55, 0.05)  // Radial / Ulnar into Palmar Arch
+    ]);
+    group.add(makeTube(armArtery.points, 0.06, 24, 8, AortaMaterial));
+
+    // Palmar Arch & Digital Arteries in hand
+    [-0.04, 0, 0.04].forEach(d => {
+      const digitalArt = new THREE.CatmullRomCurve3([
+        new THREE.Vector3(side * 2.1, -0.55, 0.05),
+        new THREE.Vector3(side * (2.18 + d), -0.78, 0.06)
+      ]);
+      group.add(makeTube(digitalArt.points, 0.022, 8, 6, AortaMaterial));
+    });
+  });
+
+  // Intercostal Arteries (9 pairs wrapping laterally around rib cage)
+  for (let r = 0; r < 8; r++) {
+    const y = 0.95 - r * 0.12;
+    const ribW = 0.72 + Math.sin((r / 8) * Math.PI) * 0.42;
+    [-1, 1].forEach(side => {
+      const ribArt = new THREE.CatmullRomCurve3([
+        new THREE.Vector3(0.08, y, -0.12),
+        new THREE.Vector3(side * (ribW * 0.5), y - 0.02, 0.0),
+        new THREE.Vector3(side * ribW, y - 0.06, 0.15)
+      ]);
+      group.add(makeTube(ribArt.points, 0.024, 14, 6, AortaMaterial));
+    });
+  }
+
+  // Abdominal Branches: Celiac Trunk, Mesenteric & Renal Arteries
+  const celiac = new THREE.CatmullRomCurve3([
+    new THREE.Vector3(0.06, 0.15, -0.08),
+    new THREE.Vector3(0.02, 0.12, 0.12),
+    new THREE.Vector3(-0.35, 0.16, 0.18) // Splenic artery
+  ]);
+  group.add(makeTube(celiac.points, 0.045, 12, 6, AortaMaterial));
+
+  [-1, 1].forEach(side => {
+    // Renal Arteries branching into kidneys
+    const renalArt = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(0.05, -0.15, -0.08),
+      new THREE.Vector3(side * 0.55, -0.18, -0.04),
+      new THREE.Vector3(side * 0.88, -0.22, 0.0)
+    ]);
+    group.add(makeTube(renalArt.points, 0.05, 14, 6, AortaMaterial));
+  });
+
+  // Aortic Bifurcation -> Common Iliac, Internal & External Iliac, Femoral Arteries
+  [-1, 1].forEach(side => {
+    const legArtery = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(0.04, -1.35, -0.06),
+      new THREE.Vector3(side * 0.42, -1.82, -0.04), // Common iliac
+      new THREE.Vector3(side * 0.58, -2.45, 0.0),   // Femoral artery
+      new THREE.Vector3(side * 0.62, -3.2, -0.04),  // Popliteal artery
+      new THREE.Vector3(side * 0.65, -4.0, 0.02),   // Anterior/posterior tibial
+      new THREE.Vector3(side * 0.68, -4.4, 0.15)    // Dorsalis pedis
+    ]);
+    group.add(makeTube(legArtery.points, 0.07, 30, 8, AortaMaterial));
+  });
+
+  // 3. VENOUS SYSTEM (Deep Royal Blue: #1d4ed8)
+  // Superior Vena Cava (SVC)
+  const svcCurve = new THREE.CatmullRomCurve3([
+    new THREE.Vector3(0.24, 1.45, 0.0),
+    new THREE.Vector3(0.22, 1.05, 0.04),
+    new THREE.Vector3(0.18, 0.72, 0.08) // Entering Right Atrium
+  ]);
+  group.add(makeTube(svcCurve.points, 0.14, 18, 12, VeinMaterial));
+
+  // Inferior Vena Cava (IVC)
+  const ivcCurve = new THREE.CatmullRomCurve3([
+    new THREE.Vector3(0.18, 0.52, 0.08),
+    new THREE.Vector3(0.16, 0.0, -0.06),
+    new THREE.Vector3(0.15, -0.65, -0.06),
+    new THREE.Vector3(0.14, -1.35, -0.05) // Confluence of iliac veins
+  ]);
+  group.add(makeTube(ivcCurve.points, 0.15, 24, 12, VeinMaterial));
+
+  // Jugular Veins & Arm Veins (Cephalic / Basilic / Subclavian)
+  [-1, 1].forEach(side => {
+    // Internal & External Jugular Veins from head
     const jugular = new THREE.CatmullRomCurve3([
-      new THREE.Vector3(side * 0.24, 0.9, -0.02),
-      new THREE.Vector3(side * 0.36, 1.55, 0.03),
-      new THREE.Vector3(side * 0.42, 2.15, 0.06)
+      new THREE.Vector3(side * 0.35, 2.3, 0.06),
+      new THREE.Vector3(side * 0.3, 1.85, 0.03),
+      new THREE.Vector3(side * 0.26, 1.45, 0.0)
     ]);
-    group.add(makeTube(carotid.points, 0.065, 16, 8, AortaMaterial));
-    group.add(makeTube(jugular.points, 0.08, 16, 8, VeinMaterial));
+    group.add(makeTube(jugular.points, 0.07, 18, 8, VeinMaterial));
+
+    // Arm Veins (Cephalic & Basilic)
+    const armVein = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(side * 0.28, 1.45, 0.0),
+      new THREE.Vector3(side * 0.85, 1.2, -0.02),
+      new THREE.Vector3(side * 1.42, 0.7, -0.03),
+      new THREE.Vector3(side * 1.85, 0.1, -0.02),
+      new THREE.Vector3(side * 2.15, -0.58, 0.02)
+    ]);
+    group.add(makeTube(armVein.points, 0.072, 24, 8, VeinMaterial));
+
+    // Renal Veins
+    const renalVein = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(0.16, -0.2, -0.06),
+      new THREE.Vector3(side * 0.55, -0.22, -0.02),
+      new THREE.Vector3(side * 0.88, -0.26, 0.02)
+    ]);
+    group.add(makeTube(renalVein.points, 0.065, 14, 6, VeinMaterial));
+
+    // Common Iliac, Femoral & Great Saphenous Veins (Legs)
+    const legVein = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(0.14, -1.35, -0.05),
+      new THREE.Vector3(side * 0.52, -1.8, -0.03),
+      new THREE.Vector3(side * 0.68, -2.42, 0.01),
+      new THREE.Vector3(side * 0.72, -3.18, -0.02),
+      new THREE.Vector3(side * 0.74, -3.98, 0.03),
+      new THREE.Vector3(side * 0.75, -4.38, 0.12)
+    ]);
+    group.add(makeTube(legVein.points, 0.082, 30, 8, VeinMaterial));
   });
 
-  // Arm Vessels (Subclavian & Brachial)
+  // 4. PULMONARY CIRCULATION (Truncus pulmonalis & 4 Pulmonary Veins)
+  // Pulmonary trunk branching to Left & Right Pulmonary Arteries (Cyan-Blue)
+  const pTrunk = new THREE.CatmullRomCurve3([
+    new THREE.Vector3(0.1, 0.72, 0.28),
+    new THREE.Vector3(0.0, 0.98, 0.22),
+    new THREE.Vector3(-0.24, 1.12, 0.08)
+  ]);
+  group.add(makeTube(pTrunk.points, 0.12, 16, 10, PulmonaryArteryMaterial));
+
   [-1, 1].forEach(side => {
-    const aArm = new THREE.CatmullRomCurve3([
-      new THREE.Vector3(side * 0.2, 0.9, 0),
-      new THREE.Vector3(side * 0.8, 0.8, 0.02),
-      new THREE.Vector3(side * 1.5, 0.4, 0),
-      new THREE.Vector3(side * 2.0, -0.4, 0)
+    const pBranch = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(-0.12, 1.05, 0.14),
+      new THREE.Vector3(side * 0.45, 1.02, -0.05),
+      new THREE.Vector3(side * 0.85, 0.95, -0.15) // Into lungs
     ]);
-    const vArm = new THREE.CatmullRomCurve3([
-      new THREE.Vector3(side * 0.32, 0.85, -0.03),
-      new THREE.Vector3(side * 0.85, 0.75, 0.0),
-      new THREE.Vector3(side * 1.55, 0.35, -0.02),
-      new THREE.Vector3(side * 2.05, -0.45, -0.02)
+    group.add(makeTube(pBranch.points, 0.08, 16, 8, PulmonaryArteryMaterial));
+
+    // Pulmonary Veins (Red) entering Left Atrium
+    const pVein = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(side * 0.82, 0.75, -0.12),
+      new THREE.Vector3(side * 0.42, 0.68, -0.05),
+      new THREE.Vector3(side * 0.12, 0.65, 0.02)
     ]);
-    group.add(makeTube(aArm.points, 0.07, 20, 8, AortaMaterial));
-    group.add(makeTube(vArm.points, 0.085, 20, 8, VeinMaterial));
+    group.add(makeTube(pVein.points, 0.065, 14, 8, AortaMaterial));
   });
 
-  // Leg Vessels (Iliac & Femoral)
-  [-1, 1].forEach(side => {
-    const aLeg = new THREE.CatmullRomCurve3([
-      new THREE.Vector3(0.06, -1.3, -0.08),
-      new THREE.Vector3(side * 0.45, -1.8, -0.05),
-      new THREE.Vector3(side * 0.58, -2.6, 0),
-      new THREE.Vector3(side * 0.62, -3.5, 0.02)
-    ]);
-    const vLeg = new THREE.CatmullRomCurve3([
-      new THREE.Vector3(0.18, -1.3, -0.06),
-      new THREE.Vector3(side * 0.55, -1.78, -0.04),
-      new THREE.Vector3(side * 0.68, -2.58, 0.01),
-      new THREE.Vector3(side * 0.72, -3.48, 0.03)
-    ]);
-    group.add(makeTube(aLeg.points, 0.08, 24, 8, AortaMaterial));
-    group.add(makeTube(vLeg.points, 0.095, 24, 8, VeinMaterial));
-  });
-
-  group.scale.set(0.9, 0.9, 0.9);
-  group.position.y = 0.5;
+  group.scale.set(0.92, 0.92, 0.92);
+  group.position.y = 0.55;
   return group;
 }
 
@@ -1177,157 +1582,397 @@ export function createMusculoskeletalSystemModel() {
 }
 
 // -------------------------------------------------------------
-// 13. URINARY SYSTEM MODEL (Systema urinarium)
+// 13. URINARY SYSTEM MODEL (Systema urinarium - Real Anatomical Kidney & Urinary Tract)
 // -------------------------------------------------------------
 export function createUrinarySystemModel() {
   const group = new THREE.Group();
   group.name = "urinary_system";
 
-  // Left and Right Kidneys (Ren dexter & sinister)
+  // 1. ABDOMINAL AORTA & INFERIOR VENA CAVA (Major Vascular Axis)
+  const aortaSeg = new THREE.CatmullRomCurve3([
+    new THREE.Vector3(0, 1.45, -0.1),
+    new THREE.Vector3(0, 0.4, -0.1),
+    new THREE.Vector3(0, -0.75, -0.08),
+    new THREE.Vector3(0, -1.35, -0.06) // Bifurcation at L4
+  ]);
+  group.add(makeTube(aortaSeg.points, 0.12, 20, 10, AortaMaterial));
+
+  const ivcSeg = new THREE.CatmullRomCurve3([
+    new THREE.Vector3(0.18, 1.45, -0.08),
+    new THREE.Vector3(0.16, 0.4, -0.08),
+    new THREE.Vector3(0.15, -0.75, -0.06),
+    new THREE.Vector3(0.14, -1.35, -0.05)
+  ]);
+  group.add(makeTube(ivcSeg.points, 0.14, 20, 10, VeinMaterial));
+
+  // Common Iliac Vessels at Pelvic Brim
   [-1, 1].forEach(side => {
-    const kGeo = new THREE.SphereGeometry(0.65, 24, 20);
-    kGeo.scale(0.82, 1.35, 0.72);
-    const kMat = new THREE.MeshStandardMaterial({ color: 0x991b1b, roughness: 0.35 });
-    const kMesh = new THREE.Mesh(kGeo, kMat);
-    // Right kidney is slightly lower due to liver
-    const yOffset = (side > 0) ? -0.1 : 0.05;
-    kMesh.position.set(side * 1.05, 0.4 + yOffset, 0);
-    kMesh.rotation.z = side * 0.15;
-    group.add(kMesh);
-
-    // Adrenal Glands (Golden-Yellow cap)
-    const agGeo = new THREE.ConeGeometry(0.28, 0.35, 10);
-    const agMat = new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.4 });
-    const agMesh = new THREE.Mesh(agGeo, agMat);
-    agMesh.position.set(side * 1.05, 1.2 + yOffset, 0);
-    group.add(agMesh);
-
-    // Renal Artery (Red) & Vein (Blue)
-    const rArt = new THREE.CatmullRomCurve3([
-      new THREE.Vector3(0, 0.45, -0.1),
-      new THREE.Vector3(side * 0.85, 0.4 + yOffset, -0.05)
+    const aIliac = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(0, -1.35, -0.06),
+      new THREE.Vector3(side * 0.42, -1.75, -0.04)
     ]);
-    const rVein = new THREE.CatmullRomCurve3([
-      new THREE.Vector3(0.12, 0.35, -0.08),
-      new THREE.Vector3(side * 0.85, 0.32 + yOffset, 0.02)
-    ]);
-    group.add(makeTube(rArt.points, 0.07, 10, 8, AortaMaterial));
-    group.add(makeTube(rVein.points, 0.085, 10, 8, VeinMaterial));
+    group.add(makeTube(aIliac.points, 0.07, 12, 8, AortaMaterial));
 
-    // Ureters (Siydik naylari - Traveling down to bladder)
-    const ureterCurve = new THREE.CatmullRomCurve3([
-      new THREE.Vector3(side * 0.88, 0.25 + yOffset, 0),
-      new THREE.Vector3(side * 0.65, -0.4, 0.05),
-      new THREE.Vector3(side * 0.42, -1.0, 0.08),
-      new THREE.Vector3(side * 0.22, -1.5, 0.05)
+    const vIliac = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(0.14, -1.35, -0.05),
+      new THREE.Vector3(side * 0.48, -1.72, -0.02)
     ]);
-    const ureterMat = new THREE.MeshStandardMaterial({ color: 0xfef08a, roughness: 0.4 });
-    group.add(makeTube(ureterCurve.points, 0.055, 24, 8, ureterMat));
+    group.add(makeTube(vIliac.points, 0.08, 12, 8, VeinMaterial));
   });
 
-  // Aorta & IVC Segments
-  const aortaSeg = new THREE.CatmullRomCurve3([
-    new THREE.Vector3(0, 1.2, -0.1),
-    new THREE.Vector3(0, -0.6, -0.1)
-  ]);
-  const ivcSeg = new THREE.CatmullRomCurve3([
-    new THREE.Vector3(0.16, 1.2, -0.08),
-    new THREE.Vector3(0.16, -0.6, -0.08)
-  ]);
-  group.add(makeTube(aortaSeg.points, 0.12, 14, 10, AortaMaterial));
-  group.add(makeTube(ivcSeg.points, 0.14, 14, 10, VeinMaterial));
+  // 2. RIGHT KIDNEY (Ren dexter - Smooth Fibrous Capsule Surface)
+  // Positioned slightly lower due to liver impression
+  const rkGroup = new THREE.Group();
+  const rkGeo = new THREE.SphereGeometry(0.72, 32, 24);
+  rkGeo.scale(0.85, 1.35, 0.72);
+  const rkMat = new THREE.MeshStandardMaterial({
+    color: 0x881337, // Rich Crimson Renal Parenchyma
+    roughness: 0.35,
+    metalness: 0.05
+  });
+  const rkMesh = new THREE.Mesh(rkGeo, rkMat);
+  rkMesh.position.set(1.15, 0.28, 0);
+  rkMesh.rotation.z = 0.12;
+  rkGroup.add(rkMesh);
 
-  // Urinary Bladder (Siydik pufagi / Qovuq - muscular pear)
-  const bladderGeo = new THREE.SphereGeometry(0.62, 24, 20);
-  bladderGeo.scale(1.05, 0.95, 0.92);
-  const bladderMat = new THREE.MeshStandardMaterial({ color: 0xfb923c, roughness: 0.4 });
+  // Right Renal Hilum vessels & Pelvis
+  const rArt = new THREE.CatmullRomCurve3([
+    new THREE.Vector3(0, 0.35, -0.1),
+    new THREE.Vector3(0.65, 0.32, -0.06),
+    new THREE.Vector3(0.98, 0.28, 0)
+  ]);
+  rkGroup.add(makeTube(rArt.points, 0.065, 14, 8, AortaMaterial));
+
+  const rVein = new THREE.CatmullRomCurve3([
+    new THREE.Vector3(0.16, 0.24, -0.06),
+    new THREE.Vector3(0.65, 0.22, -0.02),
+    new THREE.Vector3(0.98, 0.2, 0.02)
+  ]);
+  rkGroup.add(makeTube(rVein.points, 0.08, 14, 8, VeinMaterial));
+
+  // Right Adrenal Gland (Triangular Pyramidal Cap)
+  const ragGeo = new THREE.ConeGeometry(0.32, 0.42, 8);
+  ragGeo.scale(1.1, 1, 0.65);
+  const agMat = new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.38 }); // Golden Cortex
+  const ragMesh = new THREE.Mesh(ragGeo, agMat);
+  ragMesh.position.set(1.12, 1.15, 0.02);
+  ragMesh.rotation.z = -0.18;
+  rkGroup.add(ragMesh);
+
+  group.add(rkGroup);
+
+  // 3. LEFT KIDNEY (Ren sinister - Detailed Coronal Anatomical Cutaway)
+  // Higher position (T12-L3)
+  const lkGroup = new THREE.Group();
+
+  // Outer Back Capsule Half
+  const lkBackGeo = new THREE.SphereGeometry(0.72, 32, 24, 0, Math.PI * 2, 0, Math.PI);
+  lkBackGeo.scale(0.85, 1.35, 0.72);
+  const lkBackMesh = new THREE.Mesh(lkBackGeo, rkMat);
+  lkBackMesh.position.set(-1.15, 0.45, 0);
+  lkBackMesh.rotation.z = -0.12;
+  lkGroup.add(lkBackMesh);
+
+  // Inner Coronal Cutaway Face: Renal Cortex (Qobiq modda)
+  const cortexGeo = new THREE.RingGeometry(0.25, 0.72, 32);
+  cortexGeo.scale(0.85, 1.35, 1);
+  const cortexMat = new THREE.MeshStandardMaterial({
+    color: 0x991b1b, // Cortex Crimson
+    roughness: 0.4,
+    side: THREE.DoubleSide
+  });
+  const cortexMesh = new THREE.Mesh(cortexGeo, cortexMat);
+  cortexMesh.position.set(-1.15, 0.45, 0.02);
+  cortexMesh.rotation.z = -0.12;
+  lkGroup.add(cortexMesh);
+
+  // Renal Medulla Pyramids (Malpigi piramidalari - 7 triangular segments)
+  for (let p = 0; p < 7; p++) {
+    const pAngle = -Math.PI * 0.45 + (p / 6) * Math.PI * 0.9;
+    const pyrGeo = new THREE.ConeGeometry(0.14, 0.32, 6);
+    const pyrMat = new THREE.MeshStandardMaterial({ color: 0x7f1d1d, roughness: 0.45 });
+    const pyrMesh = new THREE.Mesh(pyrGeo, pyrMat);
+    pyrMesh.rotation.z = pAngle - Math.PI / 2;
+    pyrMesh.position.set(
+      -1.15 + Math.cos(pAngle) * 0.42,
+      0.45 + Math.sin(pAngle) * 0.62,
+      0.03
+    );
+    lkGroup.add(pyrMesh);
+
+    // Minor Calyx cup at apex
+    const calyxGeo = new THREE.CylinderGeometry(0.06, 0.04, 0.08, 8);
+    const calyxMat = new THREE.MeshStandardMaterial({ color: 0xfef3c7, roughness: 0.35 });
+    const calyxMesh = new THREE.Mesh(calyxGeo, calyxMat);
+    calyxMesh.rotation.z = pAngle - Math.PI / 2;
+    calyxMesh.position.set(
+      -1.15 + Math.cos(pAngle) * 0.24,
+      0.45 + Math.sin(pAngle) * 0.35,
+      0.03
+    );
+    lkGroup.add(calyxMesh);
+  }
+
+  // Major Calyces & Funnel-shaped Renal Pelvis (Pelvis renalis - Buyrak jomi)
+  const pelvisGeo = new THREE.ConeGeometry(0.24, 0.48, 12);
+  pelvisGeo.scale(1.2, 1, 0.6);
+  const pelvisMat = new THREE.MeshStandardMaterial({ color: 0xfef08a, roughness: 0.35 });
+  const pelvisMesh = new THREE.Mesh(pelvisGeo, pelvisMat);
+  pelvisMesh.rotation.z = Math.PI / 2 + 0.15;
+  pelvisMesh.position.set(-0.95, 0.42, 0.04);
+  lkGroup.add(pelvisMesh);
+
+  // Left Renal Artery & Vein
+  const lArt = new THREE.CatmullRomCurve3([
+    new THREE.Vector3(0, 0.48, -0.1),
+    new THREE.Vector3(-0.55, 0.46, -0.06),
+    new THREE.Vector3(-0.92, 0.42, 0)
+  ]);
+  lkGroup.add(makeTube(lArt.points, 0.065, 14, 8, AortaMaterial));
+
+  const lVein = new THREE.CatmullRomCurve3([
+    new THREE.Vector3(0.16, 0.38, -0.06),
+    new THREE.Vector3(-0.45, 0.36, -0.02),
+    new THREE.Vector3(-0.92, 0.35, 0.02)
+  ]);
+  lkGroup.add(makeTube(lVein.points, 0.08, 14, 8, VeinMaterial));
+
+  // Left Adrenal Gland (Crescentic Semilunar Cap)
+  const lagGeo = new THREE.TorusGeometry(0.28, 0.09, 8, 16, Math.PI);
+  const lagMesh = new THREE.Mesh(lagGeo, agMat);
+  lagMesh.position.set(-1.12, 1.25, 0.02);
+  lagMesh.rotation.z = Math.PI - 0.2;
+  lkGroup.add(lagMesh);
+
+  group.add(lkGroup);
+
+  // 4. URETERS (Siydik naylari - Retroperitoneal Muscular Conduits with Physiological S-Curves)
+  // Right Ureter
+  const rUreterCurve = new THREE.CatmullRomCurve3([
+    new THREE.Vector3(1.02, 0.15, 0.02),
+    new THREE.Vector3(0.82, -0.35, 0.06),
+    new THREE.Vector3(0.55, -0.95, 0.08),
+    new THREE.Vector3(0.32, -1.45, 0.06),
+    new THREE.Vector3(0.18, -1.68, 0.04) // Oblique entry into bladder
+  ]);
+  const ureterMat = new THREE.MeshStandardMaterial({ color: 0xfef08a, roughness: 0.38 });
+  group.add(makeTube(rUreterCurve.points, 0.055, 24, 8, ureterMat));
+
+  // Left Ureter
+  const lUreterCurve = new THREE.CatmullRomCurve3([
+    new THREE.Vector3(-0.95, 0.28, 0.04),
+    new THREE.Vector3(-0.76, -0.32, 0.06),
+    new THREE.Vector3(-0.52, -0.95, 0.08),
+    new THREE.Vector3(-0.28, -1.45, 0.06),
+    new THREE.Vector3(-0.16, -1.68, 0.04)
+  ]);
+  group.add(makeTube(lUreterCurve.points, 0.055, 24, 8, ureterMat));
+
+  // 5. URINARY BLADDER (Vesica urinaria / Qovuq - Muscular Pear Reservoir)
+  const bladderGeo = new THREE.SphereGeometry(0.68, 28, 24);
+  bladderGeo.scale(1.08, 0.95, 0.92);
+  const bladderMat = new THREE.MeshStandardMaterial({
+    color: 0xf97316, // Muscular Detrusor Orange
+    roughness: 0.38,
+    metalness: 0.05
+  });
   const bladder = new THREE.Mesh(bladderGeo, bladderMat);
-  bladder.position.set(0, -1.65, 0.08);
+  bladder.position.set(0, -1.75, 0.08);
   group.add(bladder);
 
-  // Urethra
-  const urethraCurve = new THREE.CatmullRomCurve3([
-    new THREE.Vector3(0, -2.1, 0.08),
-    new THREE.Vector3(0, -2.55, 0.12)
-  ]);
-  group.add(makeTube(urethraCurve.points, 0.07, 10, 8, bladderMat));
+  // Internal Trigone Window indicator (Trigonum vesicae)
+  const trigoneGeo = new THREE.CircleGeometry(0.24, 16);
+  const trigoneMat = new THREE.MeshBasicMaterial({ color: 0xfef08a, transparent: true, opacity: 0.65 });
+  const trigoneMesh = new THREE.Mesh(trigoneGeo, trigoneMat);
+  trigoneMesh.position.set(0, -1.82, 0.72);
+  group.add(trigoneMesh);
 
-  group.scale.set(1.2, 1.2, 1.2);
-  group.position.y = 0.3;
+  // Ureteral orifices (Ostium ureteris)
+  [-0.1, 0.1].forEach(ux => {
+    const dotGeo = new THREE.SphereGeometry(0.03, 8, 8);
+    const dotMesh = new THREE.Mesh(dotGeo, new THREE.MeshBasicMaterial({ color: 0x0284c7 }));
+    dotMesh.position.set(ux, -1.78, 0.73);
+    group.add(dotMesh);
+  });
+
+  // 6. URETHRA (Siydik chiqarish kanali with Sphincter)
+  const urethraCurve = new THREE.CatmullRomCurve3([
+    new THREE.Vector3(0, -2.25, 0.08),
+    new THREE.Vector3(0, -2.7, 0.12)
+  ]);
+  group.add(makeTube(urethraCurve.points, 0.068, 12, 8, bladderMat));
+
+  // External Urethral Sphincter Ring
+  const sphGeo = new THREE.TorusGeometry(0.12, 0.04, 8, 16);
+  const sphMat = new THREE.MeshStandardMaterial({ color: 0xb91c1c, roughness: 0.4 });
+  const sphMesh = new THREE.Mesh(sphGeo, sphMat);
+  sphMesh.rotation.x = Math.PI / 2;
+  sphMesh.position.set(0, -2.48, 0.1);
+  group.add(sphMesh);
+
+  group.scale.set(1.15, 1.15, 1.15);
+  group.position.y = 0.35;
   return group;
 }
 
 // -------------------------------------------------------------
-// 14. ENDOCRINE SYSTEM MODEL (Systema endocrinum)
+// 14. ENDOCRINE SYSTEM MODEL (Systema endocrinum - Real Internal Secretion Glands)
 // -------------------------------------------------------------
 export function createEndocrineSystemModel() {
   const group = new THREE.Group();
   group.name = "endocrine_system";
 
-  // Pituitary Gland (Hypophysis - glowing blue orb at head level)
-  const pitGeo = new THREE.SphereGeometry(0.24, 18, 18);
-  const pitMat = new THREE.MeshStandardMaterial({
+  // 1. PITUITARY GLAND & HYPOTHALAMUS (Gipofiz bezi - Master Neuroendocrine Hub)
+  const pitGroup = new THREE.Group();
+  pitGroup.position.set(0, 2.3, 0);
+
+  // Infundibular Stalk from Hypothalamus
+  const infCurve = new THREE.CatmullRomCurve3([
+    new THREE.Vector3(0, 0.22, 0),
+    new THREE.Vector3(0, 0.04, 0.02)
+  ]);
+  pitGroup.add(makeTube(infCurve.points, 0.045, 8, 8, NerveMaterial));
+
+  // Anterior Pituitary (Adenohypophysis - Scarlet/Amber)
+  const adenoGeo = new THREE.SphereGeometry(0.2, 18, 16);
+  adenoGeo.scale(1.1, 0.9, 0.85);
+  const adenoMat = new THREE.MeshStandardMaterial({
     color: 0x38bdf8,
     emissive: 0x0284c7,
     emissiveIntensity: 0.5,
     roughness: 0.25
   });
-  const pituitary = new THREE.Mesh(pitGeo, pitMat);
-  pituitary.position.set(0, 2.2, 0);
-  group.add(pituitary);
+  const adenoMesh = new THREE.Mesh(adenoGeo, adenoMat);
+  adenoMesh.position.set(0, 0, 0.08);
+  pitGroup.add(adenoMesh);
 
-  // Thyroid Gland (Qalqonsimon bez - Butterfly shape in neck)
-  const thyroidMat = new THREE.MeshStandardMaterial({ color: 0xb91c1c, roughness: 0.4 });
+  // Posterior Pituitary (Neurohypophysis - Neural Golden tone)
+  const neuroGeo = new THREE.SphereGeometry(0.16, 16, 14);
+  neuroGeo.scale(0.9, 0.85, 0.8);
+  const neuroMat = new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.3 });
+  const neuroMesh = new THREE.Mesh(neuroGeo, neuroMat);
+  neuroMesh.position.set(0, 0.02, -0.06);
+  pitGroup.add(neuroMesh);
+
+  // Sella Turcica (Bone saddle seat)
+  const sellaGeo = new THREE.TorusGeometry(0.24, 0.05, 8, 16, Math.PI);
+  const sellaMesh = new THREE.Mesh(sellaGeo, BoneMaterial);
+  sellaMesh.rotation.x = -Math.PI / 2;
+  sellaMesh.position.set(0, -0.1, 0);
+  pitGroup.add(sellaMesh);
+
+  group.add(pitGroup);
+
+  // 2. PINEAL GLAND (Epifiz bezi - Glandula pinealis)
+  const pinealGeo = new THREE.ConeGeometry(0.1, 0.18, 8);
+  const pinealMat = new THREE.MeshStandardMaterial({ color: 0xa855f7, emissive: 0x7e22ce, emissiveIntensity: 0.35 });
+  const pinealMesh = new THREE.Mesh(pinealGeo, pinealMat);
+  pinealMesh.rotation.x = -Math.PI / 2;
+  pinealMesh.position.set(0, 2.38, -0.22);
+  group.add(pinealMesh);
+
+  // 3. THYROID GLAND (Qalqonsimon bez - Butterfly Architecture with Trachea)
+  const thyGroup = new THREE.Group();
+  thyGroup.position.set(0, 1.35, 0.08);
+
+  // Tracheal Cartilage Rings beneath thyroid
+  for (let t = 0; t < 5; t++) {
+    const trGeo = new THREE.TorusGeometry(0.22, 0.035, 8, 20, Math.PI * 1.6);
+    const trMesh = new THREE.Mesh(trGeo, CartilageMaterial);
+    trMesh.rotation.x = Math.PI / 2;
+    trMesh.position.set(0, 0.25 - t * 0.12, 0.04);
+    thyGroup.add(trMesh);
+  }
+
+  // Left & Right Thyroid Lobes (Rich vascular crimson: #b91c1c)
+  const thyMat = new THREE.MeshStandardMaterial({ color: 0xb91c1c, roughness: 0.38, metalness: 0.05 });
   [-1, 1].forEach(side => {
-    const lobeGeo = new THREE.SphereGeometry(0.35, 18, 16);
-    lobeGeo.scale(0.75, 1.35, 0.65);
-    const lobe = new THREE.Mesh(lobeGeo, thyroidMat);
-    lobe.position.set(side * 0.32, 1.3, 0.12);
-    lobe.rotation.z = -side * 0.2;
-    group.add(lobe);
-  });
-  // Isthmus
-  const isthmusGeo = new THREE.BoxGeometry(0.35, 0.18, 0.12);
-  const isthmus = new THREE.Mesh(isthmusGeo, thyroidMat);
-  isthmus.position.set(0, 1.22, 0.18);
-  group.add(isthmus);
+    const lobeGeo = new THREE.SphereGeometry(0.34, 20, 18);
+    lobeGeo.scale(0.72, 1.45, 0.65);
+    const lobe = new THREE.Mesh(lobeGeo, thyMat);
+    lobe.position.set(side * 0.32, 0.05, 0.06);
+    lobe.rotation.z = -side * 0.22;
+    thyGroup.add(lobe);
 
-  // Thymus Gland (In chest)
-  const thymusGeo = new THREE.SphereGeometry(0.38, 18, 16);
-  thymusGeo.scale(0.9, 1.2, 0.6);
-  const thymusMat = new THREE.MeshStandardMaterial({ color: 0xf472b6, roughness: 0.45 });
+    // Superior & Inferior Parathyroid Glands (Qalqonoldi bezlari - 4 small lentil glands)
+    [-0.12, 0.15].forEach(py => {
+      const paraGeo = new THREE.SphereGeometry(0.055, 8, 8);
+      const paraMat = new THREE.MeshStandardMaterial({ color: 0xf59e0b, roughness: 0.3 }); // Amber
+      const paraMesh = new THREE.Mesh(paraGeo, paraMat);
+      paraMesh.position.set(side * 0.32, py, -0.12); // Posterior capsule
+      thyGroup.add(paraMesh);
+    });
+  });
+
+  // Thyroid Isthmus across trachea
+  const isthGeo = new THREE.CylinderGeometry(0.12, 0.12, 0.32, 12);
+  isthGeo.scale(1, 1, 0.5);
+  const isthMesh = new THREE.Mesh(isthGeo, thyMat);
+  isthMesh.rotation.z = Math.PI / 2;
+  isthMesh.position.set(0, -0.04, 0.18);
+  thyGroup.add(isthMesh);
+
+  group.add(thyGroup);
+
+  // 4. THYMUS GLAND (Ayrsimon bez / Timus - Bi-lobed Mediastinal Gland)
+  const thymusGeo = new THREE.SphereGeometry(0.38, 20, 18);
+  thymusGeo.scale(0.85, 1.25, 0.55);
+  const thymusMat = new THREE.MeshStandardMaterial({ color: 0xf472b6, roughness: 0.42 });
   const thymus = new THREE.Mesh(thymusGeo, thymusMat);
-  thymus.position.set(0, 0.65, 0.1);
+  thymus.position.set(0, 0.68, 0.12);
   group.add(thymus);
 
-  // Adrenal Glands (On kidneys)
+  // 5. ADRENAL GLANDS (Buyrak usti bezlari / Glandulae suprarenales)
+  // Left and Right Adrenal Glands capping the kidneys
   [-1, 1].forEach(side => {
-    const agGeo = new THREE.ConeGeometry(0.26, 0.38, 10);
+    const agGeo = new THREE.ConeGeometry(0.28, 0.42, 8);
+    agGeo.scale(1.15, 1, 0.65);
     const agMat = new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.35 });
     const agMesh = new THREE.Mesh(agGeo, agMat);
-    agMesh.position.set(side * 0.85, -0.2, 0);
+    agMesh.position.set(side * 0.95, -0.15, 0);
+    agMesh.rotation.z = -side * 0.22;
     group.add(agMesh);
   });
 
-  // Pancreatic Islets indicator (Pancreas with glowing hormone dots)
+  // 6. ENDOCRINE PANCREAS (Oshqozon osti bezi - Islets of Langerhans / Langergans orolchalari)
   const panc = createPancreasModel();
-  panc.scale.set(0.65, 0.65, 0.65);
-  panc.position.set(0.2, -0.65, 0.1);
+  panc.scale.set(0.7, 0.7, 0.7);
+  panc.position.set(0.15, -0.65, 0.08);
   group.add(panc);
 
-  // Glowing Hormone Distribution Beams (Translucent cyan-violet vertical lines)
-  const beamMat = new THREE.MeshBasicMaterial({
-    color: 0xa855f7,
+  // Luminous Langerhans Islet nodes (Glowing hormone synthesis clusters)
+  for (let n = 0; n < 8; n++) {
+    const nodeGeo = new THREE.SphereGeometry(0.04, 8, 8);
+    const nodeMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8 });
+    const nodeMesh = new THREE.Mesh(nodeGeo, nodeMat);
+    nodeMesh.position.set(-0.35 + n * 0.14, -0.62 + (n % 2) * 0.05, 0.25);
+    group.add(nodeMesh);
+  }
+
+  // 7. ENDOCRINE GONADS (Tuxumdonlar / Moyaklar - Ovaries / Testes)
+  [-1, 1].forEach(side => {
+    const gonadGeo = new THREE.SphereGeometry(0.18, 14, 12);
+    gonadGeo.scale(0.85, 1.25, 0.85);
+    const gonadMat = new THREE.MeshStandardMaterial({ color: 0xf43f5e, roughness: 0.38 });
+    const gonadMesh = new THREE.Mesh(gonadGeo, gonadMat);
+    gonadMesh.position.set(side * 0.45, -1.85, 0.06);
+    group.add(gonadMesh);
+  });
+
+  // 8. GLOWING HORMONAL DISTRIBUTION CHANNELS (Endocrine Systemic Signaling Axis)
+  const axisMat = new THREE.MeshBasicMaterial({
+    color: 0x38bdf8,
     transparent: true,
     opacity: 0.35,
     wireframe: true
   });
-  const beamGeo = new THREE.CylinderGeometry(0.04, 0.04, 4.6, 8);
-  const beamMesh = new THREE.Mesh(beamGeo, beamMat);
-  beamMesh.position.set(0, 0.1, 0);
-  group.add(beamMesh);
+  const axisGeo = new THREE.CylinderGeometry(0.035, 0.035, 4.4, 8);
+  const axisMesh = new THREE.Mesh(axisGeo, axisMat);
+  axisMesh.position.set(0, 0.2, 0);
+  group.add(axisMesh);
 
   group.scale.set(1.15, 1.15, 1.15);
+  group.position.y = 0.2;
   return group;
 }
 
@@ -1413,6 +2058,7 @@ export const PROCEDURAL_MODEL_BUILDERS = {
   skull: createSkullModel,
   heart: createHeartModel,
   eye: createEyeTissuesModel,
+  eye_tissues: createEyeTissuesModel,
   gallbladder: createGallbladderModel,
   pancreas: createPancreasModel,
   oral_cavity: createOralCavityModel,

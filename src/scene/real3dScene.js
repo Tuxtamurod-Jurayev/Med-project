@@ -441,19 +441,75 @@ export class Real3DSceneManager {
           } else {
             // Procedural bone or tissue fallback
             if (key === 'spine') {
-              child.material = new THREE.MeshStandardMaterial({
-                color: 0xf6efe2,
-                roughness: 0.42,
-                metalness: 0.05,
-                side: THREE.DoubleSide
-              });
+              const nodeName = (child.name || '').toLowerCase();
+              if (nodeName.includes('disc') || nodeName.includes('cartilage')) {
+                child.material = new THREE.MeshStandardMaterial({
+                  color: 0x93c5fd,
+                  roughness: 0.28,
+                  metalness: 0.05,
+                  transparent: true,
+                  opacity: 0.88,
+                  side: THREE.DoubleSide
+                });
+              } else {
+                child.material = new THREE.MeshStandardMaterial({
+                  color: 0xf6efe2,
+                  roughness: 0.42,
+                  metalness: 0.05,
+                  side: THREE.DoubleSide
+                });
+              }
             } else if (key === 'kidney') {
-              child.material = new THREE.MeshStandardMaterial({
-                color: 0x881337,
-                roughness: 0.35,
-                metalness: 0.05,
-                side: THREE.DoubleSide
-              });
+              const meshName = (child.name || '');
+              if (meshName.includes('10')) {
+                // Renal Cortex & Fibrous Capsule
+                child.material = new THREE.MeshStandardMaterial({
+                  color: 0x881337,
+                  roughness: 0.35,
+                  metalness: 0.05,
+                  side: THREE.DoubleSide
+                });
+              } else if (meshName.includes('11')) {
+                // Renal Medulla Pyramids
+                child.material = new THREE.MeshStandardMaterial({
+                  color: 0x7f1d1d,
+                  roughness: 0.4,
+                  metalness: 0.05,
+                  side: THREE.DoubleSide
+                });
+              } else if (meshName.includes('2') || meshName.includes('8')) {
+                // Ureter & Renal Pelvis (Ivory / Pale Yellow)
+                child.material = new THREE.MeshStandardMaterial({
+                  color: 0xfef08a,
+                  roughness: 0.35,
+                  metalness: 0.05,
+                  side: THREE.DoubleSide
+                });
+              } else if (meshName.includes('0') || meshName.includes('3') || meshName.includes('4')) {
+                // Renal Artery branches (Scarlet Red)
+                child.material = new THREE.MeshStandardMaterial({
+                  color: 0xdc2626,
+                  roughness: 0.28,
+                  metalness: 0.1,
+                  side: THREE.DoubleSide
+                });
+              } else if (meshName.includes('1') || meshName.includes('5')) {
+                // Renal Vein branches (Royal Blue)
+                child.material = new THREE.MeshStandardMaterial({
+                  color: 0x1d4ed8,
+                  roughness: 0.28,
+                  metalness: 0.1,
+                  side: THREE.DoubleSide
+                });
+              } else {
+                // Minor and Major Calyces
+                child.material = new THREE.MeshStandardMaterial({
+                  color: 0xfef3c7,
+                  roughness: 0.35,
+                  metalness: 0.05,
+                  side: THREE.DoubleSide
+                });
+              }
             } else {
               child.material.roughness = 0.35;
               child.material.side = THREE.DoubleSide;

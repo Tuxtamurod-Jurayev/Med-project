@@ -132,6 +132,56 @@ export const ANATOMY_DATA = {
     ]
   },
 
+  eye_tissues: {
+    id: "eye_tissues",
+    nameUz: "Ko'z olmasi ichki qatlamlari",
+    nameLat: "Tunicae bulbi oculi",
+    nameEn: "Ocular Layers & Extraocular Tissues 3D",
+    systemKey: "sensory",
+    system: "Sezgi a'zolari (Organa sensuum)",
+    category: "Anatomik qatlamlar va to'qimalar",
+    bonesCount: "0 ta suyak",
+    weight: "~7.5 g",
+    keywords: ["ko'z to'qimalari", "ko'z qatlamlari", "sclera", "cornea", "iris", "retina"],
+    description: "Ko'z olmasi uchta asosiy pardadan (tashqi tolali, o'rta tomirli va ichki to'r parda) hamda yorug'lik sindiruvchi muhitlardan (shox parda, gavhar, shishasimon tana) iborat.",
+    parts: [
+      { id: "sclera", nameUz: "Oqsil parda (Sklera)", nameLat: "Sclera", desc: "Ko'z olmasining orqa 5/6 qismini qoplovchi pishiq tolali oq qobiq." },
+      { id: "cornea", nameUz: "Shox parda (Kornea)", nameLat: "Cornea", desc: "Oldingi shaffof yorug'lik sindiruvchi sferik qism (sinish kuchi ~43 dioptriya)." },
+      { id: "iris", nameUz: "Kamalak parda (Iris)", nameLat: "Iris", desc: "Ko'z rangini belgilovchi va qorachiq o'lchamini toraytirib-kengaytiruvchi mushakli parda." },
+      { id: "lens", nameUz: "Gavhar (Linza)", nameLat: "Lens crystallina", desc: "Akkomodatsiyani (yaqin va uzoqqa moslanishni) ta'minlovchi ikki tomoni qabariq elastik linza." },
+      { id: "retina", nameUz: "To'r parda (Retina)", nameLat: "Retina", desc: "Fotoretseptorlar (tayoqcha va kolbachalar) joylashgan yorug'lik sezuvchi asab qavati." },
+      { id: "optic_nerve", nameUz: "Ko'ruv nervi (II juft)", nameLat: "Nervus opticus", desc: "Retinadan bosh miya ensa bo'lagiga vizual signallarni uzatuvchi qalin nerv dastasi." },
+      { id: "muscles", nameUz: "Ko'zni harakatlantiruvchi mushaklar", nameLat: "Musculi bulbi", desc: "4 ta to'g'ri va 2 ta qiyshiq mushaklar (m. recti et m. obliqui)." }
+    ],
+    functions: [
+      "Optik yorug'lik nurlarini fokuslab retinaga yo'naltirish",
+      "Fotoretseptorlar orqali yorug'lik energiyasini nerv impulslariga aylantirish",
+      "Rang ajratish (kolbachalar) va qorong'ida ko'rish (tayoqchalar)",
+      "Binokulyar va stereoskopik (3D) fazoviy ko'rish",
+      "Akkomodatsiya va qorachiq yorug'lik refleksini boshqarish"
+    ],
+    clinical: [
+      "Miopiya (yaqindan ko'rish) va gipermetropiya (uzoqdan ko'rish)",
+      "Katarakta — gavharning xiralashishi va ko'rish o'tkirligining pasayishi",
+      "Glaukoma — ko'z ichki bosimining oshishi va ko'ruv nervining zararlanishi",
+      "Retinopatiya — qandli diabet va gipertoniyada to'r parda tomirlarining zararlanishi"
+    ],
+    quiz: [
+      {
+        question: "Ko'z olmasining optik sindirish kuchi eng yuqori bo'lgan qismi qaysi?",
+        options: ["Shox parda (Cornea)", "Gavhar (Lens)", "Shishasimon tana", "Sklera"],
+        correct: 0,
+        explanation: "Shox parda (Cornea) ~43 dioptriya bilan ko'zning eng kuchli yorug'lik sindiruvchi qismidir."
+      },
+      {
+        question: "Rang ajratish uchun mas'ul bo'lgan fotoretseptorlar qaysilar?",
+        options: ["Kolbachalar (Cones)", "Tayoqchalar (Rods)", "Ganglionar hujayralar", "Bipolyar hujayralar"],
+        correct: 0,
+        explanation: "Kolbachalar (Cones) rang ajratishga javobgardir."
+      }
+    ]
+  },
+
   // 4. QON AYLANISH / YURAK
   heart: {
     id: "heart",
