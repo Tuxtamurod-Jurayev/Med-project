@@ -1206,6 +1206,16 @@ html, body {
     display: none !important;
   }
 
+  /* Level 2 Sub-organs chips bar hidden on mobile as requested */
+  .sub-organs-bar {
+    display: none !important;
+  }
+
+  .systems-menu-bar {
+    padding: 8px 10px 8px;
+    gap: 0;
+  }
+
   .mobile-menu-trigger-btn {
     display: flex;
     align-items: center;

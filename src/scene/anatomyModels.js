@@ -877,47 +877,77 @@ export function createNervousSystemModel() {
   const group = new THREE.Group();
   group.name = "nervous_system";
 
-  // 1. BRAIN (Encephalon - Anatomical Lobes, Cerebellum & Brainstem)
+  // 1. BRAIN (Encephalon - Anatomically Convoluted Lobes, Cerebellum & Brainstem)
   const brainGroup = new THREE.Group();
   brainGroup.position.set(0, 2.25, 0);
+
+  // Helper to generate organic convoluted cortex with gyri & sulci grooves
+  const makeCortexGeo = (radius, sx, sy, sz) => {
+    const geo = new THREE.SphereGeometry(radius, 28, 24);
+    const pos = geo.attributes.position;
+    for (let i = 0; i < pos.count; i++) {
+      const x = pos.getX(i);
+      const y = pos.getY(i);
+      const z = pos.getZ(i);
+      const gyrus = Math.sin(x * 18) * Math.cos(y * 16) * Math.sin(z * 18) * 0.028
+                  + Math.sin(y * 28 + z * 20) * 0.015;
+      const len = Math.sqrt(x * x + y * y + z * z) || 1.0;
+      const factor = (len + gyrus) / len;
+      pos.setXYZ(i, x * factor * sx, y * factor * sy, z * factor * sz);
+    }
+    geo.computeVertexNormals();
+    return geo;
+  };
+
+  // Helper for cerebellar horizontal folia
+  const makeFoliaGeo = (radius, sx, sy, sz) => {
+    const geo = new THREE.SphereGeometry(radius, 28, 22);
+    const pos = geo.attributes.position;
+    for (let i = 0; i < pos.count; i++) {
+      const x = pos.getX(i);
+      const y = pos.getY(i);
+      const z = pos.getZ(i);
+      const folia = Math.sin(y * 48) * 0.02;
+      const len = Math.sqrt(x * x + y * y + z * z) || 1.0;
+      const factor = (len + folia) / len;
+      pos.setXYZ(i, x * factor * sx, y * factor * sy, z * factor * sz);
+    }
+    geo.computeVertexNormals();
+    return geo;
+  };
 
   // Left & Right Cerebral Hemispheres with distinct anatomical lobes
   [-1, 1].forEach(side => {
     // Frontal Lobe (Peshona bo'lagi - Sky Blue)
-    const frontGeo = new THREE.SphereGeometry(0.42, 20, 18);
-    frontGeo.scale(0.85, 0.95, 1.15);
+    const frontGeo = makeCortexGeo(0.42, 0.85, 0.95, 1.15);
     const frontMat = new THREE.MeshStandardMaterial({ color: 0x38bdf8, roughness: 0.38 });
     const frontMesh = new THREE.Mesh(frontGeo, frontMat);
     frontMesh.position.set(side * 0.32, 0.18, 0.28);
     brainGroup.add(frontMesh);
 
     // Parietal Lobe (Tepa bo'lagi - Emerald Green)
-    const pariGeo = new THREE.SphereGeometry(0.4, 18, 16);
-    pariGeo.scale(0.85, 1.05, 1.0);
+    const pariGeo = makeCortexGeo(0.4, 0.85, 1.05, 1.0);
     const pariMat = new THREE.MeshStandardMaterial({ color: 0x34d399, roughness: 0.38 });
     const pariMesh = new THREE.Mesh(pariGeo, pariMat);
     pariMesh.position.set(side * 0.34, 0.28, -0.15);
     brainGroup.add(pariMesh);
 
     // Occipital Lobe (Ensa bo'lagi - Amber Gold)
-    const occGeo = new THREE.SphereGeometry(0.32, 16, 14);
-    occGeo.scale(0.8, 0.85, 0.95);
+    const occGeo = makeCortexGeo(0.32, 0.8, 0.85, 0.95);
     const occMat = new THREE.MeshStandardMaterial({ color: 0xfbbf24, roughness: 0.38 });
     const occMesh = new THREE.Mesh(occGeo, occMat);
     occMesh.position.set(side * 0.28, 0.05, -0.48);
     brainGroup.add(occMesh);
 
     // Temporal Lobe (Chakka bo'lagi - Lavender Purple)
-    const tempGeo = new THREE.SphereGeometry(0.35, 18, 14);
-    tempGeo.scale(0.75, 0.8, 1.1);
+    const tempGeo = makeCortexGeo(0.35, 0.75, 0.8, 1.1);
     const tempMat = new THREE.MeshStandardMaterial({ color: 0xa78bfa, roughness: 0.38 });
     const tempMesh = new THREE.Mesh(tempGeo, tempMat);
     tempMesh.position.set(side * 0.42, -0.12, 0.05);
     brainGroup.add(tempMesh);
 
     // Cerebellar Hemisphere (Miyacha yarimshari - Coral Red with folia)
-    const cereGeo = new THREE.SphereGeometry(0.32, 18, 16);
-    cereGeo.scale(0.9, 0.8, 0.85);
+    const cereGeo = makeFoliaGeo(0.32, 0.9, 0.8, 0.85);
     const cereMat = new THREE.MeshStandardMaterial({ color: 0xf87171, roughness: 0.42 });
     const cereMesh = new THREE.Mesh(cereGeo, cereMat);
     cereMesh.position.set(side * 0.24, -0.32, -0.35);
