@@ -1,23 +1,47 @@
 import confetti from 'canvas-confetti';
 import { ANATOMY_DATA } from './data/anatomyData.js';
+import { REAL_ANATOMY_ASSETS } from './data/realAnatomyAssets.js';
 import { SAMPLE_ANATOMY_IMAGES } from './data/sampleImages.js';
-import { SceneManager } from './scene/sceneManager.js';
 import { ARCameraManager } from './camera/arCamera.js';
 
 // Application State
 let currentModelKey = 'skull';
 let currentMode = 'studio'; // 'studio' | 'camera' | 'image'
+let isXRayMode = false;
+let isShowingPins = true;
+let isPulsing = false;
 let currentQuizScore = 0;
 let userAnswers = {};
 
+// 3D Tilt & Zoom State
+let zoomLevel = 1.0;
+let tiltX = 0;
+let tiltY = 0;
+
 // DOM Elements
-const canvasContainer = document.getElementById('canvasContainer');
 const cameraFeed = document.getElementById('cameraFeed');
 const imageFeedContainer = document.getElementById('imageFeedContainer');
 const targetImageDisplay = document.getElementById('targetImageDisplay');
 const targetImageLabel = document.getElementById('targetImageLabel');
 const imageFileInput = document.getElementById('imageFileInput');
 const arReticle = document.getElementById('arReticle');
+
+// Real Anatomy Viewer Elements
+const realAnatomyViewer = document.getElementById('realAnatomyViewer');
+const tiltWrapper = document.getElementById('tiltWrapper');
+const realAnatomyImg = document.getElementById('realAnatomyImg');
+const xrayAnatomyImg = document.getElementById('xrayAnatomyImg');
+const hotspotsOverlay = document.getElementById('hotspotsOverlay');
+
+// Tools & Controls
+const toggleLayerBtn = document.getElementById('toggleLayerBtn');
+const layerBtnText = document.getElementById('layerBtnText');
+const togglePinsBtn = document.getElementById('togglePinsBtn');
+const pulseAnimBtn = document.getElementById('pulseAnimBtn');
+const resetViewBtn = document.getElementById('resetViewBtn');
+const snapshotBtn = document.getElementById('snapshotBtn');
+const speakNameBtn = document.getElementById('speakNameBtn');
+const fullscreenBtn = document.getElementById('fullscreenBtn');
 
 // Mode Switch & Docks
 const modeButtons = document.querySelectorAll('.mode-btn');
@@ -27,21 +51,10 @@ const arOpacitySlider = document.getElementById('arOpacitySlider');
 const switchCameraBtn = document.getElementById('switchCameraBtn');
 const cameraStatusIndicator = document.getElementById('cameraStatusIndicator');
 
-// 3D Tool Buttons
-const resetCamBtn = document.getElementById('resetCamBtn');
-const xrayBtn = document.getElementById('xrayBtn');
-const wireframeBtn = document.getElementById('wireframeBtn');
-const autoRotateBtn = document.getElementById('autoRotateBtn');
-const snapshotBtn = document.getElementById('snapshotBtn');
-const speakNameBtn = document.getElementById('speakNameBtn');
-const fullscreenBtn = document.getElementById('fullscreenBtn');
-
-// Sidebar & Tabs
+// Sidebar & Details
 const infoSidebar = document.getElementById('infoSidebar');
 const closeSidebarBtn = document.getElementById('closeSidebarBtn');
 const drawerHandle = document.getElementById('drawerHandle');
-
-// Sidebar Fields
 const organNameUz = document.getElementById('organNameUz');
 const organNameLat = document.getElementById('organNameLat');
 const organCategory = document.getElementById('organCategory');
@@ -55,7 +68,7 @@ const quizContainer = document.getElementById('quizContainer');
 const quizScoreBadge = document.getElementById('quizScoreBadge');
 const resetQuizBtn = document.getElementById('resetQuizBtn');
 
-// Mobile Bottom Nav & Modal
+// Mobile Bottom Bar & Modal
 const mNavOrgan = document.getElementById('mNavOrgan');
 const mNavMode = document.getElementById('mNavMode');
 const mNavInfo = document.getElementById('mNavInfo');
@@ -63,24 +76,21 @@ const mNavQuiz = document.getElementById('mNavQuiz');
 const mobileOrganModal = document.getElementById('mobileOrganModal');
 const closeOrganModal = document.getElementById('closeOrganModal');
 
-// Initialize 3D Scene
-const sceneManager = new SceneManager(canvasContainer);
-
-// Initialize AR Camera
+// Initialize AR Camera Manager
 const arCamera = new ARCameraManager(cameraFeed, (status) => {
   if (status === 'active') {
     cameraFeed.style.opacity = '1';
     arReticle.classList.remove('hidden');
     cameraControlsDock.classList.remove('hidden');
-    sceneManager.setTransparentBackground(true);
+    tiltWrapper.style.opacity = '0.85';
     updateStatus('dot-active', 'AR Kamera Faol', '#10b981');
   } else {
     cameraFeed.style.opacity = '0';
     arReticle.classList.add('hidden');
     cameraControlsDock.classList.add('hidden');
+    tiltWrapper.style.opacity = '1';
     if (currentMode === 'studio') {
-      sceneManager.setTransparentBackground(false);
-      updateStatus('dot-idle', '3D Studio Rejimi', '#64748b');
+      updateStatus('dot-idle', 'Haqiqiy Anatomiya Rejimi', '#38bdf8');
     }
   }
 });
@@ -93,7 +103,124 @@ function updateStatus(dotClass, text, color) {
 }
 
 /**
- * MODE SWITCHING LOGIC (Studio | Camera | Image)
+ * LOAD REAL ANATOMICAL IMAGERY & HOTSPOTS
+ */
+function loadRealAnatomy(organKey) {
+  const asset = REAL_ANATOMY_ASSETS[organKey];
+  if (!asset) return;
+
+  // Set real images
+  realAnatomyImg.src = asset.realImage;
+  xrayAnatomyImg.src = asset.xrayImage;
+
+  // Handle pulse animation automatically for heart
+  if (organKey === 'heart') {
+    isPulsing = true;
+    tiltWrapper.classList.add('pulsing');
+    pulseAnimBtn.classList.add('active');
+  } else {
+    isPulsing = false;
+    tiltWrapper.classList.remove('pulsing');
+    pulseAnimBtn.classList.remove('active');
+  }
+
+  // Populate Hotspots
+  hotspotsOverlay.innerHTML = '';
+  asset.hotspots.forEach(pin => {
+    const pinEl = document.createElement('div');
+    pinEl.className = 'hotspot-pin';
+    pinEl.setAttribute('data-pin-id', pin.id);
+    pinEl.style.left = `${pin.x}%`;
+    pinEl.style.top = `${pin.y}%`;
+
+    pinEl.innerHTML = `
+      <div class="pin-ring"></div>
+      <div class="pin-core"></div>
+      <div class="pin-tooltip">
+        <span class="pin-tooltip-uz">${pin.nameUz}</span>
+        <span class="pin-tooltip-lat">${pin.nameLat}</span>
+      </div>
+    `;
+
+    // Click pin -> highlight in sidebar
+    pinEl.addEventListener('click', (e) => {
+      e.stopPropagation();
+      highlightPin(pin.id);
+      highlightPartInSidebar(pin.id);
+    });
+
+    hotspotsOverlay.appendChild(pinEl);
+  });
+
+  resetTiltAndZoom();
+}
+
+/**
+ * 3D SPATIAL TILT & TOUCH INTERACTION
+ */
+function applyTransform() {
+  tiltWrapper.style.transform = `rotateX(${tiltX}deg) rotateY(${tiltY}deg) scale(${zoomLevel})`;
+}
+
+function resetTiltAndZoom() {
+  zoomLevel = 1.0;
+  tiltX = 0;
+  tiltY = 0;
+  applyTransform();
+}
+
+// Mouse move 3D tilt
+realAnatomyViewer.addEventListener('pointermove', (e) => {
+  const rect = realAnatomyViewer.getBoundingClientRect();
+  const centerX = rect.left + rect.width / 2;
+  const centerY = rect.top + rect.height / 2;
+
+  const deltaX = (e.clientX - centerX) / (rect.width / 2);
+  const deltaY = (e.clientY - centerY) / (rect.height / 2);
+
+  tiltY = deltaX * 14;
+  tiltX = -deltaY * 14;
+  applyTransform();
+});
+
+realAnatomyViewer.addEventListener('pointerleave', () => {
+  tiltX = 0;
+  tiltY = 0;
+  applyTransform();
+});
+
+// Zoom with mouse scroll
+realAnatomyViewer.addEventListener('wheel', (e) => {
+  e.preventDefault();
+  zoomLevel += e.deltaY * -0.0012;
+  zoomLevel = Math.min(Math.max(0.7, zoomLevel), 1.8);
+  applyTransform();
+}, { passive: false });
+
+/**
+ * HIGHLIGHTING HELPERS
+ */
+function highlightPin(partId) {
+  document.querySelectorAll('.hotspot-pin').forEach(pin => {
+    pin.classList.toggle('active', pin.getAttribute('data-pin-id') === partId);
+  });
+}
+
+function highlightPartInSidebar(partId) {
+  const allCards = partsList.querySelectorAll('.part-card');
+  allCards.forEach(c => c.classList.remove('active'));
+
+  const matchingCard = partsList.querySelector(`[data-part-id="${partId}"]`);
+  if (matchingCard) {
+    matchingCard.classList.add('active');
+    matchingCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  switchTab('parts');
+}
+
+/**
+ * MODE SWITCHING (Haqiqiy Anatomiya | Kamera AR | Rasm Belgilash)
  */
 async function switchMode(mode) {
   currentMode = mode;
@@ -108,8 +235,8 @@ async function switchMode(mode) {
     imageSelectDock.classList.add('hidden');
     cameraControlsDock.classList.add('hidden');
     arReticle.classList.add('hidden');
-    sceneManager.setTransparentBackground(false);
-    updateStatus('dot-idle', '3D Studio Rejimi', '#64748b');
+    tiltWrapper.style.opacity = '1';
+    updateStatus('dot-idle', 'Haqiqiy Anatomiya Rejimi', '#38bdf8');
   } else if (mode === 'camera') {
     imageFeedContainer.classList.add('hidden');
     imageSelectDock.classList.add('hidden');
@@ -120,11 +247,10 @@ async function switchMode(mode) {
     imageSelectDock.classList.remove('hidden');
     cameraControlsDock.classList.add('hidden');
     arReticle.classList.add('hidden');
-    sceneManager.setTransparentBackground(true);
+    tiltWrapper.style.opacity = '0.9';
 
-    // Load sample image for current organ
     loadTargetImage(currentModelKey);
-    updateStatus('dot-image', 'Rasm & 3D Rejimi', '#38bdf8');
+    updateStatus('dot-image', 'Rasm Belgilash Rejimi', '#38bdf8');
   }
 }
 
@@ -135,7 +261,7 @@ modeButtons.forEach(btn => {
 });
 
 /**
- * TARGET IMAGE LOADING
+ * TARGET IMAGE SELECTION & UPLOAD
  */
 function loadTargetImage(key) {
   if (SAMPLE_ANATOMY_IMAGES[key]) {
@@ -143,14 +269,12 @@ function loadTargetImage(key) {
     const organName = ANATOMY_DATA[key] ? ANATOMY_DATA[key].nameUz : key;
     targetImageLabel.textContent = `Belgilangan: ${organName} sxemasi`;
 
-    // Highlight sample card in dock
     document.querySelectorAll('.sample-card').forEach(c => {
       c.classList.toggle('active', c.getAttribute('data-img-key') === key);
     });
   }
 }
 
-// Click on sample image cards in dock
 document.querySelectorAll('.sample-card').forEach(card => {
   card.addEventListener('click', () => {
     const imgKey = card.getAttribute('data-img-key');
@@ -159,7 +283,6 @@ document.querySelectorAll('.sample-card').forEach(card => {
   });
 });
 
-// Custom Image File Upload
 imageFileInput.addEventListener('change', (e) => {
   const file = e.target.files && e.target.files[0];
   if (!file) return;
@@ -177,36 +300,20 @@ imageFileInput.addEventListener('change', (e) => {
  */
 function selectOrgan(modelKey) {
   currentModelKey = modelKey;
-  sceneManager.loadModel(modelKey);
+  loadRealAnatomy(modelKey);
   renderOrganData(modelKey);
 
-  // Sync mobile modal cards
   document.querySelectorAll('.m-organ-choice').forEach(choice => {
     choice.classList.toggle('active', choice.getAttribute('data-model') === modelKey);
   });
 
-  // If in image mode, sync target image
   if (currentMode === 'image') {
     loadTargetImage(modelKey);
   }
 }
 
-// 3D Raycasting Sync
-sceneManager.onPartSelectedCallback = (partData) => {
-  const allCards = partsList.querySelectorAll('.part-card');
-  allCards.forEach(c => c.classList.remove('active'));
-
-  const matchingCard = partsList.querySelector(`[data-part-id="${partData.id}"]`);
-  if (matchingCard) {
-    matchingCard.classList.add('active');
-    matchingCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-  }
-
-  switchTab('parts');
-};
-
 /**
- * RENDER ORGAN DETAILS IN SIDEBAR
+ * RENDER ORGAN TEXT DATA IN SIDEBAR
  */
 function renderOrganData(modelKey) {
   const data = ANATOMY_DATA[modelKey];
@@ -239,7 +346,7 @@ function renderOrganData(modelKey) {
     card.addEventListener('click', () => {
       partsList.querySelectorAll('.part-card').forEach(c => c.classList.remove('active'));
       card.classList.add('active');
-      sceneManager.highlightPartById(part.id);
+      highlightPin(part.id);
     });
 
     partsList.appendChild(card);
@@ -373,47 +480,57 @@ document.querySelectorAll('.nav-s-tab').forEach(tab => {
 });
 
 /**
- * 3D DOCK CONTROLS
+ * TOOLBAR CONTROLS
  */
-resetCamBtn.addEventListener('click', () => {
-  sceneManager.resetCamera();
-  sceneManager.clearHighlight();
+// Toggle Real Anatomy vs X-Ray
+toggleLayerBtn.addEventListener('click', () => {
+  isXRayMode = !isXRayMode;
+  xrayAnatomyImg.style.opacity = isXRayMode ? '1' : '0';
+  toggleLayerBtn.classList.toggle('active', isXRayMode);
+  layerBtnText.textContent = isXRayMode ? 'Haqiqiy Anatomiya' : 'Rentgen (X-Ray)';
+});
+
+// Toggle Pins
+togglePinsBtn.addEventListener('click', () => {
+  isShowingPins = !isShowingPins;
+  hotspotsOverlay.classList.toggle('hidden', !isShowingPins);
+  togglePinsBtn.classList.toggle('active', isShowingPins);
+});
+
+// Pulse animation
+pulseAnimBtn.addEventListener('click', () => {
+  isPulsing = !isPulsing;
+  tiltWrapper.classList.toggle('pulsing', isPulsing);
+  pulseAnimBtn.classList.toggle('active', isPulsing);
+});
+
+// Reset view
+resetViewBtn.addEventListener('click', () => {
+  resetTiltAndZoom();
+  document.querySelectorAll('.hotspot-pin').forEach(p => p.classList.remove('active'));
   partsList.querySelectorAll('.part-card').forEach(c => c.classList.remove('active'));
 });
 
-xrayBtn.addEventListener('click', () => {
-  const isXRay = sceneManager.toggleXRay();
-  xrayBtn.classList.toggle('active', isXRay);
-});
-
-wireframeBtn.addEventListener('click', () => {
-  const isWireframe = sceneManager.toggleWireframe();
-  wireframeBtn.classList.toggle('active', isWireframe);
-});
-
-autoRotateBtn.addEventListener('click', () => {
-  const isAutoRotate = sceneManager.toggleAutoRotate();
-  autoRotateBtn.classList.toggle('active', isAutoRotate);
-});
-
+// Snapshot capture
 snapshotBtn.addEventListener('click', () => {
-  const dataUrl = sceneManager.captureSnapshot();
   const link = document.createElement('a');
-  link.download = `MedAnatomy_${currentModelKey}_${Date.now()}.png`;
-  link.href = dataUrl;
+  link.download = `MedAnatomy_${currentModelKey}_${Date.now()}.svg`;
+  link.href = isXRayMode ? REAL_ANATOMY_ASSETS[currentModelKey].xrayImage : REAL_ANATOMY_ASSETS[currentModelKey].realImage;
   link.click();
 });
 
-// Camera controls
+// Camera opacity slider
 arOpacitySlider.addEventListener('input', (e) => {
-  arCamera.setOpacity(parseFloat(e.target.value));
+  const val = parseFloat(e.target.value);
+  tiltWrapper.style.opacity = val;
 });
 
+// Switch camera facing (front/back)
 switchCameraBtn.addEventListener('click', async () => {
   await arCamera.switchCameraFacing();
 });
 
-// Audio pronunciation
+// Speech pronunciation (TTS)
 speakNameBtn.addEventListener('click', () => {
   const data = ANATOMY_DATA[currentModelKey];
   if (!data || !('speechSynthesis' in window)) return;
@@ -461,7 +578,6 @@ document.querySelectorAll('.m-organ-choice').forEach(choice => {
 });
 
 mNavMode.addEventListener('click', () => {
-  // Cycle modes: studio -> camera -> image -> studio
   const modes = ['studio', 'camera', 'image'];
   const nextIndex = (modes.indexOf(currentMode) + 1) % modes.length;
   switchMode(modes[nextIndex]);

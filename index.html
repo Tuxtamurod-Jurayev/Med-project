@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>MedAnatomy 3D — Interaktiv Anatomiya & AR Atlasi</title>
-  <meta name="description" content="Tibbiyot talabalari uchun kamera, rasm va 3D anatomiya platformasi" />
+  <title>MedAnatomy — Haqiqiy Anatomiya & AR Atlasi</title>
+  <meta name="description" content="Tibbiyot talabalari uchun haqiqiy rasmlar, rentgen va AR anatomiya platformasi" />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -27,19 +27,19 @@
           <div>
             <div class="logo-title">
               <span>MedAnatomy</span>
-              <span class="chip-3d">3D • AR</span>
+              <span class="chip-3d">REAL • AR</span>
             </div>
-            <span class="logo-subtitle">Tibbiyot talabalari atlasi</span>
+            <span class="logo-subtitle">Haqiqiy tibbiy anatomik atlas</span>
           </div>
         </div>
       </div>
 
-      <!-- MAIN MODE SELECTOR (Studio / Kamera / Rasm) -->
+      <!-- MAIN MODE SELECTOR (Real Atlas / Kamera AR / Rasm Belgilash) -->
       <div class="mode-switch-wrapper">
         <div class="mode-switch">
           <button class="mode-btn active" data-mode="studio">
-            <span class="m-icon">🏛️</span>
-            <span class="m-text">3D Studio</span>
+            <span class="m-icon">🔬</span>
+            <span class="m-text">Haqiqiy Anatomiya</span>
           </button>
           <button class="mode-btn" data-mode="camera">
             <span class="m-icon">📷</span>
@@ -47,7 +47,7 @@
           </button>
           <button class="mode-btn" data-mode="image">
             <span class="m-icon">🖼️</span>
-            <span class="m-text">Rasm & 3D</span>
+            <span class="m-text">Rasm Belgilash</span>
           </button>
         </div>
       </div>
@@ -73,7 +73,7 @@
     <!-- MAIN BODY -->
     <main class="main-content">
 
-      <!-- 3D VIEWPORT -->
+      <!-- VIEWPORT (REAL ANATOMY + CAMERA + IMAGE) -->
       <section class="viewport-box" id="viewportContainer">
 
         <!-- LAYER 1: LIVE VIDEO CAMERA FEED -->
@@ -92,42 +92,52 @@
         <div id="arReticle" class="ar-reticle-overlay hidden">
           <div class="reticle-frame">
             <div class="reticle-crosshair"></div>
-            <span class="reticle-label">Anatomik ob'ektni doira ichiga to'g'irlang</span>
+            <span class="reticle-label">Anatomik a'zoni doira ichiga to'g'irlang</span>
           </div>
         </div>
 
-        <!-- LAYER 4: THREE.JS 3D CANVAS -->
-        <div id="canvasContainer" class="canvas-3d-wrapper"></div>
+        <!-- LAYER 4: REAL ANATOMICAL INTERACTIVE VIEWER -->
+        <div id="realAnatomyViewer" class="real-viewer-container">
+          <div class="anatomy-tilt-wrapper" id="tiltWrapper">
+            <!-- Real Anatomy Image Layer -->
+            <img id="realAnatomyImg" class="anatomy-main-img" src="" alt="Haqiqiy Anatomiya" />
+            <!-- Real X-Ray Radiography Layer (with opacity blend) -->
+            <img id="xrayAnatomyImg" class="anatomy-xray-img" src="" alt="Rentgen tasviri" />
+            <!-- Interactive Landmark Pins (Hotspots) -->
+            <div id="hotspotsOverlay" class="hotspots-overlay"></div>
+          </div>
+        </div>
 
-        <!-- FLOATING 3D TOOLS (LEFT) -->
+        <!-- FLOATING CONTROLS (LEFT DOCK) -->
         <div class="floating-tools">
-          <button id="resetCamBtn" class="tool-btn" title="Kamerani boshlang'ich holatga qaytarish">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-            </svg>
-            <span class="t-label">Qaytarish</span>
-          </button>
-
-          <button id="xrayBtn" class="tool-btn" title="Rentgen (Shaffof) ko'rinish">
+          <button id="toggleLayerBtn" class="tool-btn" title="Haqiqiy anatomiya va Rentgenni almashtirish">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
               <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
             </svg>
-            <span class="t-label">Rentgen</span>
+            <span class="t-label" id="layerBtnText">Rentgen (X-Ray)</span>
           </button>
 
-          <button id="wireframeBtn" class="tool-btn" title="3D To'r (Wireframe)">
+          <button id="togglePinsBtn" class="tool-btn active" title="Qismlar nuqtalarini ko'rsatish/yashirish">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+              <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
             </svg>
-            <span class="t-label">To'r</span>
+            <span class="t-label">Nuqtalar</span>
           </button>
 
-          <button id="autoRotateBtn" class="tool-btn" title="360° Avtomatik aylanma">
+          <button id="pulseAnimBtn" class="tool-btn" title="Yurak/Organ harakatini yoqish">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
             </svg>
-            <span class="t-label">360°</span>
+            <span class="t-label">Harakat</span>
+          </button>
+
+          <button id="resetViewBtn" class="tool-btn" title="Holatni qaytarish">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            <span class="t-label">Qaytarish</span>
           </button>
 
           <button id="snapshotBtn" class="tool-btn" title="Surat yuklab olish">
@@ -139,7 +149,7 @@
           </button>
         </div>
 
-        <!-- IMAGE SELECTION DRAWER / BAR (When Image Mode is active) -->
+        <!-- IMAGE SELECTION DOCK (When Image Mode is active) -->
         <div id="imageSelectDock" class="image-select-dock hidden">
           <div class="dock-header">
             <span>🖼️ Belgilanadigan rasmni tanlang yoki yuklang:</span>
@@ -180,7 +190,7 @@
 
         <!-- TOUCH GESTURE HINT -->
         <div class="touch-hint">
-          <span>👆 3D modelni aylantirish uchun bosing va suring</span>
+          <span>💡 Qismlar haqida ma'lumot olish uchun rasmdagi nuqtalarni bosing</span>
         </div>
 
       </section>
@@ -240,7 +250,7 @@
 
             <div class="panel-section-title">
               <span>Anatomik Qismlar</span>
-              <span class="sub-tip">3D-da ko'rish uchun bosing</span>
+              <span class="sub-tip">Rasmdan topish uchun bosing</span>
             </div>
 
             <div id="partsList" class="parts-grid">
@@ -289,7 +299,7 @@
         <div class="sidebar-footer">
           <div id="cameraStatusIndicator" class="footer-status">
             <span class="status-dot"></span>
-            <span>3D Studio Rejimi</span>
+            <span>Haqiqiy Anatomiya Rejimi</span>
           </div>
           <span class="footer-ver">MedTech Pro</span>
         </div>
@@ -302,7 +312,7 @@
     <nav class="mobile-bottom-bar">
       <button class="m-nav-item active" id="mNavOrgan">
         <span class="m-nav-icon">🦴</span>
-        <span class="m-nav-label">Organlar</span>
+        <span class="m-nav-label">A'zolar</span>
       </button>
 
       <button class="m-nav-item" id="mNavMode">
