@@ -361,156 +361,114 @@ html, body {
   white-space: nowrap;
 }
 
-/* Layer 4: Real Anatomical Interactive Viewer */
-.real-viewer-container {
+/* Layer 4: Three.js Canvas */
+.canvas-3d-wrapper {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   z-index: 10;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  perspective: 1000px;
-  overflow: hidden;
-  user-select: none;
+  cursor: grab;
 }
 
-.anatomy-tilt-wrapper {
+.canvas-3d-wrapper:active {
+  cursor: grabbing;
+}
+
+/* AR Launch / Detect Button */
+.btn-ar-detect {
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.9) 0%, rgba(2, 132, 199, 0.95) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  color: #ffffff;
+  padding: 12px 24px;
+  border-radius: var(--radius-full);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 8px 25px rgba(6, 182, 212, 0.5), 0 0 15px rgba(2, 132, 199, 0.6);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  white-space: nowrap;
+}
+
+.btn-ar-detect:hover {
+  transform: translateX(-50%) scale(1.04);
+  background: linear-gradient(135deg, #06b6d4 0%, #0284c7 100%);
+  box-shadow: 0 10px 30px rgba(6, 182, 212, 0.7);
+}
+
+.btn-ar-detect:active {
+  transform: translateX(-50%) scale(0.97);
+}
+
+.sonar-ring {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #ffffff;
   position: relative;
-  width: 90%;
-  max-width: 540px;
-  max-height: 85%;
-  aspect-ratio: 6 / 7;
+  display: inline-block;
+}
+
+.sonar-ring::after {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 2px solid #ffffff;
+  animation: sonar-wave 1.6s infinite;
+}
+
+@keyframes sonar-wave {
+  0% { transform: scale(0.8); opacity: 1; }
+  100% { transform: scale(2.2); opacity: 0; }
+}
+
+/* Loading banner */
+.loading-banner {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 50;
   display: flex;
   align-items: center;
-  justify-content: center;
-  transition: transform 0.15s ease-out;
-  transform-style: preserve-3d;
+  gap: 10px;
+  background: rgba(12, 19, 34, 0.92);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border-accent);
+  padding: 8px 16px;
+  border-radius: var(--radius-full);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent-cyan-light);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
+  animation: fade-in 0.2s ease;
 }
 
-.anatomy-main-img,
-.anatomy-xray-img {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  filter: drop-shadow(0 14px 28px rgba(0, 0, 0, 0.7));
-  transition: opacity 0.4s ease, transform 0.3s ease;
-  pointer-events: none;
-}
-
-.anatomy-xray-img {
-  opacity: 0;
-}
-
-.anatomy-tilt-wrapper.pulsing {
-  animation: heart-ekg-pulse 1.2s infinite ease-in-out;
-}
-
-@keyframes heart-ekg-pulse {
-  0%, 100% { transform: scale(1); }
-  15% { transform: scale(1.045); }
-  30% { transform: scale(0.985); }
-  45% { transform: scale(1.03); }
-}
-
-/* Hotspots overlay & pins */
-.hotspots-overlay {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: auto;
-  z-index: 20;
-}
-
-.hotspots-overlay.hidden {
+.loading-banner.hidden {
   display: none !important;
 }
 
-.hotspot-pin {
-  position: absolute;
-  width: 24px;
-  height: 24px;
-  transform: translate(-50%, -50%);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 25;
-}
-
-.pin-core {
-  width: 12px;
-  height: 12px;
+.spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(56, 189, 248, 0.3);
+  border-top-color: #38bdf8;
   border-radius: 50%;
-  background: #38bdf8;
-  border: 2px solid #ffffff;
-  box-shadow: 0 0 12px #06b6d4, 0 0 20px #06b6d4;
-  transition: all 0.2s ease;
+  animation: spin 0.8s infinite linear;
 }
 
-.pin-ring {
-  position: absolute;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  border: 1.5px solid #38bdf8;
-  animation: pin-radar 2s infinite;
-}
-
-@keyframes pin-radar {
-  0% { transform: scale(0.6); opacity: 1; }
-  100% { transform: scale(1.6); opacity: 0; }
-}
-
-.hotspot-pin:hover .pin-core,
-.hotspot-pin.active .pin-core {
-  background: #fbbf24;
-  box-shadow: 0 0 16px #f59e0b, 0 0 28px #f59e0b;
-  transform: scale(1.3);
-}
-
-.pin-tooltip {
-  position: absolute;
-  bottom: 28px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(12, 19, 34, 0.95);
-  backdrop-filter: blur(8px);
-  border: 1px solid var(--border-accent);
-  padding: 4px 10px;
-  border-radius: var(--radius-md);
-  font-size: 11px;
-  white-space: nowrap;
-  pointer-events: none;
-  opacity: 0;
-  transform: translateX(-50%) translateY(4px);
-  transition: all 0.2s ease;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.5);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.pin-tooltip-uz {
-  font-weight: 700;
-  color: #ffffff;
-}
-
-.pin-tooltip-lat {
-  font-size: 9px;
-  font-family: var(--font-mono);
-  color: var(--accent-cyan-light);
-  font-style: italic;
-}
-
-.hotspot-pin:hover .pin-tooltip,
-.hotspot-pin.active .pin-tooltip {
-  opacity: 1;
-  transform: translateX(-50%) translateY(0);
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 
 /* Floating 3D Tools (Left Dock) */

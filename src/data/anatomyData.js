@@ -1,348 +1,340 @@
 export const ANATOMY_DATA = {
-  head_neck: {
-    id: "head_neck",
-    nameUz: "Bosh va bo'yin anatomiyasi",
-    nameLat: "Caput et Collum",
-    nameEn: "Head & Neck Anatomy",
-    system: "Skelet, mushak va tomir tizimi",
-    category: "Bosh va bo'yin sohalari",
-    bonesCount: "22 ta suyak + mushaklar",
-    weight: "~4.5 - 5 kg",
-    description: "Bosh va bo'yin sohasi inson tanasining eng murakkab anatomik qismi bo'lib, bosh suyagi, yuz va chaynash mushaklari, qon tomirlari (uyqu arteriyalari, bo'yinturuq venalari) hamda kranial nervlarni o'z ichiga oladi.",
+  skull: {
+    id: "skull",
+    nameUz: "Bosh suyagi (Real 3D skan)",
+    nameLat: "Cranium",
+    nameEn: "Human Skull 3D",
+    system: "Skelet tizimi (Systema skeletale)",
+    category: "Aksial skelet",
+    bonesCount: 22,
+    weight: "~1000 - 1200 g",
+    description: "Bosh suyagi inson bosh skeleti bo'lib, miya va sezgi a'zolarini (ko'rish, eshitish, hid bilish, ta'm bilish) tashqi shikastlanishlardan himoya qiladi. Haqiqiy inson kalla suyagining yuqori aniqlikdagi 3D modeli.",
     parts: [
       {
-        id: "facial_muscles",
-        nameUz: "Mimika va chaynash mushaklari",
-        nameLat: "Musculi faciales et masticatorii",
-        desc: "Yuz mimikasini ta'minlovchi teri osti mushaklari va og'izni ochib-yopuvchi chaynash (chakka, o'z chaynash) mushaklari."
+        id: "frontal",
+        nameUz: "Peshona suyagi",
+        nameLat: "Os frontale",
+        desc: "Kalla gumbazining oldingi qismini va ko'z kosasining yuqori devorini hosil qiluvchi toq suyak."
       },
       {
-        id: "neck_muscles",
-        nameUz: "To'sh-o'mrov-so'rg'ichsimon mushak",
-        nameLat: "M. sternocleidomastoideus",
-        desc: "Bo'yinning eng yirik mushagi. Boshni burish, yonboshga egish va nafas olishda yordamchi vazifani bajaradi."
+        id: "parietal",
+        nameUz: "Tepa suyagi",
+        nameLat: "Os parietale",
+        desc: "Kalla suyagining yon va yuqori devorlarini tashkil qiluvchi juft suyak."
       },
       {
-        id: "carotid_artery",
-        nameUz: "Umumiy uyqu arteriyasi",
-        nameLat: "Arteria carotis communis",
-        desc: "Bosh miya va yuz sohasini arterial kislorodli qon bilan ta'minlovchi eng yirik magistral tomir."
+        id: "temporal",
+        nameUz: "Chakka suyagi",
+        nameLat: "Os temporale",
+        desc: "Eshitish va muvozanat a'zolarini o'z ichiga olgan kalla suyagi."
       },
       {
-        id: "cranium_base",
-        nameUz: "Kalla asosi va yuz skeleti",
-        nameLat: "Basis cranii et Viscerocranium",
-        desc: "Ko'z kosasi, burun bo'shlig'i, yuqori va pastki jag' suyaklaridan tashkil topgan suyak karkasi."
+        id: "mandible",
+        nameUz: "Pastki jag' suyagi",
+        nameLat: "Mandibula",
+        desc: "Bosh suyagining yagona harakatchan suyagi; chaynash faoliyatini ta'minlaydi."
       }
     ],
     functions: [
-      "Bosh miya va ko'rish, eshitish, ta'm bilish a'zolarini himoya qilish",
-      "Nutq, mimika va hissiyotlarni namoyon qilish",
-      "Chaynash, yutish va birlamchi nafas olish harakatlari",
-      "Boshni fazoda muvozanatda tutish va erkin burish"
+      "Bosh miyani mexanik zarbalardan himoya qilish",
+      "Ko'rish, eshitish va hid bilish a'zolari uchun mustahkam suyak qutisi bo'lish",
+      "Chaynov va mimika mushaklarining tayanchi"
     ],
     clinical: [
-      "Yuz nervi nevriti (Bell falaji) - yuz mimika mushaklarining bir tomonlama falajlanishi.",
-      "Uyqu arteriyasi stenozi - insultga (bosh miya ishemiyasiga) olib keluvchi aterosklerotik to'siq.",
-      "Krivosheya (qiyshiq bo'yin) - to'sh-o'mrov-so'rg'ichsimon mushakning tug'ma yoki orttirilgan qisqarishi."
+      "Kalla asosi sinishlari (Fractura basis cranii) - og'ir kranial travmalar.",
+      "Chakka-pastki jag' bo'g'imi disfunksiyasi - chaynashda og'riq va qisirlash.",
+      "Kraniosinostoz - chaqaloqlarda suyak choklarining erta bitishi."
     ],
     quiz: [
       {
-        question: "Bo'yindagi eng yirik va boshni buruvchi asosiy mushak qaysi?",
-        options: ["M. trapezius", "M. sternocleidomastoideus", "M. platysma", "M. scalenus"],
+        question: "Bosh suyagidagi yagona erkin harakatlanuvchi suyak qaysi?",
+        options: ["Maxilla", "Mandibula (Pastki jag')", "Os frontale", "Os temporale"],
         answerIndex: 1,
-        explanation: "To'sh-o'mrov-so'rg'ichsimon mushak (M. sternocleidomastoideus) bo'yinning asosiy qavariq mushagi bo'lib, boshni qarama-qarshi tomonga buradi."
+        explanation: "Mandibula (pastki jag') bosh suyagidagi yagona erkin harakatlanuvchi suyakdir."
       },
       {
-        question: "Bosh miyani qon bilan ta'minlovchi asosiy arteriya qaysi?",
-        options: ["Arteria subclavia", "Arteria carotis interna", "Arteria facialis", "Arteria temporalis"],
+        question: "Bosh suyagi jami nechta suyakdan iborat (eshitish suyakchalarisiz)?",
+        options: ["18 ta", "22 ta", "30 ta", "12 ta"],
         answerIndex: 1,
-        explanation: "Ichki uyqu arteriyasi (Arteria carotis interna) umumiy uyqu arteriyasidan ajralib, bosh miya katta qismini qon bilan ta'minlaydi."
+        explanation: "Bosh suyagi 22 ta suyakdan (8 ta miya bo'limi, 14 ta yuz bo'limi) iborat."
       },
       {
-        question: "Mimika mushaklarini qaysi kranial nerv innervatsiya qiladi?",
-        options: ["Uch shoxli nerv (V)", "Yuz nervi (VII juft)", "Sayyor nerv (X)", "Til osti nervi (XII)"],
-        answerIndex: 1,
-        explanation: "VII juft kranial nerv (Nervus facialis - yuz nervi) barcha mimika mushaklarini harakatlantiradi."
+        question: "Bosh miya orqa miya bilan qaysi teshik orqali tutashadi?",
+        options: ["Foramen magnum", "Foramen ovale", "Foramen jugulare", "Canalis caroticus"],
+        answerIndex: 0,
+        explanation: "Ensa suyagidagi katta teshik (Foramen magnum) orqali bosh miya orqa miya bilan davom etadi."
       }
     ]
   },
 
   brain: {
     id: "brain",
-    nameUz: "Bosh miya modeli (4D anatomiya)",
+    nameUz: "Bosh miya (Real 3D model)",
     nameLat: "Encephalon",
-    nameEn: "Human Brain 4D Anatomy",
+    nameEn: "Human Brain 3D Anatomy",
     system: "Markaziy asab tizimi (Systema nervosum centrale)",
     category: "Miya bo'limlari",
     bonesCount: 0,
-    weight: "~1300 - 1450 g",
-    description: "Bosh miya (Encephalon) inson tanasining eng oliy boshqaruv markazi bo'lib, katta yarimsharlar (telencephalon), oraliq miya (diencephalon), o'rta miya (mesencephalon), miyacha (cerebellum) va miya poyasidan (truncus encephali) iborat.",
+    weight: "~1350 - 1450 g",
+    description: "Inson bosh miyasining yuqori aniqlikdagi anatomik 3D modeli: yarimsharlar po'stlog'i, egatlar va burmalar, miyacha, miya poyasi va asab yo'llari.",
     parts: [
       {
         id: "cerebrum",
         nameUz: "Katta yarimsharlar po'stlog'i",
         nameLat: "Cortex cerebri",
-        desc: "Oliy asab faoliyati, tafakkur, xotira, nutq va ongli harakatlarni boshqaruvchi kulrang modda qatlami."
+        desc: "Oliy asab faoliyati, tafakkur, xotira, ongli harakatlar va nutq markazi."
       },
       {
         id: "cerebellum",
         nameUz: "Miyacha (Kichik miya)",
         nameLat: "Cerebellum",
-        desc: "Harakatlar koordinatsiyasi, muvozanat va mushaklar tonusini boshqaruvchi bo'lim."
+        desc: "Harakatlar koordinatsiyasi, muvozanat va mushak tonusini boshqaradi."
       },
       {
         id: "brainstem",
-        nameUz: "Miya poyasi (Uzunchoq miya, ko'prik)",
+        nameUz: "Miya poyasi",
         nameLat: "Truncus encephali",
-        desc: "Nafas olish, yurak urishi va qon bosimi kabi hayotiy muhim reflektor markazlarni o'z ichiga olgan soha."
+        desc: "Nafas olish va yurak-qon tomir faoliyati kabi hayotiy reflekslar markazi."
       },
       {
-        id: "temporal_lobe",
-        nameUz: "Chakka va ensa bo'laklari",
-        nameLat: "Lobi temporalis et occipitalis",
-        desc: "Eshitish, hid bilish va ko'rish analizatorlarining oliy markazlari joylashgan soha."
+        id: "lobes",
+        nameUz: "Peshona, chakka, tepa va ensa bo'laklari",
+        nameLat: "Lobi cerebri",
+        desc: "Ko'rish, eshitish, taktil sezish va irodaviy harakat zonalari."
       }
     ],
     functions: [
-      "Tafakkur, ong, nutq, xotira va his-tuyg'ularni shakllantirish",
-      "Ichki a'zolar faoliyatini avtonom (vegetativ) boshqarish",
-      "Sezgi organlaridan kelgan barcha signallarni qabul qilish va tahlil qilish",
-      "Tana harakatlari koordinatsiyasi va muvozanatini saqlash"
+      "Ong, tafakkur, mantiq va xotirani boshqarish",
+      "Ichki a'zolar va gormonal tizim faoliyatini nazorat qilish",
+      "Tana muvozanati va murakkab motor harakatlarni muvofiqlashtirish"
     ],
     clinical: [
-      "Bosh miya qon aylanishining o'tkir buzilishi (Insult) - ishemik yoki gemorragik miya to'qimasi zararlanishi.",
-      "Miyacha ataksiyasi - harakatlar muvozanati va nozik motorikaning buzilishi.",
-      "Altsgeymer kasalligi - miya po'stlog'idagi neyronlar degradatsiyasi natijasida xotira va aqlning pasayishi."
+      "Insult - miya qon aylanishining o'tkir buzilishi va to'qima ishemiyasi.",
+      "Miyacha ataksiyasi - harakat koordinatsiyasi va muvozanatning yo'qolishi.",
+      "Epilepsiya - miya po'stlog'idagi patologik neyronal qo'zg'alishlar."
     ],
     quiz: [
       {
-        question: "Inson harakatlari muvozanati va koordinatsiyasi uchun miyaning qaysi qismi javobgar?",
+        question: "Harakatlar koordinatsiyasi va tana muvozanati uchun miyaning qaysi bo'limi javobgar?",
         options: ["Peshona bo'lagi", "Miyacha (Cerebellum)", "Gipotalamus", "Ko'rish do'mbog'i"],
         answerIndex: 1,
-        explanation: "Miyacha (Cerebellum) murakkab harakatlar koordinatsiyasi, muvozanat va tana holatini boshqaradi."
+        explanation: "Miyacha (Cerebellum) nozik motor harakatlar va muvozanatni ta'minlaydi."
       },
       {
         question: "Nafas olish va yurak urishi kabi hayotiy markazlar qayerda joylashgan?",
-        options: ["Uzunchoq miyada (Medulla oblongata)", "Miya qadag'ida", "Ensa bo'lagida", "Gipofizda"],
+        options: ["Uzunchoq miyada (Medulla oblongata)", "Gipofizda", "Ensa bo'lagida", "Qadoqsimon tanada"],
         answerIndex: 0,
-        explanation: "Uzunchoq miya (Medulla oblongata) va miya poyasida hayotiy muhim nafas va yurak-tomir markazlari joylashgan."
+        explanation: "Uzunchoq miya va miya poyasida hayotiy muhim reflektor markazlar joylashgan."
       },
       {
-        question: "Odam bosh miyasi o'rtacha qancha og'irlikka ega?",
-        options: ["~500 - 600 g", "~1300 - 1450 g", "~2500 g", "~900 g"],
-        answerIndex: 1,
-        explanation: "Kattalarda bosh miyaning o'rtacha massasi 1300-1450 grammni tashkil qiladi."
+        question: "Ko'rish analizatorining oliy po'stloq markazi miyaning qaysi bo'lagida?",
+        options: ["Peshona", "Chakka", "Ensa (Lobus occipitalis)", "Tepa"],
+        answerIndex: 2,
+        explanation: "Ko'rish markazi ensa bo'lagi (Lobus occipitalis) po'stlog'ida joylashgan."
       }
     ]
   },
 
-  heart_vascular: {
-    id: "heart_vascular",
-    nameUz: "Yurak va ko'krak qon-tomirlari",
-    nameLat: "Cor et Angiologia",
-    nameEn: "Thorax, Heart & Vascular Tree",
+  heart: {
+    id: "heart",
+    nameUz: "Inson yuragi (Real 3D kardiologiya)",
+    nameLat: "Cor",
+    nameEn: "Human Heart 3D Model",
     system: "Yurak-qon tomir tizimi",
     category: "Qon aylanish markazi",
-    bonesCount: "12 juft qovurg'a karkasi",
-    weight: "~300 g (Yurak)",
-    description: "Shaffof ko'krak qafasi ichida yurak, aorta yoyi va o'pka qon-tomir daraxtining (Arteria et venae pulmonales) joylashishi hamda qon aylanish sikli.",
+    bonesCount: 0,
+    weight: "~280 - 340 g",
+    description: "Inson yuragining haqiqiy 3D anatomik modeli: qorinchalar, bo'lmachalar, aorta yoyi, o'pka arteriyasi, kovak venalar va toj (koronar) qon-tomirlar tarmog'i.",
     parts: [
       {
-        id: "aorta_arch",
-        nameUz: "Aorta yoyi va magistral tarmoqlar",
+        id: "aorta",
+        nameUz: "Aorta yoyi",
         nameLat: "Arcus aortae",
-        desc: "Chap qorinchadan chiqib, bosh, bo'yin va qo'llarga qon beruvchi yirik tomir yoyi."
+        desc: "Chap qorinchadan chiqib, butun tanaga arterial qon tarqatuvchi eng yirik magistral tomir."
       },
       {
-        id: "pulmonary_tree",
-        nameUz: "O'pka qon-tomir daraxti",
-        nameLat: "Arbor vasculosa pulmonalis",
-        desc: "O'pka alveolalariga venoz qonni kislorod bilan to'yintirish uchun olib boruvchi shoxlangan tomirlar."
+        id: "left_ventricle",
+        nameUz: "Chap qorincha",
+        nameLat: "Ventriculus sinister",
+        desc: "Yurakning eng baquvvat, qalin devorli qismi bo'lib, katta qon aylanish doirasini ta'minlaydi."
       },
       {
-        id: "ventricles",
-        nameUz: "Yurak qorinchalari",
-        nameLat: "Ventriculi cordis",
-        desc: "Qonni butun tana a'zolariga yuqori bosim bilan haydab beruvchi baquvvat mushak kameralari."
+        id: "right_ventricle",
+        nameUz: "O'ng qorincha",
+        nameLat: "Ventriculus dexter",
+        desc: "Venoz qonni o'pkalarga tozalanish uchun haydaydi."
       },
       {
-        id: "rib_cage_transparent",
-        nameUz: "Ko'krak qafasi suyaklari",
-        nameLat: "Cavea thoracis",
-        desc: "Yurak va o'pkalarni tashqi zarbalardan asrovchi suyak-tog'ay himoya karkasi."
+        id: "coronary",
+        nameUz: "Toj (Koronar) arteriyalari",
+        nameLat: "Arteriae coronariae",
+        desc: "Yurak mushagini oziqlantiruvchi o'ng va chap toj tomirlar."
       }
     ],
     functions: [
-      "Katta va kichik qon aylanish doiralarida uzluksiz qon harakatini ta'minlash",
-      "O'pkalarda gazlar almashinuvini (gemoglobinni kislorod bilan to'yintirishni) amalga oshirish",
-      "Arterial bosimni barqaror ushlab turish"
+      "Qonni organizm bo'ylab uzluksiz sirkulyatsiyasini ta'minlash",
+      "Organ va to'qimalarni kislorod bilan to'yintirish",
+      "Moddalar almashinuv mahsulotlarini chiqarish a'zolariga yetkazish"
     ],
     clinical: [
-      "Miokard infarkti - toj arteriyalar trombozi oqibatida yurak mushagining nekrozi.",
-      "Aorta anevrizmasi - aorta devorining yupqalashishi va yorilish xavfi bo'lgan kengayishi.",
-      "O'pka arteriyasi tromboemboliyasi (TELA) - o'pka qon-tomirining to'satdan tromb bilan tiqilib qolishi."
+      "Miokard infarkti - koronar arteriyalar trombozi oqibatida yurak mushagining nekrozi.",
+      "Aritmiyalar - yurak o'tkazuvchanlik tizimidagi buzilishlar tufayli ritmning o'zgarishi.",
+      "Yurak yetishmovchiligi - qon haydash faoliyatining susayishi."
     ],
     quiz: [
       {
-        question: "Aorta qaysi kameradan boshlanadi?",
+        question: "Aorta qon tomiri yurakning qaysi kamerasidan boshlanadi?",
         options: ["O'ng qorinchadan", "Chap qorinchadan", "Chap bo'lmachadan", "O'ng bo'lmachadan"],
         answerIndex: 1,
-        explanation: "Aorta chap qorinchadan boshlanadi va kislorodga boy qonni butun tana to'qimalariga yetkazadi."
+        explanation: "Aorta chap qorinchadan boshlanadi va kislorodga boy qonni butun tanaga tarqatadi."
       },
       {
-        question: "Kichik qon aylanish doirasi qaysi a'zoda amalga oshadi?",
-        options: ["Jigarda", "Bosh miyada", "O'pkalarda", "Buyraklarda"],
-        answerIndex: 2,
-        explanation: "Kichik qon aylanish doirasi yurak va o'pkalar o'rtasida bo'lib, venoz qon o'pkada kislorodga to'yinadi."
-      },
-      {
-        question: "Yurak toj tomirlari (koronar arteriyalar) qayerdan boshlanadi?",
-        options: ["Aorta piyozchasidan (Bulbus aortae)", "O'pka arteriyasidan", "Kovak venadan", "Chap qorinchadan"],
+        question: "Yurakning eng qalin va baquvvat devorga ega kamerasi qaysi?",
+        options: ["Chap qorincha", "O'ng qorincha", "Chap bo'lmacha", "O'ng bo'lmacha"],
         answerIndex: 0,
-        explanation: "Toj arteriyalar bevosita aorta piyozchasining o'ng va chap cho'ntaklaridan boshlanadi."
+        explanation: "Chap qorincha devori butun tanaga yuqori bosim ostida qon haydashi sababli o'ng qorinchadan 3 baravar qalinroqdir."
+      },
+      {
+        question: "Yurak mushagining o'zini qon bilan ta'minlovchi tomirlar nima deyiladi?",
+        options: ["Kovak venalar", "Toj (Koronar) arteriyalari", "Uyqu arteriyalari", "O'mrov osti arteriyalari"],
+        answerIndex: 1,
+        explanation: "Toj (koronar) arteriyalari aorta asosidan boshlanib, miokardni bevosita qon bilan ta'minlaydi."
       }
     ]
   },
 
-  torso_organs: {
-    id: "torso_organs",
-    nameUz: "Gavda va ichki a'zolar kompleksi",
-    nameLat: "Viscera thoracis et abdominis",
-    nameEn: "Torso & Internal Organs",
-    system: "Ichki a'zolar (Splanchnologia) va tomir-nervlar",
-    category: "Ko'krak va qorin bo'shlig'i",
-    bonesCount: "Qovurg'alar va to'sh",
-    weight: "~10 - 12 kg (barcha a'zolar)",
-    description: "Inson tanasining to'liq ichki a'zolari: o'pkalar, yurak, jigar, oshqozon, ichaklar, qo'l va ko'krak nerv chigallari hamda magistral qon tomirlarining haqiqiy 3D anatomik joylashuvi.",
+  eye: {
+    id: "eye",
+    nameUz: "Ko'z olmasi (Real 3D oftalmologiya)",
+    nameLat: "Oculus / Bulbus oculi",
+    nameEn: "Human Eye 3D Anatomy",
+    system: "Sezgi a'zolari (Organa sensuum)",
+    category: "Ko'rish a'zosi",
+    bonesCount: 0,
+    weight: "~7.5 g",
+    description: "Inson ko'z olmasining yuqori aniqlikdagi 3D modeli: shox parda (cornea), oq parda (sclera), kamalak parda (iris), qorachiq, ko'z gavhari (lens), to'r parda (retina) va ko'rish nervi (N. opticus).",
     parts: [
       {
-        id: "lungs_torso",
-        nameUz: "O'pkalar va plevra",
-        nameLat: "Pulmones",
-        desc: "Ko'krak bo'shlig'ining asosiy qismini egallagan nafas a'zolari."
+        id: "cornea",
+        nameUz: "Shox parda",
+        nameLat: "Cornea",
+        desc: "Ko'zning oldingi shaffof qismi bo'lib, yorug'lik nurlarini asosiy sindiruvchi optik muhit."
       },
       {
-        id: "liver",
-        nameUz: "Jigar (Insonning eng yirik bezi)",
-        nameLat: "Hepar",
-        desc: "O'ng qovurg'a ostida joylashgan yirik a'zo; qonni zaharlardan tozalash, o't suyuqligi ishlab chiqarish va moddalar almashinuvida ishtirok etadi."
+        id: "iris",
+        nameUz: "Kamalak parda va qorachiq",
+        nameLat: "Iris et Pupilla",
+        desc: "Ko'z rangini belgilovchi va ko'z ichiga tushayotgan yorug'lik miqdorini diafragma kabi boshqaruvchi tuzilma."
       },
       {
-        id: "stomach",
-        nameUz: "Oshqozon",
-        nameLat: "Gaster (Ventriculus)",
-        desc: "Ovqatni mexanik va kimyoviy (xlorid kislota va pepsin yordamida) hazm qiluvchi qop shaklidagi mushak a'zosi."
+        id: "retina",
+        nameUz: "To'r parda",
+        nameLat: "Retina",
+        desc: "Yorug'likni sezuvchi fotoretseptorlar (tayoqchalar va kolbachalar) joylashgan sezgir qavat."
       },
       {
-        id: "brachial_plexus",
-        nameUz: "Yelka va qo'l nerv chigallari",
-        nameLat: "Plexus brachialis",
-        desc: "Bo'yin umurtqalaridan chiqib, butun qo'l mushaklari va terisini innervatsiya qiluvchi sariq nerv tolalari."
-      },
-      {
-        id: "intestines",
-        nameUz: "Ingichka va yo'g'on ichaklar",
-        nameLat: "Intestinum tenue et crassum",
-        desc: "Oziq moddalarni qonga so'rish va hazm chiqindilarini shakllantirib chiqarish tizimi."
+        id: "optic_nerve",
+        nameUz: "Ko'rish nervi (II juft)",
+        nameLat: "Nervus opticus",
+        desc: "To'r pardada hosil bo'lgan elektr signallarni bosh miya ensa po'stlog'iga yetkazuvchi asab tolalari."
       }
     ],
     functions: [
-      "Nafas olish, oziqlanish va hazm qilish jarayonlarini to'liq ta'minlash",
-      "Organizmning metabolik va detoksikatsiya (zararsizlantirish) funksiyasi (Jigar)",
-      "Qon aylanishi va immunitetni qo'llab-quvvatlash"
+      "Tashqi olamdagi yorug'lik va tasvirlarni qabul qilish",
+      "Ranglar, yorug'lik va fazoviy chuqurlikni farqlash",
+      "Vizual signallarni nerv impulslariga aylantirib miyaga uzatish"
     ],
     clinical: [
-      "Gepatit va jigar sirrozi - jigar to'qimasining yallig'lanishi va chandiqlanishi.",
-      "Oshqozon yara kasalligi (Ulcus pepticum) - me'da shilliq qavatining kislotali eroziyasi.",
-      "Pnevmoniya va plevrit - o'pka to'qimasi va plevra bo'shlig'i yallig'lanishi."
+      "Katarakta - ko'z gavharining xiralashishi natijasida ko'rish qobiliyatining yo'qolishi.",
+      "Glaukoma - ko'z ichi bosimining oshishi oqibatida ko'rish nervining atrofiyasi.",
+      "Miopiya (Yaqindan ko'rish) - tasvirning to'r parda oldiga tushib qolishi."
     ],
     quiz: [
       {
-        question: "Inson organizmidagi eng yirik ichki a'zo va bez qaysi?",
-        options: ["Oshqozon osti bezi", "Jigar (Hepar)", "Taloq", "O'pka"],
+        question: "Ko'z ichiga tushadigan yorug'lik oqimini diafragma kabi nima boshqaradi?",
+        options: ["Shox parda", "Qorachiq va kamalak parda (Iris)", "To'r parda", "Shishasimon tana"],
         answerIndex: 1,
-        explanation: "Jigar (Hepar) inson tanasidagi eng yirik bez bo'lib, o'rtacha 1.5 kg og'irlikka ega."
+        explanation: "Kamalak parda (Iris) mushaklari qorachiq hajmini o'zgartirib, yorug'lik miqdorini boshqaradi."
       },
       {
-        question: "Oshqozon shirasidagi asosiy kislota qaysi?",
-        options: ["Sulfat kislotasi", "Xlorid kislotasi (HCl)", "Sirka kislotasi", "Fosfat kislotasi"],
+        question: "Rangli ko'rish uchun javobgar fotoretseptorlar qaysilar?",
+        options: ["Tayoqchalar", "Kolbachalar (Cones)", "Ganglioz hujayralar", "Bipolyar neyronlar"],
         answerIndex: 1,
-        explanation: "Oshqozonda xlorid kislotasi (HCl) ishlab chiqarilib, u oqsillarni parchalash va mikroblarni o'ldirishda xizmat qiladi."
-      },
-      {
-        question: "Qo'lni harakatlantiruvchi nerv tolalari qaysi chigaldan boshlanadi?",
-        options: ["Bel chigalidan", "Yelka chigalidan (Plexus brachialis)", "Dumg'aza chigalidan", "Quyosh chigalidan"],
-        answerIndex: 1,
-        explanation: "Yelka nerv chigali (Plexus brachialis) C5-Th1 segmentlaridan hosil bo'lib, butun yuqori sohani boshqaradi."
-      }
-    ]
-  },
-
-  cranial_nerves: {
-    id: "cranial_nerves",
-    nameUz: "Kranial nervlar tizimi (12 juft)",
-    nameLat: "Nervi craniales (I-XII)",
-    nameEn: "12 Cranial Nerves System",
-    system: "Periferik va kranial nerv tizimi",
-    category: "Bosh miya nervlari",
-    bonesCount: "12 juft kranial nerv",
-    weight: "~150 g",
-    description: "Bosh miya asosidan chiquvchi 12 juft kranial nervlar yuz, ko'z, quloq, til, hid bilish, muvozanat va ichki a'zolarni innervatsiya qiluvchi eng muhim asab yo'llaridir.",
-    parts: [
-      {
-        id: "olfactory_optic",
-        nameUz: "I-II juft: Hid bilish va Ko'rish nervlari",
-        nameLat: "N. olfactorius et N. opticus",
-        desc: "Retinadan ko'rish signallarini va burun shilliq qavatidan hid signallarini miyaga to'g'ridan-to'g'ri eltuvchi sezuvchi nervlar."
-      },
-      {
-        id: "trigeminal",
-        nameUz: "V juft: Uch shoxli nerv",
-        nameLat: "N. trigeminus",
-        desc: "Yuz terisi, ko'z, tishlar va og'iz bo'shlig'i sezgirligini hamda chaynash mushaklarini ta'minlovchi yirik nerv."
-      },
-      {
-        id: "facial_nerve",
-        nameUz: "VII juft: Yuz nervi",
-        nameLat: "N. facialis",
-        desc: "Yuzdagi barcha mimika mushaklarini harakatlantiruvchi va tilning oldingi 2/3 qismidan ta'm sezuvchi nerv."
-      },
-      {
-        id: "vagus_nerve",
-        nameUz: "X juft: Sayyor nerv",
-        nameLat: "N. vagus",
-        desc: "Eng uzun kranial nerv bo'lib, yurak, o'pkalar, qizilo'ngach, oshqozon va ichaklarning parasimpatik boshqaruvini ta'minlaydi."
-      }
-    ],
-    functions: [
-      "Ko'rish, hid bilish, eshitish va ta'm bilish sezgilarini miyaga uzatish",
-      "Ko'z soqqasi va yuz mimika mushaklarini boshqarish",
-      "Yurak urishi, nafas va hazm a'zolari ritmini tinchlantiruvchi parasimpatik boshqaruv"
-    ],
-    clinical: [
-      "Trigeminal nevralgiya (Uch shoxli nerv shamollashi) - yuzda kuchli, xurujli elektr toki urgandek og'riqlar.",
-      "Yuz nervi parezi - ko'zning yumilmasligi, og'iz burchagining tushib qolishi.",
-      "Vagus disfunksiyasi - yurak aritmiyalari va hazm qilish buzilishlari."
-    ],
-    quiz: [
-      {
-        question: "Qorin va ko'krak bo'shlig'i ichki a'zolarini innervatsiya qiluvchi eng uzun kranial nerv qaysi?",
-        options: ["N. trigeminus (V)", "N. facialis (VII)", "N. vagus (X - Sayyor nerv)", "N. accessorius (XI)"],
-        answerIndex: 2,
-        explanation: "Sayyor nerv (Nervus vagus - X juft) boshdan boshlanib qorin bo'shlig'igacha tushib, ichki a'zolarni boshqaradi."
+        explanation: "Kolbachalar (Cones) kunduzgi va rangli ko'rishni ta'minlaydi."
       },
       {
         question: "Ko'rish nervi nechanchi juft kranial nerv hisoblanadi?",
         options: ["I juft", "II juft (N. opticus)", "III juft", "IV juft"],
         answerIndex: 1,
-        explanation: "II juft kranial nerv (Nervus opticus) ko'rish signallarini ko'z to'r pardasidan miya ensa po'stlog'iga yetkazadi."
+        explanation: "II juft kranial nerv (Nervus opticus) ko'rish nervi hisoblanadi."
+      }
+    ]
+  },
+
+  spine: {
+    id: "spine",
+    nameUz: "Umurtqa pog'onasi (Real 3D model)",
+    nameLat: "Columna vertebralis",
+    nameEn: "Human Spine 3D Anatomy",
+    system: "Skelet tizimi (Systema skeletale)",
+    category: "Aksial skelet o'qi",
+    bonesCount: "32-34 ta umurtqa",
+    weight: "~1800 - 2000 g",
+    description: "Inson umurtqa pog'onasi va orqa miya kanalining haqiqiy 3D anatomik modeli: bo'yin, ko'krak, bel umurtqalari, umurtqalararo disklar va dumg'aza suyagi.",
+    parts: [
+      {
+        id: "cervical",
+        nameUz: "Bo'yin umurtqalari (7 ta)",
+        nameLat: "Vertebrae cervicales (C1-C7)",
+        desc: "Boshni tutib turuvchi va harakatlantiruvchi eng erkin umurtqalar (C1 - Atlant, C2 - Aksis)."
       },
       {
-        question: "Jami nechta kranial nervlar jufti mavjud?",
-        options: ["8 juft", "10 juft", "12 juft", "31 juft"],
+        id: "thoracic",
+        nameUz: "Ko'krak umurtqalari (12 ta)",
+        nameLat: "Vertebrae thoracicae (Th1-Th12)",
+        desc: "Qovurg'alar bilan birikib ko'krak qafasini hosil qiluvchi umurtqalar."
+      },
+      {
+        id: "lumbar",
+        nameUz: "Bel umurtqalari (5 ta)",
+        nameLat: "Vertebrae lumbales (L1-L5)",
+        desc: "Tananing asosiy og'irligini ko'taruvchi eng yirik va massiv umurtqalar."
+      },
+      {
+        id: "sacrum",
+        nameUz: "Dumg'aza suyagi",
+        nameLat: "Os sacrum",
+        desc: "Birlashgan 5 ta umurtqadan iborat bo'lib, chanoq halqasini mustahkamlaydi."
+      }
+    ],
+    functions: [
+      "Inson tanasining vertikal o'qi va asosiy tayanchi",
+      "Orqa miyani mexanik shikastlanishlardan asrash",
+      "Yurish va yugurishda elastik amortizatsiya qilish"
+    ],
+    clinical: [
+      "Disk churrasi (Gryja) - umurtqalararo disk tolasining yorilishi va nerv ildizining qisilishi.",
+      "Skolioz - umurtqa pog'onasining yon tomonga patologik egrilanishi.",
+      "Osteoxondroz - disklar va tog'aylarning degenerativ yemirilib borishi."
+    ],
+    quiz: [
+      {
+        question: "Inson bo'yin bo'limida nechta umurtqa bor?",
+        options: ["5 ta", "7 ta (C1-C7)", "8 ta", "12 ta"],
+        answerIndex: 1,
+        explanation: "Barcha sutemizuvchilarda (jumladan insonda) 7 ta bo'yin umurtqasi mavjud."
+      },
+      {
+        question: "Birinchi bo'yin umurtqasining (C1) nomi nima?",
+        options: ["Atlant (Atlas)", "Aksis", "Prominens", "Sakrum"],
+        answerIndex: 0,
+        explanation: "C1 umurtqasi Atlant deb ataladi va kalla suyagini tutib turadi."
+      },
+      {
+        question: "Tananing asosiy vertikal og'irligini ko'taruvchi eng massiv umurtqalar qaysilar?",
+        options: ["Bo'yin umurtqalari", "Ko'krak umurtqalari", "Bel umurtqalari (L1-L5)", "Dum suyagi"],
         answerIndex: 2,
-        explanation: "Odamda jami 12 juft kranial nervlar mavjud (orqa miya nervlari esa 31 juft)."
+        explanation: "Bel umurtqalari (L1-L5) tananing eng katta yuk tushadigan qismidir."
       }
     ]
   }
