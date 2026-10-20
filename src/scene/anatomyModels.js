@@ -51,8 +51,14 @@ export const NerveMaterial = new THREE.MeshStandardMaterial({
 
 export const MuscleMaterial = new THREE.MeshStandardMaterial({
   color: 0xb91c1c,
-  roughness: 0.4,
+  roughness: 0.38,
   metalness: 0.05
+});
+
+export const TendonMaterial = new THREE.MeshStandardMaterial({
+  color: 0xf8fafc,
+  roughness: 0.22,
+  metalness: 0.08
 });
 
 export const BileGreenMaterial = new THREE.MeshStandardMaterial({
@@ -2044,87 +2050,511 @@ export function createMusculoskeletalSystemModel() {
   const group = new THREE.Group();
   group.name = "musculoskeletal_system";
 
-  // Spine & Ribs Foundation
-  for (let r = 0; r < 7; r++) {
-    const y = 0.8 - r * 0.18;
+  // Reusable tube helper
+  const makeSeg = (pts, radius = 0.05, segs = 14, rSegs = 8, mat = BoneMaterial) => {
+    const curve = new THREE.CatmullRomCurve3(pts);
+    const geo = new THREE.TubeGeometry(curve, segs, radius, rSegs, false);
+    const mesh = new THREE.Mesh(geo, mat.clone());
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
+    return mesh;
+  };
+
+  // 1. AXIAL SKELETON: CRANIUM, SPINE, THORAX & PELVIS
+  // A. Cranium & Facial Skeleton (Skull)
+  const skullGroup = new THREE.Group();
+  skullGroup.position.set(0, 1.82, 0);
+
+  // Calvaria / Cranial Vault
+  const calvGeo = new THREE.SphereGeometry(0.38, 28, 24);
+  calvGeo.scale(0.88, 1.05, 1.12);
+  const calvMesh = new THREE.Mesh(calvGeo, BoneMaterial.clone());
+  skullGroup.add(calvMesh);
+
+  // Facial Skeleton & Maxilla
+  const faceGeo = new THREE.BoxGeometry(0.36, 0.32, 0.34);
+  const faceMesh = new THREE.Mesh(faceGeo, BoneMaterial.clone());
+  faceMesh.position.set(0, -0.22, 0.16);
+  skullGroup.add(faceMesh);
+
+  // Orbits (Eye sockets)
+  [-1, 1].forEach(side => {
+    const orbGeo = new THREE.TorusGeometry(0.09, 0.024, 8, 16);
+    const orbMesh = new THREE.Mesh(orbGeo, BoneMaterial.clone());
+    orbMesh.position.set(side * 0.14, -0.14, 0.33);
+    skullGroup.add(orbMesh);
+  });
+
+  // Mandible (Jawbone with chin and ramus)
+  const jawCurve = [
+    new THREE.Vector3(-0.24, -0.15, 0.02),
+    new THREE.Vector3(-0.22, -0.38, 0.18),
+    new THREE.Vector3(0.00, -0.42, 0.34),
+    new THREE.Vector3(0.22, -0.38, 0.18),
+    new THREE.Vector3(0.24, -0.15, 0.02)
+  ];
+  skullGroup.add(makeSeg(jawCurve, 0.042, 18, 8, BoneMaterial));
+  group.add(skullGroup);
+
+  // B. Cervical Vertebral Column (C1-C7)
+  for (let c = 0; c < 7; c++) {
+    const cy = 1.62 - c * 0.06;
+    const cvGeo = new THREE.CylinderGeometry(0.12, 0.13, 0.04, 16);
+    const cvMesh = new THREE.Mesh(cvGeo, BoneMaterial.clone());
+    cvMesh.position.set(0, cy, -0.04);
+    group.add(cvMesh);
+
+    // Intervertebral disc
+    const cdGeo = new THREE.CylinderGeometry(0.125, 0.125, 0.018, 16);
+    const cdMesh = new THREE.Mesh(cdGeo, CartilageMaterial.clone());
+    cdMesh.position.set(0, cy - 0.025, -0.04);
+    group.add(cdMesh);
+  }
+
+  // C. Thoracic Cage & Vertebral Axis
+  // 12 Thoracic Vertebrae & Spinous processes
+  for (let t = 0; t < 12; t++) {
+    const ty = 1.18 - t * 0.085;
+    const tz = -0.06 - Math.sin((t / 12) * Math.PI) * 0.05;
+    const tvGeo = new THREE.CylinderGeometry(0.14 + t * 0.004, 0.15 + t * 0.004, 0.055, 16);
+    const tvMesh = new THREE.Mesh(tvGeo, BoneMaterial.clone());
+    tvMesh.position.set(0, ty, tz);
+    group.add(tvMesh);
+
+    // Spinous process pointing posteroinferiorly
+    const spGeo = new THREE.ConeGeometry(0.04, 0.18, 6);
+    const spMesh = new THREE.Mesh(spGeo, BoneMaterial.clone());
+    spMesh.rotation.x = -Math.PI / 2.3;
+    spMesh.position.set(0, ty - 0.02, tz - 0.14);
+    group.add(spMesh);
+  }
+
+  // Sternum (Manubrium, Body, Xiphoid process)
+  const sternumCurve = [
+    new THREE.Vector3(0, 1.15, 0.32),
+    new THREE.Vector3(0, 0.85, 0.36),
+    new THREE.Vector3(0, 0.52, 0.30),
+    new THREE.Vector3(0, 0.38, 0.24) // Xiphoid
+  ];
+  group.add(makeSeg(sternumCurve, 0.065, 18, 8, BoneMaterial));
+
+  // Clavicles (Collar bones - S-curve from manubrium to shoulders)
+  [-1, 1].forEach(side => {
+    const clavCurve = [
+      new THREE.Vector3(side * 0.08, 1.18, 0.30),
+      new THREE.Vector3(side * 0.38, 1.20, 0.22),
+      new THREE.Vector3(side * 0.68, 1.15, 0.08)
+    ];
+    group.add(makeSeg(clavCurve, 0.045, 16, 8, BoneMaterial));
+  });
+
+  // Scapulae (Shoulder blades dorsal plates)
+  [-1, 1].forEach(side => {
+    const scapGeo = new THREE.BoxGeometry(0.36, 0.48, 0.04);
+    const scapMesh = new THREE.Mesh(scapGeo, BoneMaterial.clone());
+    scapMesh.position.set(side * 0.46, 0.95, -0.22);
+    scapMesh.rotation.y = -side * 0.25;
+    group.add(scapMesh);
+  });
+
+  // 12 Pairs of True & False Ribs (Costa)
+  for (let r = 0; r < 12; r++) {
+    const ry = 1.14 - r * 0.075;
+    const rzVertebra = -0.06 - Math.sin((r / 12) * Math.PI) * 0.05;
+    const rWidth = 0.36 + Math.sin((r / 12) * Math.PI) * 0.32;
+    const antY = 1.12 - r * 0.068;
+
     [-1, 1].forEach(side => {
-      const rib = new THREE.CatmullRomCurve3([
-        new THREE.Vector3(0, y, -0.2),
-        new THREE.Vector3(side * 0.7, y - 0.08, 0),
-        new THREE.Vector3(side * 0.2, y - 0.16, 0.4)
-      ]);
-      group.add(makeTube(rib.points, 0.04, 12, 6, BoneMaterial));
+      const ribPts = [
+        new THREE.Vector3(side * 0.08, ry, rzVertebra),
+        new THREE.Vector3(side * (rWidth * 0.7), ry - 0.02, -0.15),
+        new THREE.Vector3(side * rWidth, ry - 0.05, 0.08),
+        new THREE.Vector3(side * (rWidth * 0.6), antY - 0.06, 0.30),
+        new THREE.Vector3(side * 0.12, antY - 0.08, 0.32)
+      ];
+      group.add(makeSeg(ribPts, 0.028, 18, 6, BoneMaterial));
+
+      // Costal cartilage connecting to sternum for ribs 1-7
+      if (r < 7) {
+        const cartPts = [
+          new THREE.Vector3(side * 0.12, antY - 0.08, 0.32),
+          new THREE.Vector3(side * 0.03, antY - 0.07, 0.33)
+        ];
+        group.add(makeSeg(cartPts, 0.026, 6, 6, CartilageMaterial));
+      }
     });
   }
 
-  // Major Skeletal Muscles (Striated Red Fiber)
-  // Pectoralis Major (Chest muscles)
+  // D. Lumbar Spine & Pelvis (Pelvic Girdle)
+  for (let l = 0; l < 5; l++) {
+    const ly = 0.14 - l * 0.09;
+    const lGeo = new THREE.CylinderGeometry(0.18, 0.19, 0.065, 16);
+    const lMesh = new THREE.Mesh(lGeo, BoneMaterial.clone());
+    lMesh.position.set(0, ly, -0.03 + l * 0.015);
+    group.add(lMesh);
+  }
+
+  // Sacrum & Coccyx
+  const sacrumGeo = new THREE.ConeGeometry(0.28, 0.38, 12);
+  sacrumGeo.scale(1.0, 1.0, 0.55);
+  const sacrumMesh = new THREE.Mesh(sacrumGeo, BoneMaterial.clone());
+  sacrumMesh.rotation.x = Math.PI * 0.94;
+  sacrumMesh.position.set(0, -0.42, -0.08);
+  group.add(sacrumMesh);
+
+  // Pelvis / Iliac Blades (Ossa coxae)
   [-1, 1].forEach(side => {
-    const pecGeo = new THREE.SphereGeometry(0.55, 16, 14);
-    pecGeo.scale(1.1, 0.6, 0.4);
+    const iliumGeo = new THREE.TorusGeometry(0.38, 0.09, 10, 24, Math.PI * 1.15);
+    const iliumMesh = new THREE.Mesh(iliumGeo, BoneMaterial.clone());
+    iliumMesh.rotation.y = side * 0.42;
+    iliumMesh.rotation.z = side * 0.38;
+    iliumMesh.position.set(side * 0.38, -0.35, -0.04);
+    group.add(iliumMesh);
+
+    // Ischium & Pubic ramus (forming the acetabulum hip socket)
+    const acetGeo = new THREE.SphereGeometry(0.14, 12, 10);
+    const acetMesh = new THREE.Mesh(acetGeo, BoneMaterial.clone());
+    acetMesh.position.set(side * 0.34, -0.55, 0.02);
+    group.add(acetMesh);
+  });
+
+  // 2. APPENDICULAR SKELETON: UPPER & LOWER LIMBS
+  // A. Upper Limbs (Bones: Humerus, Radius, Ulna, Hands)
+  [-1, 1].forEach(side => {
+    // Shoulder joint & Humerus
+    const humPts = [
+      new THREE.Vector3(side * 0.72, 1.12, 0.05), // Head of humerus
+      new THREE.Vector3(side * 0.78, 0.75, 0.04), // Shaft
+      new THREE.Vector3(side * 0.82, 0.42, 0.02)  // Condyles (Elbow)
+    ];
+    group.add(makeSeg(humPts, 0.055, 16, 8, BoneMaterial));
+
+    // Elbow Joint (Trochlea & Capitulum)
+    const elbowGeo = new THREE.SphereGeometry(0.085, 12, 10);
+    const elbowMesh = new THREE.Mesh(elbowGeo, CartilageMaterial.clone());
+    elbowMesh.position.set(side * 0.82, 0.42, 0.02);
+    group.add(elbowMesh);
+
+    // Radius & Ulna (Forearm)
+    const radPts = [
+      new THREE.Vector3(side * 0.84, 0.40, 0.02),
+      new THREE.Vector3(side * 0.88, 0.08, 0.05),
+      new THREE.Vector3(side * 0.90, -0.18, 0.08)
+    ];
+    const ulnPts = [
+      new THREE.Vector3(side * 0.80, 0.40, 0.00),
+      new THREE.Vector3(side * 0.82, 0.08, 0.02),
+      new THREE.Vector3(side * 0.84, -0.18, 0.04)
+    ];
+    group.add(makeSeg(radPts, 0.038, 14, 8, BoneMaterial));
+    group.add(makeSeg(ulnPts, 0.036, 14, 8, BoneMaterial));
+
+    // Carpal bones & Metacarpals (Hand skeleton)
+    const handPts = [
+      new THREE.Vector3(side * 0.87, -0.20, 0.06),
+      new THREE.Vector3(side * 0.90, -0.38, 0.08),
+      new THREE.Vector3(side * 0.92, -0.52, 0.10)
+    ];
+    group.add(makeSeg(handPts, 0.045, 10, 6, BoneMaterial));
+  });
+
+  // B. Lower Limbs (Bones: Femur, Patella, Tibia, Fibula, Feet)
+  [-1, 1].forEach(side => {
+    // Femur (Thigh bone)
+    const femPts = [
+      new THREE.Vector3(side * 0.34, -0.55, 0.02),  // Femoral head in acetabulum
+      new THREE.Vector3(side * 0.42, -0.62, 0.02),  // Greater trochanter
+      new THREE.Vector3(side * 0.38, -1.05, 0.04),  // Femoral shaft
+      new THREE.Vector3(side * 0.32, -1.48, 0.02)   // Condyles (Knee)
+    ];
+    group.add(makeSeg(femPts, 0.075, 20, 10, BoneMaterial));
+
+    // Patella (Kneecap)
+    const patGeo = new THREE.SphereGeometry(0.09, 14, 10);
+    patGeo.scale(1.1, 1.2, 0.55);
+    const patMesh = new THREE.Mesh(patGeo, BoneMaterial.clone());
+    patMesh.position.set(side * 0.32, -1.48, 0.12);
+    group.add(patMesh);
+
+    // Knee Articular Cartilage
+    const kneeGeo = new THREE.SphereGeometry(0.12, 12, 10);
+    const kneeMesh = new THREE.Mesh(kneeGeo, CartilageMaterial.clone());
+    kneeMesh.position.set(side * 0.32, -1.48, 0.02);
+    group.add(kneeMesh);
+
+    // Tibia (Shinbone - weight-bearing)
+    const tibPts = [
+      new THREE.Vector3(side * 0.32, -1.52, 0.02),
+      new THREE.Vector3(side * 0.30, -1.95, 0.04),
+      new THREE.Vector3(side * 0.28, -2.35, 0.02) // Medial malleolus (Ankle)
+    ];
+    group.add(makeSeg(tibPts, 0.065, 18, 10, BoneMaterial));
+
+    // Fibula (Lateral slender bone)
+    const fibPts = [
+      new THREE.Vector3(side * 0.42, -1.56, 0.00),
+      new THREE.Vector3(side * 0.40, -1.95, 0.02),
+      new THREE.Vector3(side * 0.36, -2.35, 0.00) // Lateral malleolus
+    ];
+    group.add(makeSeg(fibPts, 0.035, 16, 8, BoneMaterial));
+
+    // Foot Skeleton (Calcaneus heel, Talus, Metatarsals)
+    const footPts = [
+      new THREE.Vector3(side * 0.32, -2.38, -0.12), // Calcaneus heel
+      new THREE.Vector3(side * 0.30, -2.42, 0.08),  // Midfoot arch
+      new THREE.Vector3(side * 0.28, -2.46, 0.32)   // Metatarsals & Toes
+    ];
+    group.add(makeSeg(footPts, 0.065, 14, 8, BoneMaterial));
+  });
+
+  // 3. THE SKELETAL MUSCULAR SYSTEM (Muscles & Tendons)
+  // A. Neck & Head Muscles
+  [-1, 1].forEach(side => {
+    // Sternocleidomastoideus (Diagonal neck muscle band)
+    const scmPts = [
+      new THREE.Vector3(side * 0.22, 1.70, -0.06), // Mastoid process
+      new THREE.Vector3(side * 0.16, 1.45, 0.12),
+      new THREE.Vector3(side * 0.06, 1.22, 0.28)  // Sternum/clavicle tendon
+    ];
+    group.add(makeSeg(scmPts, 0.052, 14, 8, MuscleMaterial));
+
+    // Tendon of SCM
+    const scmTendon = [
+      new THREE.Vector3(side * 0.06, 1.22, 0.28),
+      new THREE.Vector3(side * 0.04, 1.18, 0.30)
+    ];
+    group.add(makeSeg(scmTendon, 0.042, 6, 6, TendonMaterial));
+
+    // Masseter (Jaw chewing muscle)
+    const massGeo = new THREE.BoxGeometry(0.12, 0.22, 0.08);
+    const massMesh = new THREE.Mesh(massGeo, MuscleMaterial);
+    massMesh.position.set(side * 0.22, 1.55, 0.16);
+    group.add(massMesh);
+  });
+
+  // B. Chest & Shoulder Muscles (Pectoralis & Deltoid)
+  [-1, 1].forEach(side => {
+    // Pectoralis Major (Clavicular & Sternocostal heads)
+    const pecGeo = new THREE.SphereGeometry(0.42, 24, 20);
+    pecGeo.scale(1.25, 0.82, 0.45);
     const pecMesh = new THREE.Mesh(pecGeo, MuscleMaterial);
-    pecMesh.position.set(side * 0.48, 0.55, 0.32);
-    pecMesh.rotation.z = side * 0.2;
+    pecMesh.position.set(side * 0.36, 0.88, 0.28);
+    pecMesh.rotation.z = side * 0.28;
+    pecMesh.rotation.y = side * 0.15;
     group.add(pecMesh);
-  });
 
-  // Deltoideus (Shoulder muscles)
-  [-1, 1].forEach(side => {
-    const deltGeo = new THREE.SphereGeometry(0.42, 16, 14);
-    deltGeo.scale(0.8, 1.2, 0.9);
+    // Pectoralis Major Tendon inserting into lateral bicipital groove of humerus
+    const pecTendon = [
+      new THREE.Vector3(side * 0.58, 0.94, 0.24),
+      new THREE.Vector3(side * 0.72, 1.02, 0.12)
+    ];
+    group.add(makeSeg(pecTendon, 0.042, 8, 6, TendonMaterial));
+
+    // Deltoideus (Multi-pennate shoulder cap: anterior, lateral, posterior heads)
+    const deltGeo = new THREE.SphereGeometry(0.38, 24, 20);
+    deltGeo.scale(0.85, 1.35, 1.05);
     const deltMesh = new THREE.Mesh(deltGeo, MuscleMaterial);
-    deltMesh.position.set(side * 1.05, 0.8, 0.05);
+    deltMesh.position.set(side * 0.76, 1.08, 0.06);
+    deltMesh.rotation.z = -side * 0.22;
     group.add(deltMesh);
+
+    // Serratus Anterior (Lateral chest digitations)
+    for (let s = 0; s < 4; s++) {
+      const sy = 0.82 - s * 0.10;
+      const serPts = [
+        new THREE.Vector3(side * 0.45, sy, -0.05),
+        new THREE.Vector3(side * 0.52, sy - 0.02, 0.12)
+      ];
+      group.add(makeSeg(serPts, 0.038, 8, 6, MuscleMaterial));
+    }
+
+    // Trapezius (Posterior neck & upper back)
+    const trapGeo = new THREE.BoxGeometry(0.42, 0.52, 0.12);
+    const trapMesh = new THREE.Mesh(trapGeo, MuscleMaterial);
+    trapMesh.position.set(side * 0.32, 1.30, -0.18);
+    trapMesh.rotation.y = -side * 0.25;
+    group.add(trapMesh);
   });
 
-  // Biceps Brachii (Arm flexor)
+  // C. Arm & Forearm Muscles (Biceps, Triceps, Brachioradialis)
   [-1, 1].forEach(side => {
-    const bicepGeo = new THREE.CylinderGeometry(0.18, 0.14, 0.85, 12);
-    const bicepMesh = new THREE.Mesh(bicepGeo, MuscleMaterial);
-    bicepMesh.position.set(side * 1.25, 0.1, 0.05);
-    group.add(bicepMesh);
+    // Biceps Brachii (Two fusiform muscular bellies)
+    const bicepCurve = [
+      new THREE.Vector3(side * 0.74, 1.02, 0.10), // Long & short head origins
+      new THREE.Vector3(side * 0.78, 0.78, 0.15), // Main muscle belly
+      new THREE.Vector3(side * 0.80, 0.54, 0.10)  // Distal belly
+    ];
+    group.add(makeSeg(bicepCurve, 0.105, 16, 10, MuscleMaterial));
+
+    // Biceps Distal Tendon inserting into radial tuberosity
+    const bicepTendon = [
+      new THREE.Vector3(side * 0.80, 0.54, 0.10),
+      new THREE.Vector3(side * 0.82, 0.38, 0.06)
+    ];
+    group.add(makeSeg(bicepTendon, 0.038, 8, 6, TendonMaterial));
+
+    // Triceps Brachii (Posterior extensor compartment)
+    const tricepCurve = [
+      new THREE.Vector3(side * 0.70, 1.05, -0.08),
+      new THREE.Vector3(side * 0.76, 0.78, -0.12),
+      new THREE.Vector3(side * 0.80, 0.52, -0.08)
+    ];
+    group.add(makeSeg(tricepCurve, 0.115, 16, 10, MuscleMaterial));
+
+    // Triceps Olecranon Tendon
+    const tricepTendon = [
+      new THREE.Vector3(side * 0.80, 0.52, -0.08),
+      new THREE.Vector3(side * 0.82, 0.40, -0.04)
+    ];
+    group.add(makeSeg(tricepTendon, 0.048, 8, 6, TendonMaterial));
+
+    // Brachioradialis & Forearm Flexor/Extensor Mass
+    const forearmCurve = [
+      new THREE.Vector3(side * 0.84, 0.38, 0.06),
+      new THREE.Vector3(side * 0.88, 0.10, 0.08),
+      new THREE.Vector3(side * 0.89, -0.14, 0.06)
+    ];
+    group.add(makeSeg(forearmCurve, 0.085, 16, 10, MuscleMaterial));
   });
 
-  // Rectus Abdominis (Abdominal 6-pack)
-  for (let row = 0; row < 3; row++) {
+  // D. Abdominal Musculature (Rectus Abdominis & Obliques)
+  // Rectus Abdominis (Anatomical 6-pack with 3 tendinous intersections)
+  for (let pack = 0; pack < 3; pack++) {
+    const py = 0.42 - pack * 0.18;
     [-1, 1].forEach(side => {
-      const abGeo = new THREE.BoxGeometry(0.24, 0.2, 0.1);
-      const abMesh = new THREE.Mesh(abGeo, MuscleMaterial);
-      abMesh.position.set(side * 0.16, 0.1 - row * 0.24, 0.35);
-      group.add(abMesh);
+      const rectGeo = new THREE.BoxGeometry(0.18, 0.14, 0.08);
+      rectGeo.scale(1.0, 1.0, 0.85);
+      const rectMesh = new THREE.Mesh(rectGeo, MuscleMaterial);
+      rectMesh.position.set(side * 0.12, py, 0.32);
+      group.add(rectMesh);
     });
+
+    // Tendinous intersections (Intersectiones tendineae - white fibrous horizontal bands)
+    const bandPts = [
+      new THREE.Vector3(-0.25, py - 0.08, 0.33),
+      new THREE.Vector3(0.0, py - 0.08, 0.34),
+      new THREE.Vector3(0.25, py - 0.08, 0.33)
+    ];
+    group.add(makeSeg(bandPts, 0.022, 10, 6, TendonMaterial));
   }
 
-  // Pelvis / Hip Bones
-  const pelvisGeo = new THREE.TorusGeometry(0.65, 0.18, 12, 24);
-  const pelvis = new THREE.Mesh(pelvisGeo, BoneMaterial);
-  pelvis.rotation.x = Math.PI / 2.3;
-  pelvis.position.set(0, -0.75, 0.05);
-  group.add(pelvis);
+  // Linea Alba (Vertical white midline tendon from xiphoid to pubic symphysis)
+  const lineaAlbaPts = [
+    new THREE.Vector3(0, 0.52, 0.33),
+    new THREE.Vector3(0, 0.14, 0.34),
+    new THREE.Vector3(0, -0.32, 0.28)
+  ];
+  group.add(makeSeg(lineaAlbaPts, 0.024, 16, 6, TendonMaterial));
 
-  // Quadriceps Femoris (Thigh muscles)
+  // External Oblique Muscles (Lateral abdomen fanning towards iliac crest)
   [-1, 1].forEach(side => {
-    const quadGeo = new THREE.CylinderGeometry(0.28, 0.22, 1.4, 14);
-    const quadMesh = new THREE.Mesh(quadGeo, MuscleMaterial);
-    quadMesh.position.set(side * 0.52, -1.6, 0.05);
-    group.add(quadMesh);
+    const obGeo = new THREE.BoxGeometry(0.26, 0.48, 0.14);
+    const obMesh = new THREE.Mesh(obGeo, MuscleMaterial);
+    obMesh.position.set(side * 0.38, 0.18, 0.16);
+    obMesh.rotation.y = side * 0.35;
+    group.add(obMesh);
+  });
 
-    // Knee Joint (Cartilage cap)
-    const kneeGeo = new THREE.SphereGeometry(0.18, 12, 12);
-    const knee = new THREE.Mesh(kneeGeo, CartilageMaterial);
-    knee.position.set(side * 0.52, -2.4, 0.08);
-    group.add(knee);
+  // E. Pelvic, Gluteal & Thigh Musculature
+  [-1, 1].forEach(side => {
+    // Gluteus Maximus & Medius (Powerful posterior/lateral hip muscles)
+    const glutGeo = new THREE.SphereGeometry(0.35, 20, 18);
+    glutGeo.scale(0.95, 1.25, 0.95);
+    const glutMesh = new THREE.Mesh(glutGeo, MuscleMaterial);
+    glutMesh.position.set(side * 0.38, -0.42, -0.18);
+    glutMesh.rotation.z = -side * 0.25;
+    group.add(glutMesh);
 
-    // Gastrocnemius (Calf muscle)
-    const calfGeo = new THREE.SphereGeometry(0.24, 14, 14);
-    calfGeo.scale(0.85, 1.4, 0.9);
-    const calf = new THREE.Mesh(calfGeo, MuscleMaterial);
-    calf.position.set(side * 0.52, -3.0, -0.05);
-    group.add(calf);
+    // Quadriceps Femoris (Rectus femoris & Vastus muscle bellies)
+    const quadCurve = [
+      new THREE.Vector3(side * 0.38, -0.62, 0.14), // Origin below ASIS
+      new THREE.Vector3(side * 0.40, -1.02, 0.20), // Bulging belly
+      new THREE.Vector3(side * 0.34, -1.35, 0.14)  // Approaching patella
+    ];
+    group.add(makeSeg(quadCurve, 0.165, 20, 12, MuscleMaterial));
+
+    // Vastus lateralis & medialis bulging flanks
+    const vastLat = [
+      new THREE.Vector3(side * 0.52, -0.85, 0.08),
+      new THREE.Vector3(side * 0.48, -1.18, 0.08)
+    ];
+    group.add(makeSeg(vastLat, 0.13, 10, 8, MuscleMaterial));
+
+    // Quadriceps Tendon inserting into superior pole of patella
+    const quadTendon = [
+      new THREE.Vector3(side * 0.34, -1.35, 0.14),
+      new THREE.Vector3(side * 0.32, -1.45, 0.13)
+    ];
+    group.add(makeSeg(quadTendon, 0.075, 8, 8, TendonMaterial));
+
+    // Patellar Ligament (Ligamentum patellae - from patella to tibial tuberosity)
+    const patLig = [
+      new THREE.Vector3(side * 0.32, -1.50, 0.12),
+      new THREE.Vector3(side * 0.31, -1.65, 0.09)
+    ];
+    group.add(makeSeg(patLig, 0.055, 8, 8, TendonMaterial));
+
+    // Sartorius (Long strap muscle running diagonally across thigh)
+    const sartPts = [
+      new THREE.Vector3(side * 0.48, -0.42, 0.12),
+      new THREE.Vector3(side * 0.36, -0.95, 0.16),
+      new THREE.Vector3(side * 0.24, -1.48, 0.06)
+    ];
+    group.add(makeSeg(sartPts, 0.045, 16, 6, MuscleMaterial));
+
+    // Hamstrings (Biceps femoris & Semitendinosus - posterior thigh flexors)
+    const hamCurve = [
+      new THREE.Vector3(side * 0.34, -0.65, -0.14),
+      new THREE.Vector3(side * 0.38, -1.05, -0.16),
+      new THREE.Vector3(side * 0.32, -1.42, -0.10)
+    ];
+    group.add(makeSeg(hamCurve, 0.14, 18, 10, MuscleMaterial));
+  });
+
+  // F. Leg, Calf & Ankle Musculature
+  [-1, 1].forEach(side => {
+    // Tibialis Anterior (Anterior shin dorsiflexor)
+    const tibCurve = [
+      new THREE.Vector3(side * 0.34, -1.60, 0.10),
+      new THREE.Vector3(side * 0.32, -1.95, 0.10),
+      new THREE.Vector3(side * 0.29, -2.25, 0.08)
+    ];
+    group.add(makeSeg(tibCurve, 0.072, 16, 8, MuscleMaterial));
+
+    // Tibialis anterior tendon crossing anterior ankle
+    const tibTendon = [
+      new THREE.Vector3(side * 0.29, -2.25, 0.08),
+      new THREE.Vector3(side * 0.26, -2.40, 0.18)
+    ];
+    group.add(makeSeg(tibTendon, 0.035, 8, 6, TendonMaterial));
+
+    // Gastrocnemius (Two muscular calf bellies: medial & lateral heads)
+    [-1, 1].forEach(gHead => {
+      const calfPts = [
+        new THREE.Vector3(side * 0.32 + gHead * 0.07, -1.55, -0.06),
+        new THREE.Vector3(side * 0.33 + gHead * 0.08, -1.82, -0.12),
+        new THREE.Vector3(side * 0.31 + gHead * 0.04, -2.05, -0.08)
+      ];
+      group.add(makeSeg(calfPts, 0.082, 14, 8, MuscleMaterial));
+    });
+
+    // Soleus (Deep flat calf muscle)
+    const soleusPts = [
+      new THREE.Vector3(side * 0.32, -1.75, -0.06),
+      new THREE.Vector3(side * 0.31, -2.05, -0.06)
+    ];
+    group.add(makeSeg(soleusPts, 0.088, 10, 8, MuscleMaterial));
+
+    // The Achilles Tendon (Tendo calcaneus - thickest, strongest tendon in the body)
+    const achillesPts = [
+      new THREE.Vector3(side * 0.31, -2.05, -0.08),
+      new THREE.Vector3(side * 0.31, -2.22, -0.09),
+      new THREE.Vector3(side * 0.32, -2.38, -0.12) // Inserting into calcaneus heel
+    ];
+    group.add(makeSeg(achillesPts, 0.052, 12, 8, TendonMaterial));
   });
 
   group.scale.set(0.95, 0.95, 0.95);
-  group.position.y = 0.6;
   return group;
 }
 
