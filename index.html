@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>MedAnatomy 3D AR — Tibbiyot Talabalari uchun Interaktiv Anatomiya</title>
+  <meta name="description" content="Inson suyaklari va ichki a'zolarining interaktiv 3D va AR ta'limiy platformasi. Lotincha anatomik nomenklatura, 360° vizualizatsiya va testlar." />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/src/style.css" />
+</head>
+<body class="bg-slate-950 text-slate-100 antialiased overflow-hidden select-none">
+
+  <!-- APP CONTAINER -->
+  <div id="app" class="relative w-screen h-screen flex flex-col overflow-hidden">
+
+    <!-- TOP HEADER -->
+    <header class="header-bar z-30 flex items-center justify-between px-4 py-2.5 bg-slate-900/80 backdrop-blur-md border-b border-cyan-500/20">
+      <div class="flex items-center gap-3">
+        <div class="brand-logo flex items-center gap-2">
+          <div class="logo-icon w-9 h-9 rounded-xl bg-gradient-to-tr from-cyan-600 to-emerald-500 flex items-center justify-center shadow-lg shadow-cyan-500/20">
+            <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+            </svg>
+          </div>
+          <div>
+            <h1 class="text-sm font-bold tracking-tight text-white flex items-center gap-1.5">
+              <span>MedAnatomy</span>
+              <span class="px-1.5 py-0.5 text-[10px] font-semibold bg-cyan-500/20 text-cyan-400 rounded-md border border-cyan-500/30">3D AR</span>
+            </h1>
+            <p class="text-[11px] text-slate-400 font-medium">Tibbiyot talabalari uchun interaktiv atlas</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Header actions -->
+      <div class="flex items-center gap-2">
+        <!-- AR Camera Button -->
+        <button id="toggleCameraBtn" class="action-pill bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 hover:border-cyan-500/50 flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold transition-all">
+          <span class="w-2.5 h-2.5 rounded-full bg-slate-500 indicator-dot"></span>
+          <span id="cameraBtnText">AR Kamerani yoqish</span>
+        </button>
+
+        <!-- Audio Pronunciation Button -->
+        <button id="speakNameBtn" title="Lotincha nomini talaffuz qilish" class="icon-btn bg-slate-800 hover:bg-cyan-950/60 text-slate-300 hover:text-cyan-400 border border-slate-700 hover:border-cyan-500/40 w-8 h-8 rounded-full flex items-center justify-center transition-all">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+          </svg>
+        </button>
+
+        <!-- Sidebar Toggle -->
+        <button id="toggleSidebarBtn" title="Ma'lumotlar panelini ochish/yopish" class="icon-btn bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 w-8 h-8 rounded-full flex items-center justify-center transition-all">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </button>
+
+        <!-- Fullscreen -->
+        <button id="fullscreenBtn" title="To'liq ekran" class="icon-btn hidden sm:flex bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 w-8 h-8 rounded-full items-center justify-center transition-all">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- MAIN INTERACTIVE VIEWPORT -->
+    <main class="relative flex-1 flex overflow-hidden">
+
+      <!-- 3D & CAMERA VIEW CONTAINER -->
+      <div id="viewportContainer" class="relative flex-1 h-full w-full bg-slate-950 overflow-hidden">
+        
+        <!-- Video Camera Feed for AR -->
+        <video id="cameraFeed" class="absolute inset-0 w-full h-full object-cover z-0 pointer-events-none opacity-0 transition-opacity duration-500" autoplay playsinline muted></video>
+
+        <!-- AR Reticle / Target Alignment Guide -->
+        <div id="arReticle" class="absolute inset-0 pointer-events-none z-10 hidden flex items-center justify-center">
+          <div class="w-64 h-64 border-2 border-dashed border-cyan-400/50 rounded-3xl relative animate-pulse flex items-center justify-center">
+            <div class="w-4 h-4 bg-cyan-400 rounded-full shadow-lg shadow-cyan-400"></div>
+            <span class="absolute -bottom-8 px-3 py-1 bg-slate-900/90 text-cyan-300 text-[11px] font-mono rounded-full border border-cyan-500/40">
+              Modelni tana / rasm ustiga to'g'irlang
+            </span>
+          </div>
+        </div>
+
+        <!-- Three.js Canvas Container -->
+        <div id="canvasContainer" class="absolute inset-0 z-10 cursor-grab active:cursor-grabbing"></div>
+
+        <!-- 3D TOOLBAR (FLOATING LEFT) -->
+        <div class="floating-toolbar absolute top-4 left-4 z-20 flex flex-col gap-2">
+          <button id="resetCamBtn" title="Kamerani boshlang'ich holatga qaytarish" class="tool-btn">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            <span class="tool-label">Qaytarish</span>
+          </button>
+
+          <button id="xrayBtn" title="Rentgen (Shaffof) rejimi" class="tool-btn">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+            </svg>
+            <span class="tool-label">Rentgen</span>
+          </button>
+
+          <button id="wireframeBtn" title="To'r (Wireframe) rejimi" class="tool-btn">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+            </svg>
+            <span class="tool-label">To'r</span>
+          </button>
+
+          <button id="autoRotateBtn" title="Avtomatik 360° aylantirish" class="tool-btn">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span class="tool-label">360° Aylanma</span>
+          </button>
+
+          <button id="snapshotBtn" title="Ekranni rasmga olish" class="tool-btn">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            <span class="tool-label">Surat olish</span>
+          </button>
+        </div>
+
+        <!-- AR FLOATING CONTROLS (Active when camera is running) -->
+        <div id="arControlsBar" class="absolute top-4 right-4 z-20 hidden flex items-center gap-2 bg-slate-900/90 backdrop-blur-md px-3 py-2 rounded-2xl border border-cyan-500/30 shadow-xl">
+          <label class="text-[11px] text-slate-300 font-medium flex items-center gap-1.5">
+            <span>Shaffoflik:</span>
+            <input type="range" id="arOpacitySlider" min="0.2" max="1" step="0.05" value="0.85" class="w-20 accent-cyan-400 cursor-pointer" />
+          </label>
+          <button id="switchCameraBtn" title="Old / Orqa kamerani almashtirish" class="p-1.5 bg-slate-800 hover:bg-slate-700 text-cyan-300 rounded-lg border border-slate-700">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+          </button>
+        </div>
+
+        <!-- BOTTOM ORGAN SELECTOR BAR -->
+        <div class="organ-selector-bar absolute bottom-4 left-1/2 -translate-x-1/2 z-20 w-[95%] max-w-2xl bg-slate-900/85 backdrop-blur-xl border border-slate-700/80 rounded-2xl p-1.5 shadow-2xl flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+          
+          <button data-model="skull" class="organ-tab active">
+            <span class="emoji">💀</span>
+            <span class="name">Bosh suyagi</span>
+            <span class="latin">Cranium</span>
+          </button>
+
+          <button data-model="heart" class="organ-tab">
+            <span class="emoji">❤️</span>
+            <span class="name">Yurak</span>
+            <span class="latin">Cor</span>
+          </button>
+
+          <button data-model="arm_hand" class="organ-tab">
+            <span class="emoji">🦴</span>
+            <span class="name">Qo'l panjasi</span>
+            <span class="latin">Ossa manus</span>
+          </button>
+
+          <button data-model="ribcage_lungs" class="organ-tab">
+            <span class="emoji">🫁</span>
+            <span class="name">Ko'krak & O'pka</span>
+            <span class="latin">Thorax</span>
+          </button>
+
+          <button data-model="spine" class="organ-tab">
+            <span class="emoji">🧬</span>
+            <span class="name">Umurtqa</span>
+            <span class="latin">Columna vert.</span>
+          </button>
+
+        </div>
+
+        <!-- 3D INTERACTION HINT -->
+        <div id="interactiveHint" class="absolute bottom-20 left-1/2 -translate-x-1/2 z-10 pointer-events-none text-[11px] text-slate-400/80 bg-slate-900/60 backdrop-blur-sm px-3 py-1 rounded-full border border-slate-800">
+          💡 3D modelni aylantirish uchun suring • Qismlarni tanlash uchun bosing
+        </div>
+
+      </div>
+
+      <!-- RIGHT SIDEBAR: MEDICAL ATLAS & QUIZ -->
+      <aside id="infoSidebar" class="sidebar z-20 w-full sm:w-96 md:w-[410px] h-full bg-slate-900/95 backdrop-blur-xl border-l border-slate-800 flex flex-col transition-transform duration-300">
+        
+        <!-- Sidebar Header -->
+        <div class="p-4 border-b border-slate-800/80">
+          <div class="flex items-start justify-between gap-2">
+            <div>
+              <span id="organCategory" class="inline-block px-2 py-0.5 text-[10px] font-semibold bg-emerald-500/10 text-emerald-400 rounded-md border border-emerald-500/20 mb-1">
+                Aksial skelet
+              </span>
+              <h2 id="organNameUz" class="text-xl font-extrabold text-white tracking-tight">Bosh suyagi</h2>
+              <p id="organNameLat" class="text-xs font-mono font-medium text-cyan-400 italic">Cranium • Human Skull</p>
+            </div>
+            
+            <button id="closeSidebarMobile" class="sm:hidden text-slate-400 hover:text-white p-1">
+              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+
+          <!-- Quick specs badges -->
+          <div class="grid grid-cols-2 gap-2 mt-3 text-[11px]">
+            <div class="bg-slate-800/60 p-2 rounded-xl border border-slate-700/50">
+              <span class="text-slate-400 block text-[10px]">Tizim:</span>
+              <span id="organSystem" class="font-medium text-slate-200">Skelet tizimi</span>
+            </div>
+            <div class="bg-slate-800/60 p-2 rounded-xl border border-slate-700/50">
+              <span class="text-slate-400 block text-[10px]">Suyaklar / Og'irlik:</span>
+              <span id="organSpecs" class="font-medium text-slate-200">22 ta suyak</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- TABS NAV -->
+        <div class="flex border-b border-slate-800 px-4 text-xs font-semibold">
+          <button class="sidebar-tab active" data-tab="parts">Tuzilishi</button>
+          <button class="sidebar-tab" data-tab="functions">Vazifasi</button>
+          <button class="sidebar-tab" data-tab="clinical">Klinika</button>
+          <button class="sidebar-tab text-amber-400" data-tab="quiz">Test (Quiz) 🏆</button>
+        </div>
+
+        <!-- TAB CONTENT (SCROLLABLE) -->
+        <div class="flex-1 overflow-y-auto p-4 space-y-4 text-sm text-slate-300 custom-scrollbar">
+
+          <!-- TAB 1: TUZILISHI & QISMLARI -->
+          <div id="tabParts" class="tab-panel active space-y-3">
+            <p id="organDescription" class="text-xs leading-relaxed text-slate-300 bg-slate-800/40 p-3 rounded-xl border border-slate-700/40">
+              Bosh suyagi inson bosh skeleti bo'lib...
+            </p>
+
+            <div>
+              <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2 flex items-center justify-between">
+                <span>Anatomik Qismlar</span>
+                <span class="text-[10px] text-cyan-400 font-normal">3D-da ko'rish uchun bosing</span>
+              </h3>
+              <div id="partsList" class="space-y-1.5">
+                <!-- Dynamically populated parts -->
+              </div>
+            </div>
+          </div>
+
+          <!-- TAB 2: VAZIFALARI -->
+          <div id="tabFunctions" class="tab-panel hidden space-y-2">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Fiziologik Vazifalar</h3>
+            <ul id="functionsList" class="space-y-2 text-xs">
+              <!-- Dynamically populated -->
+            </ul>
+          </div>
+
+          <!-- TAB 3: KLINIKA -->
+          <div id="tabClinical" class="tab-panel hidden space-y-2">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-amber-400 mb-2">Klinik Ahamiyat & Kasalliklar</h3>
+            <ul id="clinicalList" class="space-y-2 text-xs">
+              <!-- Dynamically populated -->
+            </ul>
+          </div>
+
+          <!-- TAB 4: QUIZ (BILIMNI SINASH) -->
+          <div id="tabQuiz" class="tab-panel hidden space-y-4">
+            <div class="bg-gradient-to-br from-amber-500/10 to-cyan-500/10 border border-amber-500/30 rounded-2xl p-4">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-xs font-bold text-amber-400 flex items-center gap-1">
+                  <span>🧠</span> Anatomiya Savollari
+                </span>
+                <span id="quizScoreBadge" class="text-[11px] font-mono font-bold bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded-full">
+                  Ball: 0/3
+                </span>
+              </div>
+              <p class="text-xs text-slate-300">
+                Ushbu bo'lim bo'yicha talabalik bilimingizni tekshirib ko'ring!
+              </p>
+            </div>
+
+            <div id="quizContainer" class="space-y-4">
+              <!-- Dynamically rendered questions -->
+            </div>
+
+            <button id="resetQuizBtn" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-200 rounded-xl border border-slate-700 transition-all">
+              Testni qayta boshlash
+            </button>
+          </div>
+
+        </div>
+
+        <!-- Sidebar Footer Status -->
+        <div class="p-3 bg-slate-950/60 border-t border-slate-800/80 text-[11px] text-slate-400 flex items-center justify-between">
+          <span id="cameraStatusIndicator" class="flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-slate-600"></span>
+            <span>3D Studio Rejimi</span>
+          </span>
+          <span class="font-mono text-[10px] text-slate-500">v1.0 • MedTech</span>
+        </div>
+
+      </aside>
+
+    </main>
+
+  </div>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
