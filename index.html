@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>MedAnatomy 3D — Haqiqiy 3D Modellash & AR Atlasi</title>
-  <meta name="description" content="Tibbiyot talabalari uchun 3D modellar va kamera AR anatomiya platformasi" />
+  <title>MedAnatomy 3D — Interaktiv Anatomiya & 3D Qidiruv Atlasi</title>
+  <meta name="description" content="Tibbiyot talabalari uchun 3D modellar, qidiruv va kamera AR anatomiya platformasi" />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -28,7 +28,7 @@
           <div class="logo-text">
             <div class="logo-title-row">
               <span class="brand-name">MedAnatomy</span>
-              <span class="brand-badge">3D • AR</span>
+              <span class="brand-badge">3D • PRO</span>
             </div>
             <span class="brand-sub">Interaktiv anatomiya atlasi</span>
           </div>
@@ -86,107 +86,60 @@
       </div>
     </header>
 
-    <!-- HORIZONTAL 3D ORGAN SELECTION STRIP (ALL 9 ORGANS WITH REACT ICONS) -->
-    <nav class="organ-strip-bar custom-scrollbar" id="organStripBar">
-      <div class="organ-strip-inner">
-        <!-- 1. BOSH SUYAGI -->
-        <button class="organ-tab-btn active" data-model="skull" title="Bosh suyagi">
-          <svg class="react-icon organ-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/>
-            <path d="M8 20v2h8v-2"/>
-            <path d="M12 16v1"/>
-            <path d="M4 11a8 8 0 1 1 16 0c0 3-1.5 5.5-3 6.5V20H7v-2.5C5.5 16.5 4 14 4 11z"/>
+    <!-- ANATOMY SEARCH & SYSTEM NAVIGATION BAR (REPLACES HORIZONTAL TAB STRIP) -->
+    <section class="anatomy-search-section" id="anatomySearchSection">
+      <div class="search-bar-container">
+        <!-- Search Input Box -->
+        <div class="search-input-box">
+          <svg class="react-icon search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"/>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
           </svg>
-          <span class="organ-tab-name">Bosh suyagi</span>
-          <span class="organ-tab-sub">Cranium</span>
-        </button>
+          <input 
+            type="text" 
+            id="anatomySearchInput" 
+            class="anatomy-search-input" 
+            placeholder="A'zo yoki sistemani qidiring... Masalan: yurak, bosh miya, tishlar, ot pufagi, nerv..."
+            autocomplete="off"
+            spellcheck="false"
+          />
+          <button id="clearSearchBtn" class="clear-search-btn hidden" title="Tozalash" aria-label="Tozalash">
+            <svg class="react-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+          <span class="search-badge-hint desktop-only" title="Qidiruv tugmasi">/</span>
+        </div>
 
-        <!-- 2. BOSH MIYA -->
-        <button class="organ-tab-btn" data-model="brain" title="Bosh miya">
-          <svg class="react-icon organ-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M9.5 2A4.5 4.5 0 0 0 5 6.5c0 .7.17 1.36.46 1.95A4.5 4.5 0 0 0 4 12c0 1.25.5 2.39 1.33 3.22A4.5 4.5 0 0 0 5 17.5a4.5 4.5 0 0 0 4.5 4.5c1.17 0 2.22-.45 3-1.18.78.73 1.83 1.18 3 1.18a4.5 4.5 0 0 0 4.5-4.5c0-.68-.15-1.32-.42-1.9A4.5 4.5 0 0 0 20 12c0-1.13-.42-2.16-1.1-2.95.38-.7.6-1.5.6-2.35A4.5 4.5 0 0 0 14.5 2c-1.22 0-2.32.49-3.12 1.28A4.48 4.48 0 0 0 9.5 2z"/>
-            <path d="M12 4v16"/>
-          </svg>
-          <span class="organ-tab-name">Bosh miya</span>
-          <span class="organ-tab-sub">Encephalon</span>
-        </button>
-
-        <!-- 3. YURAK -->
-        <button class="organ-tab-btn" data-model="heart" title="Yurak">
-          <svg class="react-icon organ-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
-            <path d="M3.22 12H9.5l.5-1 2 4.5 2-7 1.5 3.5h4.28"/>
-          </svg>
-          <span class="organ-tab-name">Yurak</span>
-          <span class="organ-tab-sub">Cor</span>
-        </button>
-
-        <!-- 4. O'PKA -->
-        <button class="organ-tab-btn" data-model="lung" title="O'pka">
-          <svg class="react-icon organ-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 2v7"/>
-            <path d="M12 9l-3 3"/>
-            <path d="M12 9l3 3"/>
-            <path d="M17 10c2 1 3 3.5 3 6.5a6.5 6.5 0 0 1-6.5 6.5c-1 0-1.5-.5-1.5-1.5V12"/>
-            <path d="M7 10c-2 1-3 3.5-3 6.5A6.5 6.5 0 0 0 10.5 23c1 0 1.5-.5 1.5-1.5V12"/>
-          </svg>
-          <span class="organ-tab-name">O'pka</span>
-          <span class="organ-tab-sub">Pulmones</span>
-        </button>
-
-        <!-- 5. OSHQOZON -->
-        <button class="organ-tab-btn" data-model="stomach" title="Oshqozon">
-          <svg class="react-icon organ-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 2v4"/>
-            <path d="M12 6c-3 0-6 2-6 6 0 5 4 10 9 10s7-4 7-9c0-5-4-7-8-7"/>
-            <path d="M16 22v-3a2 2 0 0 1 2-2h2"/>
-          </svg>
-          <span class="organ-tab-name">Oshqozon</span>
-          <span class="organ-tab-sub">Gaster</span>
-        </button>
-
-        <!-- 6. JIGAR -->
-        <button class="organ-tab-btn" data-model="liver" title="Jigar">
-          <svg class="react-icon organ-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M4 11c0-4 4-7 11-7 4 0 6 2 6 5 0 5-3 11-8 11-5 0-9-4-9-9z"/>
-            <path d="M4 11h11"/>
-          </svg>
-          <span class="organ-tab-name">Jigar</span>
-          <span class="organ-tab-sub">Hepar</span>
-        </button>
-
-        <!-- 7. BUYRAK -->
-        <button class="organ-tab-btn" data-model="kidney" title="Buyrak">
-          <svg class="react-icon organ-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M7 4c-3.5 3-4 8-2 12s6 5 9 4 5-3 6-7-1-9-6-10c-3-.6-5 .5-7 1z"/>
-            <path d="M14 11a3 3 0 0 0-3 3"/>
-          </svg>
-          <span class="organ-tab-name">Buyrak</span>
-          <span class="organ-tab-sub">Ren</span>
-        </button>
-
-        <!-- 8. KO'Z OLMASI -->
-        <button class="organ-tab-btn" data-model="eye" title="Ko'z olmasi">
-          <svg class="react-icon organ-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
-            <circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="1"/>
-          </svg>
-          <span class="organ-tab-name">Ko'z olmasi</span>
-          <span class="organ-tab-sub">Bulbus oculi</span>
-        </button>
-
-        <!-- 9. UMURTQA POG'ONASI -->
-        <button class="organ-tab-btn" data-model="spine" title="Umurtqa pog'onasi">
-          <svg class="react-icon organ-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 2v20"/>
-            <circle cx="12" cy="4" r="2"/><circle cx="12" cy="9" r="2"/><circle cx="12" cy="15" r="2"/><circle cx="12" cy="20" r="2"/>
-            <path d="M8 9h8"/><path d="M7 15h10"/><path d="M9 4h6"/>
-          </svg>
-          <span class="organ-tab-name">Umurtqa</span>
-          <span class="organ-tab-sub">Spine</span>
-        </button>
+        <!-- Currently Active Organ Indicator Badge -->
+        <div class="active-badge-display" id="activeBadgeDisplay">
+          <span class="active-dot"></span>
+          <span class="active-label">Faol model:</span>
+          <span class="active-title" id="activeOrganTitle">Bosh miya</span>
+          <span class="active-lat" id="activeOrganLatin">Encephalon</span>
+          <span class="active-sys" id="activeOrganSystem">Nerv sistemasi</span>
+        </div>
       </div>
-    </nav>
+
+      <!-- Quick System Filter Pills -->
+      <div class="system-chips-row custom-scrollbar" id="systemChipsRow">
+        <button class="sys-chip active" data-system="all">Barchasi (20+)</button>
+        <button class="sys-chip" data-system="nervous">Nerv sistemasi</button>
+        <button class="sys-chip" data-system="circulatory">Qon aylanish</button>
+        <button class="sys-chip" data-system="respiratory">Nafas olish</button>
+        <button class="sys-chip" data-system="digestive">Ovqat hazm</button>
+        <button class="sys-chip" data-system="musculoskeletal">Tayanch-harakat</button>
+        <button class="sys-chip" data-system="urinary">Siydik chiqarish</button>
+        <button class="sys-chip" data-system="endocrine">Endokrin</button>
+        <button class="sys-chip" data-system="sensory">Sezgi a'zolari</button>
+      </div>
+
+      <!-- Live Search Results Dropdown -->
+      <div id="searchResultsDropdown" class="search-results-dropdown hidden custom-scrollbar">
+        <!-- Injected dynamically by main.js -->
+      </div>
+    </section>
 
     <!-- MAIN INTERACTIVE CANVAS & SIDEBAR LAYOUT -->
     <main class="main-content">
@@ -209,7 +162,6 @@
             <span class="reticle-instruction">Kamerani gavdaga yoki kitobga yo'naltiring</span>
           </div>
 
-          <!-- PROMINENT AR TRIGGER BUTTON ("Telefondan kamerada belgilanganda 3D model ishga tushurilsin") -->
           <button id="btnArDetect" class="btn-ar-detect">
             <svg class="react-icon ar-btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
               <circle cx="12" cy="12" r="10"/>
@@ -309,9 +261,9 @@
         <div class="sidebar-header">
           <div class="sidebar-title-wrap">
             <div>
-              <span id="organCategory" class="category-chip">Aksial skelet</span>
-              <h2 id="organNameUz" class="organ-heading">Bosh suyagi</h2>
-              <p id="organNameLat" class="organ-latin-sub">Cranium • Human Skull</p>
+              <span id="organCategory" class="category-chip">Oliy boshqaruv markazi</span>
+              <h2 id="organNameUz" class="organ-heading">Bosh miya</h2>
+              <p id="organNameLat" class="organ-latin-sub">Encephalon • Human Brain 3D</p>
             </div>
             <button id="closeSidebarBtn" class="btn-close-drawer" aria-label="Yopish">
               <svg class="react-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -325,11 +277,11 @@
           <div class="stats-row">
             <div class="stat-box">
               <span class="s-label">Tizim</span>
-              <span id="organSystem" class="s-val">Skelet tizimi</span>
+              <span id="organSystem" class="s-val">Nerv sistemasi</span>
             </div>
             <div class="stat-box">
               <span class="s-label">Parametr</span>
-              <span id="organSpecs" class="s-val">22 ta suyak</span>
+              <span id="organSpecs" class="s-val">100 mlrd neyron</span>
             </div>
           </div>
         </div>
@@ -378,7 +330,7 @@
           <!-- TAB 1: TUZILISHI & QISMLARI -->
           <div id="tabParts" class="tab-panel active">
             <div class="description-card">
-              <p id="organDescription">Bosh suyagi inson bosh skeleti bo'lib, bosh miyani himoyalash va yuz shaklini hosil qilish xizmatini bajaradi.</p>
+              <p id="organDescription">Inson bosh miyasi organizmning oliy boshqaruv markazidir.</p>
             </div>
 
             <div class="panel-section-title">
@@ -412,7 +364,7 @@
             <div class="quiz-banner">
               <div class="quiz-banner-top">
                 <span class="quiz-title">Bilimingizni sinang</span>
-                <span id="quizScoreBadge" class="quiz-pill">Ball: 0/3</span>
+                <span id="quizScoreBadge" class="quiz-pill">Ball: 0/2</span>
               </div>
               <p class="quiz-desc">Ushbu a'zo bo'yicha talabalik bilimingizni tekshirib ko'ring!</p>
             </div>
@@ -445,16 +397,14 @@
 
     </main>
 
-    <!-- MOBILE BOTTOM NAVIGATION BAR (REACT ICONS) -->
+    <!-- MOBILE BOTTOM NAVIGATION BAR -->
     <nav class="mobile-bottom-bar">
       <button class="m-nav-item active" id="mNavOrgan">
         <svg class="react-icon m-nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/>
-          <path d="M8 20v2h8v-2"/>
-          <path d="M12 16v1"/>
-          <path d="M4 11a8 8 0 1 1 16 0c0 3-1.5 5.5-3 6.5V20H7v-2.5C5.5 16.5 4 14 4 11z"/>
+          <circle cx="11" cy="11" r="8"/>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"/>
         </svg>
-        <span class="m-nav-label">3D A'zolar</span>
+        <span class="m-nav-label">Qidiruv</span>
       </button>
 
       <button class="m-nav-item" id="mNavMode">
@@ -485,17 +435,16 @@
       </button>
     </nav>
 
-    <!-- MOBILE ORGAN SELECTOR POPUP MODAL (ALL 9 ORGANS WITH REACT ICONS) -->
+    <!-- MOBILE ORGAN SELECTOR & SEARCH MODAL -->
     <div id="mobileOrganModal" class="modal-backdrop hidden">
       <div class="modal-card">
         <div class="modal-header">
           <div class="modal-title-row">
             <svg class="react-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="m21 16-9 5-9-5V8l9-5 9 5v8Z"/>
-              <path d="M3.27 6.96 12 12.01l8.73-5.05"/>
-              <path d="M12 22.08V12"/>
+              <circle cx="11" cy="11" r="8"/>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"/>
             </svg>
-            <h3>3D Anatomik a'zolar:</h3>
+            <h3>Anatomik A'zolar va Sistemalar:</h3>
           </div>
           <button id="closeOrganModal" class="btn-close-modal" aria-label="Yopish">
             <svg class="react-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -504,98 +453,19 @@
             </svg>
           </button>
         </div>
-        <div class="modal-organ-grid custom-scrollbar">
 
-          <button class="m-organ-choice active" data-model="skull">
-            <svg class="react-icon m-choice-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/><path d="M8 20v2h8v-2"/><path d="M12 16v1"/><path d="M4 11a8 8 0 1 1 16 0c0 3-1.5 5.5-3 6.5V20H7v-2.5C5.5 16.5 4 14 4 11z"/>
-            </svg>
-            <div class="m-choice-text">
-              <span class="m-o-name">Bosh suyagi</span>
-              <span class="m-o-lat">Cranium • Skelet</span>
-            </div>
-          </button>
+        <!-- Mobile search input -->
+        <div class="modal-search-box">
+          <input 
+            type="text" 
+            id="mobileSearchInput" 
+            placeholder="A'zo yoki sistemani yozing..." 
+            autocomplete="off"
+          />
+        </div>
 
-          <button class="m-organ-choice" data-model="brain">
-            <svg class="react-icon m-choice-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M9.5 2A4.5 4.5 0 0 0 5 6.5c0 .7.17 1.36.46 1.95A4.5 4.5 0 0 0 4 12c0 1.25.5 2.39 1.33 3.22A4.5 4.5 0 0 0 5 17.5a4.5 4.5 0 0 0 4.5 4.5c1.17 0 2.22-.45 3-1.18.78.73 1.83 1.18 3 1.18a4.5 4.5 0 0 0 4.5-4.5c0-.68-.15-1.32-.42-1.9A4.5 4.5 0 0 0 20 12c0-1.13-.42-2.16-1.1-2.95.38-.7.6-1.5.6-2.35A4.5 4.5 0 0 0 14.5 2c-1.22 0-2.32.49-3.12 1.28A4.48 4.48 0 0 0 9.5 2z"/><path d="M12 4v16"/>
-            </svg>
-            <div class="m-choice-text">
-              <span class="m-o-name">Bosh miya</span>
-              <span class="m-o-lat">Encephalon • Markaziy asab</span>
-            </div>
-          </button>
-
-          <button class="m-organ-choice" data-model="heart">
-            <svg class="react-icon m-choice-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/><path d="M3.22 12H9.5l.5-1 2 4.5 2-7 1.5 3.5h4.28"/>
-            </svg>
-            <div class="m-choice-text">
-              <span class="m-o-name">Yurak</span>
-              <span class="m-o-lat">Cor • Qon aylanish</span>
-            </div>
-          </button>
-
-          <button class="m-organ-choice" data-model="lung">
-            <svg class="react-icon m-choice-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 2v7"/><path d="M12 9l-3 3"/><path d="M12 9l3 3"/><path d="M17 10c2 1 3 3.5 3 6.5a6.5 6.5 0 0 1-6.5 6.5c-1 0-1.5-.5-1.5-1.5V12"/><path d="M7 10c-2 1-3 3.5-3 6.5A6.5 6.5 0 0 0 10.5 23c1 0 1.5-.5 1.5-1.5V12"/>
-            </svg>
-            <div class="m-choice-text">
-              <span class="m-o-name">O'pka</span>
-              <span class="m-o-lat">Pulmones • Nafas olish</span>
-            </div>
-          </button>
-
-          <button class="m-organ-choice" data-model="stomach">
-            <svg class="react-icon m-choice-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 2v4"/><path d="M12 6c-3 0-6 2-6 6 0 5 4 10 9 10s7-4 7-9c0-5-4-7-8-7"/><path d="M16 22v-3a2 2 0 0 1 2-2h2"/>
-            </svg>
-            <div class="m-choice-text">
-              <span class="m-o-name">Oshqozon</span>
-              <span class="m-o-lat">Gaster • Ovqat hazm</span>
-            </div>
-          </button>
-
-          <button class="m-organ-choice" data-model="liver">
-            <svg class="react-icon m-choice-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M4 11c0-4 4-7 11-7 4 0 6 2 6 5 0 5-3 11-8 11-5 0-9-4-9-9z"/><path d="M4 11h11"/>
-            </svg>
-            <div class="m-choice-text">
-              <span class="m-o-name">Jigar</span>
-              <span class="m-o-lat">Hepar • Metabolizm</span>
-            </div>
-          </button>
-
-          <button class="m-organ-choice" data-model="kidney">
-            <svg class="react-icon m-choice-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M7 4c-3.5 3-4 8-2 12s6 5 9 4 5-3 6-7-1-9-6-10c-3-.6-5 .5-7 1z"/><path d="M14 11a3 3 0 0 0-3 3"/>
-            </svg>
-            <div class="m-choice-text">
-              <span class="m-o-name">Buyrak</span>
-              <span class="m-o-lat">Ren • Siydik-ayirish</span>
-            </div>
-          </button>
-
-          <button class="m-organ-choice" data-model="eye">
-            <svg class="react-icon m-choice-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="1"/>
-            </svg>
-            <div class="m-choice-text">
-              <span class="m-o-name">Ko'z olmasi</span>
-              <span class="m-o-lat">Bulbus oculi • Ko'rish</span>
-            </div>
-          </button>
-
-          <button class="m-organ-choice" data-model="spine">
-            <svg class="react-icon m-choice-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 2v20"/><circle cx="12" cy="4" r="2"/><circle cx="12" cy="9" r="2"/><circle cx="12" cy="15" r="2"/><circle cx="12" cy="20" r="2"/><path d="M8 9h8"/><path d="M7 15h10"/><path d="M9 4h6"/>
-            </svg>
-            <div class="m-choice-text">
-              <span class="m-o-name">Umurtqa</span>
-              <span class="m-o-lat">Columna vertebralis</span>
-            </div>
-          </button>
-
+        <div id="mobileOrganGrid" class="modal-organ-grid custom-scrollbar">
+          <!-- Populated dynamically from ANATOMY_DATA -->
         </div>
       </div>
     </div>

@@ -257,37 +257,176 @@ html, body {
 }
 
 /* ==========================================================================
-   2. HORIZONTAL 3D ORGAN SELECTION STRIP (ALL 9 ORGANS)
+   2. ANATOMY SEARCH & SYSTEM NAVIGATION SECTION
    ========================================================================== */
-.organ-strip-bar {
-  height: var(--strip-height);
-  background: rgba(12, 19, 34, 0.95);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+.anatomy-search-section {
+  position: relative;
+  background: rgba(10, 16, 30, 0.96);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   border-bottom: 1px solid var(--border-subtle);
-  overflow-x: auto;
-  overflow-y: hidden;
-  white-space: nowrap;
-  z-index: 30;
+  padding: 8px 16px 10px 16px;
+  z-index: 35;
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  gap: 8px;
 }
 
-.organ-strip-inner {
+.search-bar-container {
   display: flex;
   align-items: center;
-  gap: 8px;
+  justify-content: space-between;
+  gap: 14px;
+  width: 100%;
+}
+
+.search-input-box {
+  flex: 1;
+  max-width: 620px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-full);
   padding: 0 14px;
+  height: 40px;
+  transition: all 0.22s ease;
 }
 
-.organ-tab-btn {
-  display: inline-flex;
+.search-input-box:focus-within {
+  border-color: var(--accent-cyan-light);
+  background: rgba(15, 23, 42, 0.95);
+  box-shadow: 0 0 16px rgba(56, 189, 248, 0.25);
+}
+
+.search-icon {
+  width: 18px;
+  height: 18px;
+  color: var(--accent-cyan-light);
+  margin-right: 10px;
+  flex-shrink: 0;
+}
+
+.anatomy-search-input {
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #fff;
+  font-size: 13.5px;
+  font-family: inherit;
+  font-weight: 500;
+}
+
+.anatomy-search-input::placeholder {
+  color: var(--text-dim);
+  font-size: 13px;
+}
+
+.clear-search-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-left: 6px;
+  flex-shrink: 0;
+}
+
+.clear-search-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
+
+.clear-search-btn .react-icon {
+  width: 13px;
+  height: 13px;
+}
+
+.search-badge-hint {
+  font-size: 11px;
+  font-family: var(--font-mono);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: var(--text-muted);
+  border-radius: 4px;
+  padding: 1px 6px;
+  margin-left: 8px;
+  flex-shrink: 0;
+  pointer-events: none;
+}
+
+/* CURRENT ACTIVE ORGAN INDICATOR */
+.active-badge-display {
+  display: flex;
   align-items: center;
   gap: 8px;
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-full);
+  padding: 5px 14px;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
+.active-dot {
+  width: 8px;
+  height: 8px;
+  background: #10b981;
+  border-radius: 50%;
+  box-shadow: 0 0 8px #10b981;
+}
+
+.active-label {
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+.active-title {
+  font-weight: 700;
+  color: #fff;
+}
+
+.active-lat {
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.active-sys {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  background: rgba(56, 189, 248, 0.12);
+  color: var(--accent-cyan-light);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+}
+
+/* SYSTEM QUICK FILTER CHIPS */
+.system-chips-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  overflow-x: auto;
+  white-space: nowrap;
+  padding: 2px 0 2px 0;
+}
+
+.sys-chip {
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-sm);
-  padding: 7px 12px;
+  border-radius: var(--radius-full);
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 500;
   color: var(--text-muted);
   cursor: pointer;
   font-family: inherit;
@@ -295,46 +434,168 @@ html, body {
   user-select: none;
 }
 
-.organ-tab-btn .organ-svg {
-  width: 18px;
-  height: 18px;
-  color: var(--text-dim);
-  transition: color 0.2s ease;
-}
-
-.organ-tab-name {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-main);
-}
-
-.organ-tab-sub {
-  font-size: 11px;
-  color: var(--text-dim);
-  font-style: italic;
-}
-
-.organ-tab-btn:hover {
+.sys-chip:hover {
   background: rgba(255, 255, 255, 0.08);
+  color: #fff;
   border-color: rgba(255, 255, 255, 0.2);
 }
 
-.organ-tab-btn:hover .organ-svg {
-  color: var(--accent-cyan-light);
-}
-
-.organ-tab-btn.active {
-  background: var(--bg-active);
-  border-color: var(--border-accent);
-  box-shadow: 0 0 12px rgba(56, 189, 248, 0.2);
-}
-
-.organ-tab-btn.active .organ-svg {
-  color: var(--accent-cyan-light);
-}
-
-.organ-tab-btn.active .organ-tab-name {
+.sys-chip.active {
+  background: linear-gradient(135deg, #0284c7 0%, #06b6d4 100%);
   color: #fff;
+  border-color: transparent;
+  box-shadow: 0 2px 10px rgba(6, 182, 212, 0.35);
+  font-weight: 600;
+}
+
+/* LIVE SEARCH RESULTS DROPDOWN */
+.search-results-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 16px;
+  width: calc(100% - 32px);
+  max-width: 660px;
+  max-height: 440px;
+  background: rgba(11, 18, 33, 0.98);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  border-radius: var(--radius-md);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.7), 0 0 24px rgba(56, 189, 248, 0.15);
+  overflow-y: auto;
+  z-index: 100;
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.search-result-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.search-result-card:hover,
+.search-result-card.focused {
+  background: rgba(56, 189, 248, 0.12);
+  border-color: rgba(56, 189, 248, 0.35);
+  transform: translateX(3px);
+}
+
+.search-result-card.active {
+  background: rgba(56, 189, 248, 0.18);
+  border-color: var(--border-accent);
+}
+
+.card-icon-wrap {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.card-icon-wrap .react-icon {
+  width: 20px;
+  height: 20px;
+}
+
+.card-text-wrap {
+  flex: 1;
+  min-width: 0;
+}
+
+.card-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.card-name-uz {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.card-sys-tag {
+  font-size: 10.5px;
+  font-weight: 600;
+  padding: 1px 7px;
+  border-radius: 4px;
+}
+
+.card-sub-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  color: var(--text-dim);
+  margin-top: 2px;
+}
+
+.card-name-lat {
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.card-category-dot {
+  color: var(--text-dim);
+}
+
+.card-category {
+  color: var(--text-dim);
+}
+
+.card-action-icon {
+  color: var(--text-dim);
+  display: flex;
+  align-items: center;
+}
+
+.card-action-icon .react-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.search-result-card:hover .card-action-icon,
+.search-result-card.focused .card-action-icon {
+  color: var(--accent-cyan-light);
+}
+
+.search-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 28px 16px;
+  text-align: center;
+  gap: 8px;
+}
+
+.empty-svg {
+  width: 32px;
+  height: 32px;
+  color: var(--text-dim);
+}
+
+.empty-title {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.empty-sub {
+  font-size: 12px;
+  color: var(--text-dim);
 }
 
 /* ==========================================================================
@@ -345,7 +606,7 @@ html, body {
   display: flex;
   position: relative;
   overflow: hidden;
-  height: calc(100vh - var(--header-height) - var(--strip-height));
+  min-height: 0;
 }
 
 /* 3.1 VIEWPORT BOX */
@@ -1277,8 +1538,54 @@ html, body {
     font-size: 12px;
   }
 
+/* MODAL SEARCH BOX */
+.modal-search-box {
+  margin-bottom: 12px;
+}
+
+.modal-search-box input {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-full);
+  padding: 8px 14px;
+  color: #fff;
+  font-size: 13px;
+  outline: none;
+  font-family: inherit;
+}
+
+.modal-search-box input:focus {
+  border-color: var(--accent-cyan-light);
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.25);
+}
+
+.m-choice-icon {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.m-choice-icon .react-icon {
+  width: 20px;
+  height: 20px;
+}
+
   .main-content {
-    height: calc(100vh - var(--header-height) - var(--strip-height) - var(--bottom-bar-height));
+    height: auto;
+    min-height: 0;
+    flex: 1;
+  }
+
+  .active-badge-display {
+    display: none;
+  }
+
+  .search-input-box {
+    max-width: 100%;
   }
 
   /* Info sidebar becomes bottom sheet drawer */

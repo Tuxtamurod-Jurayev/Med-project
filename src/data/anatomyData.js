@@ -1,157 +1,640 @@
 export const ANATOMY_DATA = {
-  skull: {
-    id: "skull",
-    nameUz: "Bosh suyagi",
-    nameLat: "Cranium",
-    nameEn: "Human Skull 3D",
-    system: "Skelet tizimi (Systema skeletale)",
-    category: "Aksial skelet",
-    bonesCount: "22 ta suyak",
-    weight: "~1000 - 1200 g",
-    description: "Bosh suyagi inson bosh skeleti bo'lib, miya va sezgi a'zolarini tashqi shikastlanishlardan himoya qiladi. Haqiqiy inson kalla suyagining yuqori aniqlikdagi 3D modeli.",
-    parts: [
-      { id: "frontal", nameUz: "Peshona suyagi", nameLat: "Os frontale", desc: "Kalla gumbazining oldingi qismi va ko'z kosasining yuqori devorini hosil qiladi." },
-      { id: "parietal", nameUz: "Tepa suyagi", nameLat: "Os parietale", desc: "Kalla suyagining yon va yuqori devorlarini tashkil qiluvchi juft suyak." },
-      { id: "temporal", nameUz: "Chakka suyagi", nameLat: "Os temporale", desc: "Eshitish va muvozanat a'zolarini o'z ichiga olgan murakkab suyak." },
-      { id: "mandible", nameUz: "Pastki jag' suyagi", nameLat: "Mandibula", desc: "Bosh suyagining yagona harakatchan suyagi; chaynash harakatini ta'minlaydi." }
-    ],
-    functions: [
-      "Bosh miyani mexanik zarbalardan himoya qilish",
-      "Ko'rish, eshitish va hid bilish a'zolari uchun suyak qutisi bo'lish",
-      "Chaynov va mimika mushaklarining birikish asosi"
-    ],
-    clinical: [
-      "Kalla asosi sinishlari (Fractura basis cranii) - og'ir kranial travmalar.",
-      "Chakka-pastki jag' bo'g'imi disfunksiyasi - chaynashda og'riq va qisirlash."
-    ],
-    quiz: [
-      {
-        question: "Bosh suyagidagi yagona erkin harakatlanuvchi suyak qaysi?",
-        options: ["Maxilla", "Mandibula (Pastki jag')", "Os frontale", "Os temporale"],
-        answerIndex: 1,
-        explanation: "Mandibula (pastki jag') bosh suyagidagi yagona erkin harakatlanuvchi suyakdir."
-      },
-      {
-        question: "Bosh suyagi jami nechta suyakdan iborat (eshitish suyakchalarisiz)?",
-        options: ["18 ta", "22 ta", "30 ta", "12 ta"],
-        answerIndex: 1,
-        explanation: "Bosh suyagi 22 ta suyakdan (8 ta miya bo'limi, 14 ta yuz bo'limi) iborat."
-      }
-    ]
-  },
-
+  // 1. NERV SISTEMASI / MIYA
   brain: {
     id: "brain",
     nameUz: "Bosh miya",
     nameLat: "Encephalon",
     nameEn: "Human Brain 3D",
-    system: "Markaziy asab tizimi (Systema nervosum centrale)",
+    systemKey: "nervous",
+    system: "Nerv sistemasi (Systema nervosum)",
     category: "Oliy boshqaruv markazi",
     bonesCount: "100 milliard neyron",
     weight: "~1350 - 1450 g",
-    description: "Inson bosh miyasining yuqori aniqlikdagi anatomik 3D modeli: yarimsharlar po'stlog'i, egatlar va burmalar, miyacha, miya poyasi va asab yo'llari.",
+    keywords: ["bosh miyya", "bosh miya", "miya", "brain", "encephalon", "asab", "nerv", "nerv sistemasi", "cerebrum", "cerebellum", "yarimshar", "miyacha", "po'stloq", "peshona bo'lagi"],
+    description: "Inson bosh miyasining rang-barang anatomik bo'laklarga ajratilgan yuqori aniqlikdagi 3D modeli: peshona bo'lagi (ko'k), tepa bo'lagi (yashil), ensa bo'lagi (sariq), chakka bo'lagi (binafsha), miyacha (qizil) va miya poyasi.",
     parts: [
-      { id: "cerebrum", nameUz: "Katta yarimsharlar po'stlog'i", nameLat: "Cortex cerebri", desc: "Oliy asab faoliyati, tafakkur, xotira, ongli harakatlar va nutq markazi." },
-      { id: "cerebellum", nameUz: "Miyacha (Kichik miya)", nameLat: "Cerebellum", desc: "Harakatlar koordinatsiyasi, muvozanat va mushak tonusini boshqaradi." },
-      { id: "brainstem", nameUz: "Miya poyasi", nameLat: "Truncus encephali", desc: "Nafas olish va yurak urishi kabi hayotiy markazlar sohasidir." }
+      { id: "frontal_lobe", nameUz: "Peshona bo'lagi (Lobus frontalis)", nameLat: "Lobus frontalis", desc: "Mantiqiy fikrlash, iroda, ongli harakatlar (motorika) va Broka nutq markazi joylashgan oliy bo'lim." },
+      { id: "parietal_lobe", nameUz: "Tepa bo'lagi (Lobus parietalis)", nameLat: "Lobus parietalis", desc: "Teri-mushak sezgilari (og'riq, harorat, teginish) va fazoviy oriyentatsiyani birlashtiradi." },
+      { id: "occipital_lobe", nameUz: "Ensa bo'lagi (Lobus occipitalis)", nameLat: "Lobus occipitalis", desc: "Ko'rish analizatorining oliy po'stloq markazi; ko'rilgan shakl va ranglarni qayta ishlaydi." },
+      { id: "temporal_lobe", nameUz: "Chakka bo'lagi (Lobus temporalis)", nameLat: "Lobus temporalis", desc: "Eshitish markazi, hid bilish, xotira tuzilmalari (gipokamp) va Vernike nutqni tushunish markazi." },
+      { id: "cerebellum", nameUz: "Miyacha (Cerebellum)", nameLat: "Cerebellum", desc: "Nozik motor harakatlar koordinatsiyasi, tana muvozanati va mushaklar tonusini boshqaradi." },
+      { id: "brainstem", nameUz: "Miya poyasi (Truncus encephali)", nameLat: "Truncus encephali", desc: "Uzunchoq miya, ko'prik va o'rta miya; nafas olish va qon aylanish hayotiy markazlari joylashgan." }
     ],
     functions: [
-      "Ong, tafakkur, xotira va his-tuyg'ularni shakllantirish",
-      "Ichki a'zolar va vegetativ tizim faoliyatini boshqarish",
-      "Tana muvozanati va murakkab motor harakatlarni muvofiqlashtirish"
+      "Ong, abstrakt tafakkur, iroda, xotira va nutqni boshqarish",
+      "Barcha ixtiyoriy va g'ayriixtiyoriy harakatlarni koordinatsiya qilish",
+      "Ichki a'zolar faoliyatini vegetativ nerv tizimi orqali muvofiqlashtirish",
+      "Sezgi a'zolaridan keluvchi millionlab signallarni tahlil qilish"
     ],
     clinical: [
-      "Insult - miya qon aylanishining o'tkir buzilishi va to'qima ishemiyasi.",
-      "Miyacha ataksiyasi - harakat koordinatsiyasi va muvozanatning yo'qolishi."
+      "Insult (Iktus) - miya tomirlari trombozi yoki qon quyilishi oqibatida to'qima ishemiyasi.",
+      "Parkinson kasalligi - qora modda (substantia nigra) dopaminerjik neyronlarining zararlanishi.",
+      "Alsgeymer kasalligi - neyronlar degeneratsiyasi va xotira buzilishi."
     ],
     quiz: [
       {
         question: "Harakatlar koordinatsiyasi va tana muvozanati uchun miyaning qaysi bo'limi javobgar?",
         options: ["Peshona bo'lagi", "Miyacha (Cerebellum)", "Gipotalamus", "Ko'rish do'mbog'i"],
+        correct: 1,
         answerIndex: 1,
-        explanation: "Miyacha (Cerebellum) nozik motor harakatlar va muvozanatni ta'minlaydi."
+        explanation: "Miyacha (Cerebellum) nozik harakatlarni uyg'unlashtirish va muvozanatni ta'minlaydi."
+      },
+      {
+        question: "Ko'rish analizatorining oliy po'stloq markazi miyaning qaysi bo'lagida joylashgan?",
+        options: ["Ensa bo'lagida (Lobus occipitalis)", "Chakka bo'lagida", "Peshona bo'lagida", "Tepa bo'lagida"],
+        correct: 0,
+        answerIndex: 0,
+        explanation: "Ensa bo'lagi (Lobus occipitalis) ko'rish signallarini tahlil qiluvchi asosiy markaz hisoblanadi."
       }
     ]
   },
 
-  eye: {
-    id: "eye",
-    nameUz: "Ko'z olmasi",
-    nameLat: "Bulbus oculi",
-    nameEn: "Human Eye 3D",
-    system: "Sezgi a'zolari (Organa sensuum)",
-    category: "Ko'rish a'zosi",
-    bonesCount: "0 ta suyak",
-    weight: "~7.5 g",
-    description: "Inson ko'z olmasining 3D modeli: shox parda (cornea), oq parda (sclera), kamalak parda (iris), qorachiq, ko'z gavhari va ko'rish nervi (N. opticus).",
+  // 2. TAYANCH-HARAKAT / BOSH SUYAGI
+  skull: {
+    id: "skull",
+    nameUz: "Bosh suyagi",
+    nameLat: "Cranium",
+    nameEn: "Human Skull 3D",
+    systemKey: "musculoskeletal",
+    system: "Tayanch-harakat a'zolari (Systema skeletale)",
+    category: "Aksial kalla skeleti",
+    bonesCount: "22 ta suyak",
+    weight: "~1000 - 1200 g",
+    keywords: ["bosh suyagi", "kalla suyagi", "bosh", "suyak", "skull", "cranium", "bosh skeleti", "peshona suyagi", "chakka suyagi", "jag", "mandibula", "maxilla"],
+    description: "Inson bosh suyagining boy rang-barang anatomik tuzilishi: kalla gumbazi, peshona suyagi (sariq), tepa suyaklari (yashil), chakka suyaklari (binafsha), ensa suyagi (qizil), yuqori va pastki jag' suyaklari hamda tishlar qatori.",
     parts: [
-      { id: "cornea", nameUz: "Shox parda", nameLat: "Cornea", desc: "Ko'zning oldingi shaffof qismi; yorug'lik nurlarini asosiy sindiruvchi optik muhit." },
-      { id: "iris", nameUz: "Kamalak parda va qorachiq", nameLat: "Iris et Pupilla", desc: "Ko'z rangini belgilaydi va ko'z ichiga tushadigan yorug'lik oqimini tartibga soladi." },
-      { id: "retina", nameUz: "To'r parda", nameLat: "Retina", desc: "Yorug'likni sezuvchi fotoretseptorlar (tayoqchalar va kolbachalar) qavati." }
+      { id: "frontal_bone", nameUz: "Peshona suyagi", nameLat: "Os frontale", desc: "Kalla suyagining oldingi qismini va ko'z kosasining yuqori devorini hosil qiladi." },
+      { id: "parietal_bones", nameUz: "Tepa suyaklari", nameLat: "Ossa parietalia", desc: "Kalla suyagi gumbazining yuqori va yon devorlarini tashkil qiluvchi juft suyak." },
+      { id: "temporal_bones", nameUz: "Chakka suyaklari", nameLat: "Ossa temporalia", desc: "Eshitish va muvozanat apparati joylashgan, piramida qismiga ega murakkab juft suyak." },
+      { id: "occipital_bone", nameUz: "Ensa suyagi", nameLat: "Os occipitale", desc: "Kallaning orqa pastki sohasini hosil qiladi, katta ensa teshigi (foramen magnum) orqali orqa miyaga ulanadi." },
+      { id: "mandible", nameUz: "Pastki jag' suyagi", nameLat: "Mandibula", desc: "Bosh suyagidagi yagona erkin harakatlanuvchi suyak; chaynash harakatini taminlaydi." },
+      { id: "maxilla", nameUz: "Yuqori jag' suyagi", nameLat: "Maxilla", desc: "Yuz skeletining markaziy qismi, yuqori tishlar katakchalari va gaymor bo'shlig'iga ega." }
     ],
     functions: [
-      "Tashqi olamdagi yorug'lik va ranglarni qabul qilish",
-      "Optik tasvirni to'r pardada hosil qilish",
-      "Nerv impulslarini miya ensa po'stlog'iga yetkazish"
+      "Bosh miyani mexanik shikastlanish va tashqi bosimlardan himoyalash",
+      "Ko'rish, eshitish, muvozanat va hid bilish analizatorlari uchun qattiq himoya qutisi bo'lish",
+      "Ovqatni chaynash va nutq tovushlarini hosil qilishda tayanch mexanizm"
     ],
     clinical: [
-      "Katarakta - ko'z gavharining xiralashishi.",
-      "Glaukoma - ko'z ichi bosimining oshishi oqibatida ko'rish nervi atrofiyasi."
+      "Kalla asosi sinishi (Fractura basis cranii) - ko'z atrofida 'ko'zoynak' gematomalari bilan kechadi.",
+      "Gaymorit - yuqori jag' suyagidagi Gaymor bo'shlig'ining yallig'lanishi."
     ],
     quiz: [
       {
-        question: "Rangli ko'rish uchun javobgar fotoretseptorlar qaysilar?",
-        options: ["Tayoqchalar", "Kolbachalar (Cones)", "Ganglioz hujayralar", "Bipolyar neyronlar"],
+        question: "Bosh suyagidagi yagona erkin harakatlanuvchi suyak qaysi?",
+        options: ["Maxilla", "Mandibula (Pastki jag')", "Os frontale", "Os temporale"],
+        correct: 1,
         answerIndex: 1,
-        explanation: "Kolbachalar (Cones) kunduzgi va rangli ko'rishni ta'minlaydi."
+        explanation: "Mandibula (pastki jag') bosh suyagidagi yagona harakatchan suyakdir."
       }
     ]
   },
 
-  heart: {
-    id: "heart",
-    nameUz: "Inson yuragi",
-    nameLat: "Cor",
-    nameEn: "Human Heart 3D",
-    system: "Yurak-qon tomir tizimi",
-    category: "Qon aylanish markazi",
+  // 3. SEZGI / KO'Z TO'QIMALARI
+  eye: {
+    id: "eye",
+    nameUz: "Ko'z to'qimalari va olmasi",
+    nameLat: "Bulbus oculi & Tunicae oculi",
+    nameEn: "Human Eye & Ocular Tissues 3D",
+    systemKey: "sensory",
+    system: "Sezgi a'zolari (Organa sensuum)",
+    category: "Ko'rish a'zosi to'qimalari",
     bonesCount: "0 ta suyak",
-    weight: "~280 - 340 g",
-    description: "Inson yuragining haqiqiy 3D kardiologik modeli: qorinchalar, bo'lmachalar, aorta yoyi, o'pka poyasi va toj (koronar) qon-tomirlar tarmog'i.",
+    weight: "~7.5 g",
+    keywords: ["ko'z toqimalari", "koz toqimalari", "ko'z", "koz", "eye", "bulbus oculi", "to'r parda", "shox parda", "gavhar", "kamalak parda", "retina", "cornea", "iris", "ko'z olmasi"],
+    description: "Inson ko'z olmasi to'qimalarining yorqin rangli 3D anatomik modeli: shaffof shox parda (cornea), oq parda (sclera), jozibador rangli kamalak parda (iris), qorachiq, botiq to'r parda (retina), ko'z gavhari, tomirli parda va ko'rish nervi (nervus opticus).",
     parts: [
-      { id: "aorta", nameUz: "Aorta yoyi", nameLat: "Arcus aortae", desc: "Chap qorinchadan boshlanuvchi eng yirik magistral arterial tomir." },
-      { id: "left_ventricle", nameUz: "Chap qorincha", nameLat: "Ventriculus sinister", desc: "Yurakning eng baquvvat mushak devorli kamerasi." },
-      { id: "right_ventricle", nameUz: "O'ng qorincha", nameLat: "Ventriculus dexter", desc: "Venoz qonni o'pkalarga yo'naltiradi." }
+      { id: "cornea", nameUz: "Shox parda (Cornea)", nameLat: "Cornea", desc: "Ko'zning oldingi butkul shaffof, qon tomirsiz nurni asosiy sindiruvchi sathi (40-43 dioptriya)." },
+      { id: "iris_pupil", nameUz: "Kamalak parda va qorachiq", nameLat: "Iris & Pupilla", desc: "Ko'z rangini beruvchi pigmentli diafragma; qorachiq orqali ko'z ichiga tushuvchi yorug'lik miqdorini boshqaradi." },
+      { id: "lens", nameUz: "Ko'z gavhari (Lens crystallina)", nameLat: "Lens", desc: "Yassi-qavariq tirik biologik linza; akkomodatsiya (yaqin va uzoqqa fokuslash) vazifasini bajaradi." },
+      { id: "retina", nameUz: "To'r parda (Retina)", nameLat: "Retina", desc: "120 mln tayoqchalar (oq-qora ko'rish) va 7 mln kolbachalar (rangli ko'rish) joylashgan fotoretseptor qavat." },
+      { id: "optic_nerve", nameUz: "Ko'rish nervi (N. opticus)", nameLat: "Nervus opticus", desc: "To'r pardadan hosil bo'lgan millionlab nerv tolalarini bosh miya ensa po'stlog'iga eltuvchi yo'l." },
+      { id: "eye_muscles", nameUz: "Ko'z mushaklari (Musculi bulbi)", nameLat: "Musculi bulbi", desc: "Ko'z olmasini hamma tomonga chaqqon harakatlantiruvchi 4 ta to'g'ri va 2 ta qiyshiq mushaklar." }
     ],
     functions: [
-      "Qonni organizm bo'ylab uzluksiz haydab berish",
-      "A'zo va to'qimalarni kislorod bilan ta'minlash",
-      "Arterial qon bosimini hosil qilish"
+      "Elektromagnit yorug'lik to'lqinlarini qabul qilish va sindirish",
+      "Optik tasvirni to'r pardadagi fotoretseptorlarga fokuslash",
+      "Ranglar gammasini (qizil, yashil, ko'k) farqlash va tasvirni elektr impulsiga aylantirish"
     ],
     clinical: [
-      "Miokard infarkti - koronar tomir to'silib yurak to'qimasi nobud bo'lishi.",
-      "Aritmiya - yurak qisqarish ritmining buzilishi."
+      "Katarakta - ko'z gavhari oqsillarining xiralashishi va ko'rish keskinligining pasayishi.",
+      "Glaukoma - ko'z ichi suyuqligi bosimi oshib, ko'rish nervining atrofiyaga uchrashi.",
+      "Miopiya (Yaqindan ko'rish) - nur to'r parda oldida fokuslanishi."
+    ],
+    quiz: [
+      {
+        question: "Rangli ko'rish uchun javobgar fotoretseptorlar nima deb ataladi?",
+        options: ["Tayoqchalar", "Kolbachalar (Cones)", "Ganglioz hujayralar", "Bipolyar hujayralar"],
+        correct: 1,
+        answerIndex: 1,
+        explanation: "Kolbachalar (Cones) kunduzgi rangli ko'rishni ta'minlaydi."
+      }
+    ]
+  },
+
+  // 4. QON AYLANISH / YURAK
+  heart: {
+    id: "heart",
+    nameUz: "Inson yuragi (Optimallashtirilgan)",
+    nameLat: "Cor",
+    nameEn: "Human Heart 3D Optimized",
+    systemKey: "circulatory",
+    system: "Qon aylanish sistemasi (Systema cardiovasculare)",
+    category: "Markaziy nasos a'zosi",
+    bonesCount: "0 ta suyak",
+    weight: "~280 - 340 g",
+    keywords: ["yurak", "yurak tuzilishi", "yurak tuzilishini", "cor", "heart", "aorta", "vena", "qorincha", "bolmacha", "miokard", "koronar tomir", "qon aylanish", "puls"],
+    description: "Yuqori darajada optimallashtirilgan 3D kardiologik yurak modeli: alvon qizil Aorta yoyi va tarmoqlari, ko'k rangli Kovak venalar (Vena cava), feruza O'pka poyasi, qalin miokard mushak devori, yorqin toj (koronar) qon tomirlari hamda haqiqiy kardiologik 'lub-dub' pulsatsiyasi.",
+    parts: [
+      { id: "aorta_arch", nameUz: "Aorta yoyi (Arcus aortae)", nameLat: "Arcus aortae", desc: "Chap qorinchadan chiquvchi inson tanasidagi eng yirik arterial magistral; kislorodli qonni butun vujudga tarqatadi." },
+      { id: "left_ventricle", nameUz: "Chap qorincha (Ventriculus sinister)", nameLat: "Ventriculus sinister", desc: "Eng qalin va kuchli miokard devoriga ega kamera (10-15 mm); qonni katta qon aylanish doirasiga otadi." },
+      { id: "right_ventricle", nameUz: "O'ng qorincha (Ventriculus dexter)", nameLat: "Ventriculus dexter", desc: "Venoz qonni o'pka arteriyasi orqali kichik doiraga (o'pkalarga) haydaydi." },
+      { id: "atria", nameUz: "Chap va O'ng bo'lmachalar", nameLat: "Atria cordis", desc: "Kovak va o'pka venalaridan qonni qabul qilib, qorinchalarga o'tkazuvchi yuqori kameralar." },
+      { id: "pulmonary_trunk", nameUz: "O'pka poyasi (Truncus pulmonalis)", nameLat: "Truncus pulmonalis", desc: "O'ng qorinchadan venoz qonni kislorod bilan to'yintirish uchun o'pkalarga yetkazadi." },
+      { id: "coronary_arteries", nameUz: "Toj (Koronar) arteriyalari", nameLat: "Arteriae coronariae", desc: "Yurak miokard to'qimasining o'zini uzluksiz kislorod va ozuqa bilan ta'minlovchi xususiy tomirlar." }
+    ],
+    functions: [
+      "Katta va kichik qon aylanish doiralari bo'ylab qonni to'xtovsiz haydash (minutiga 5-6 litr)",
+      "A'zo va to'qimalarni kislorod, ozuqa, ferment va gormonlar bilan ta'minlash",
+      "Organizmda barqaror arterial qon bosimini saqlab turish"
+    ],
+    clinical: [
+      "Miokard infarkti - toj arteriyasi trombozi oqibatida yurak mushagining nekrozga uchrashi.",
+      "Aritmiyalar - yurak o'tkazuvchi tizimi (Gis tutami, sinus tuguni) faoliyatining buzilishi.",
+      "Yurak klapanlari nuqsonlari (Stenoz va Yetishmovchilik)."
     ],
     quiz: [
       {
         question: "Aorta qon tomiri yurakning qaysi kamerasidan boshlanadi?",
         options: ["O'ng qorinchadan", "Chap qorinchadan", "Chap bo'lmachadan", "O'ng bo'lmachadan"],
+        correct: 1,
         answerIndex: 1,
-        explanation: "Aorta chap qorinchadan boshlanadi va kislorodga boy qonni butun tanaga tarqatadi."
+        explanation: "Aorta chap qorinchadan boshlanib, kislorodga to'yingan qonni tana bo'ylab tarqatadi."
       }
     ]
   },
 
+  // 5. OVQAT HAZM / O'T PUFAGI
+  gallbladder: {
+    id: "gallbladder",
+    nameUz: "O't pufagi va o't yo'llari",
+    nameLat: "Vesica biliaris & Ductus biliares",
+    nameEn: "Gallbladder & Biliary System 3D",
+    systemKey: "digestive",
+    system: "Ovqat hazm qilish sistemasi (Systema digestorium)",
+    category: "Gepatobiliar rezervuar",
+    bonesCount: "0 ta suyak",
+    weight: "~40 - 70 ml hajm",
+    keywords: ["ot pufagi", "o't pufagi", "gallbladder", "vesica biliaris", "safro", "o't", "ot yo'llari", "choledochus", "jigar", "hazm", "yog"],
+    description: "Inson o't pufagining batafsil 3D modeli: noksimon tubi (fundus), tanasi (corpus), bo'yni (collum), pufak yo'li (ductus cysticus), umumiy jigar yo'li, umumiy o't yo'li (ductus choledochus) hamda 12 barmoqli ichakka ulanuvchi Fater so'rg'ichi (Oddi sfinkteri).",
+    parts: [
+      { id: "fundus_vesicae", nameUz: "O't pufagi tubi (Fundus vesicae)", nameLat: "Fundus vesicae biliaris", desc: "Jigarning oldingi pastki chetidan bir oz bo'rtib turuvchi kengaygan pastki qism." },
+      { id: "corpus_vesicae", nameUz: "O't pufagi tanasi (Corpus vesicae)", nameLat: "Corpus vesicae biliaris", desc: "Jigar pastki yuzasidagi o't pufagi chuqurchasida yotuvchi asosiy rezervuar." },
+      { id: "ductus_cysticus", nameUz: "Pufak yo'li (Ductus cysticus)", nameLat: "Ductus cysticus", desc: "Geyzter spiral klapanlariga ega ingichka chiqaruvchi naycha." },
+      { id: "ductus_choledochus", nameUz: "Umumiy o't yo'li (Ductus choledochus)", nameLat: "Ductus choledochus", desc: "Safroni 12 barmoqli ichak bo'shlig'iga quyuvchi magistral o't yo'li." },
+      { id: "sphincter_oddi", nameUz: "Oddi sfinkteri (Sphincter Oddi)", nameLat: "Sphincter ampullae hepatopancreaticae", desc: "O't va me'da osti bezi shirasi tushishini nazorat qiluvchi silliq mushakli klapan." }
+    ],
+    functions: [
+      "Jigar ishlab chiqargan o't suyuqligini to'plash va 5-10 baravargacha quyultirish",
+      "Yog'li ovqat iste'mol qilinganda xolesistokinin ta'sirida qisqarib o'tni ichakka quyish",
+      "Yog'larni emulsiyalash va ichak peristaltikasini rag'batlantirish"
+    ],
+    clinical: [
+      "Xoletsistit - o't pufagi devorining o'tkir yoki surunkali yallig'lanishi.",
+      "O't-tosh kasalligi (Xolelitiaz) - xolesterin yoki bilirubin cho'kmasidan toshlar hosil bo'lishi.",
+      "Mexanik sariqlik - umumiy o't yo'li tosh bilan tiqilib qolishi."
+    ],
+    quiz: [
+      {
+        question: "O't pufagining asosiy vazifasi nimadan iborat?",
+        options: ["O't suyuqligini ishlab chiqarish", "O't suyuqligini to'plash va quyultirish", "Insulin ishlab chiqarish", "Oqsillarni parchalash"],
+        correct: 1,
+        answerIndex: 1,
+        explanation: "O't suyuqligini jigar ishlab chiqaradi, o't pufagi esa uni to'playdi va quyultirib saqlaydi."
+      }
+    ]
+  },
+
+  // 6. OVQAT HAZM / OSHQOZON OSTI BEZI
+  pancreas: {
+    id: "pancreas",
+    nameUz: "Oshqozon osti bezi",
+    nameLat: "Pancreas",
+    nameEn: "Human Pancreas 3D",
+    systemKey: "digestive",
+    system: "Ovqat hazm qilish va Endokrin sistema",
+    category: "Aralash sekretsiya bezi",
+    bonesCount: "0 ta suyak",
+    weight: "~70 - 100 g",
+    keywords: ["oshqozon osti bezlari", "oshqozon osti bezi", "pancreas", "insulin", "glyukagon", "wirsung", "hazm", "endokrin", "ferment", "langergans"],
+    description: "Inson oshqozon osti bezining anatomik 3D modeli: 12 barmoqli ichak (duodenum) qovuzlog'ida yotuvchi boshi (caput), bo'yni (collum), tanasi (corpus), dum qismi (cauda), bosh chiqaruvchi Virsung nayi (ductus pancreaticus) va taloq arteriyasi.",
+    parts: [
+      { id: "caput_pancreatis", nameUz: "Bezi boshi (Caput pancreatis)", nameLat: "Caput pancreatis", desc: "12 barmoqli ichakning taqasimon buralishi ichida mustahkam joylashgan eng keng qismi." },
+      { id: "corpus_pancreatis", nameUz: "Bezi tanasi (Corpus pancreatis)", nameLat: "Corpus pancreatis", desc: "Umurtqa pog'onasi oldida, oshqozon orqasida ko'ndalangiga yotuvchi uchburchak shaklli tana." },
+      { id: "cauda_pancreatis", nameUz: "Bezi dumi (Cauda pancreatis)", nameLat: "Cauda pancreatis", desc: "Chap qovurg'a ostiga, taloq darvozasiga yetib boruvchi ingichkalashgan uchi." },
+      { id: "ductus_pancreaticus", nameUz: "Virsung nayi (Ductus pancreaticus)", nameLat: "Ductus pancreaticus", desc: "Bez bo'ylab o'tuvchi va hazm fermentlarini 12 barmoqli ichakka quyuvchi bosh nay." },
+      { id: "islets_langerhans", nameUz: "Langergans orolchalari", nameLat: "Insulae pancreaticae", desc: "Qonga to'g'ridan-to'g'ri insulin va glyukagon gormonlarini chiqaruvchi mikroskopik klasterlar." }
+    ],
+    functions: [
+      "Ekzokrin funksiya: tripsin, amilaza va lipaza hazm fermentlarini sintezlash",
+      "Endokrin funksiya: beta-hujayralar orqali qon qandini tushiruvchi Insulin ajratish",
+      "Alfa-hujayralar orqali qondagi qandni oshiruvchi Glyukagon sintez qilish"
+    ],
+    clinical: [
+      "O'tkir pankreatit - bez fermentlarining o'z to'qimasini eritib yuborishi (autoliz).",
+      "Qandli diabet (1 va 2-tur) - insulin yetishmovchiligi yoki retseptorlar sezgirligi yo'qolishi."
+    ],
+    quiz: [
+      {
+        question: "Qondagi glyukoza miqdorini kamaytiruvchi insulin gormonini qaysi hujayralar ishlab chiqaradi?",
+        options: ["Alfa hujayralar", "Beta hujayralar", "Delta hujayralar", "F hujayralar"],
+        correct: 1,
+        answerIndex: 1,
+        explanation: "Langergans orolchalaridagi Beta-hujayralar insulin gormonini sintezlaydi."
+      }
+    ]
+  },
+
+  // 7. OVQAT HAZM / OG'IZ BO'SHLIG'I (TISHLAR, TIL)
+  oral_cavity: {
+    id: "oral_cavity",
+    nameUz: "Og'iz bo'shlig'i: Tishlar va Til",
+    nameLat: "Cavitas oris, Dentes et Lingua",
+    nameEn: "Oral Cavity, Teeth & Tongue 3D",
+    systemKey: "digestive",
+    system: "Ovqat hazm qilish sistemasi (Systema digestorium)",
+    category: "Hazm traktining boshlang'ich bo'limi",
+    bonesCount: "32 ta doimiy tish",
+    weight: "~180 g (til va to'qimalar)",
+    keywords: ["og'iz boshligi", "ogiz boshligi", "og'iz bo'shlig'i", "tishlar", "til", "tish", "dentes", "lingua", "tanglay", "chaynash", "oral cavity", "teeth", "tongue", "milk"],
+    description: "Og'iz bo'shlig'i a'zolarining batafsil 3D modeli: yuqori va pastki tish yoylari (kesuvchi, qoziq, kichik va katta oziq tishlar), milk to'qimasi, harakatchan mushakli til (lingua), ta'm bilish so'rg'ichlari va qattiq hamda yumshoq tanglay.",
+    parts: [
+      { id: "teeth_arch", nameUz: "Tishlar qatori (32 ta)", nameLat: "Dentes permanentes", desc: "8 ta kurak tish (keskich), 4 ta qoziq tish, 8 ta kichik oziq tish va 12 ta katta oziq tish (aqldon tishlari bilan)." },
+      { id: "tongue_body", nameUz: "Til (Lingua)", nameLat: "Lingua", desc: "Xususiy va skelet mushaklaridan iborat kuchli organ; chaynash, yutish va artikulyatsion nutqni ta'minlaydi." },
+      { id: "taste_papillae", nameUz: "Ta'm bilish so'rg'ichlari", nameLat: "Papillae linguales", desc: "Til orqasidagi novsimon, zamburug'simon va ipsimon so'rg'ichlar; shirin, sho'r, nordon va achchiq ta'mni sezadi." },
+      { id: "gingiva", nameUz: "Milk to'qimasi (Gingiva)", nameLat: "Gingiva", desc: "Tish bo'yni va alveolyar o'siqlarni qoplab turuvchi shilliq qavat." },
+      { id: "palate", nameUz: "Qattiq va Yumshoq tanglay", nameLat: "Palatum durum et molle", desc: "Og'iz bo'shlig'i yuqori devorini hosil qilib, burun bo'shlig'idan ajratib turuvchi to'siq." }
+    ],
+    functions: [
+      "Ovqatni mexanik maydalash, ezish va chaynash",
+      "Ta'm bilish retseptorlari orqali taom sifatini aniqlash",
+      "Tuprik fermentlari (ptialin) yordamida dastlabki uglevodlarni parchalash",
+      "Insonning tushunarli so'zlashuvchi nutqi (artikulyatsiyasi)da ishtirok etish"
+    ],
+    clinical: [
+      "Karies - tish emal va dentinining bakterial kislotalar ta'sirida yemirilishi.",
+      "Gingivit va Parodontit - milk to'qimasining yallig'lanishi va tishlarning qimirlab qolishi.",
+      "Glossit - til to'qimasining yallig'lanishi."
+    ],
+    quiz: [
+      {
+        question: "Voyaga yetgan sog'lom inson og'iz bo'shlig'ida nechta doimiy tish bo'ladi?",
+        options: ["28 ta", "32 ta", "24 ta", "36 ta"],
+        correct: 1,
+        answerIndex: 1,
+        explanation: "Voyaga yetgan insonda to'liq tish formulasida 32 ta doimiy tish bo'ladi."
+      }
+    ]
+  },
+
+  // 8. TAYANCH-HARAKAT / BARMOG'LAR VA QO'L TUZILISHI
+  hand_fingers: {
+    id: "hand_fingers",
+    nameUz: "Barmoqlar va qo'l panjasi tuzilishi",
+    nameLat: "Digiti manus & Skeleton manus",
+    nameEn: "Hand & Finger Anatomy 3D",
+    systemKey: "musculoskeletal",
+    system: "Tayanch-harakat a'zolari (Systema skeletale)",
+    category: "Yuqori erkin a'zo skeleti",
+    bonesCount: "27 ta suyak (bir qo'lda)",
+    weight: "~400 g",
+    keywords: ["barmoqlar tuzulishi", "barmoqlar", "barmoq", "qo'l", "panja", "falanga", "kaft", "kaft usti", "fingers", "hand", "digiti manus", "carpus", "metacarpus", "bog'im"],
+    description: "Inson qo'l panjasi va barmoqlarining nozik 3D modeli: kaft usti suyaklari (carpus - 8 ta), 5 ta kaft suyagi (metacarpus), barmoq suyaklari (proksimal, o'rta va distal falangalar), bo'g'im tog'aylari va barmoq harakatini ta'minlovchi paylar.",
+    parts: [
+      { id: "carpus_cluster", nameUz: "Kaft usti suyaklari (8 ta)", nameLat: "Ossa carpi", desc: "Qayiqsimon, oysimon, uchburchak, no'xatsimon, trapetsiya, trapetsiyasimon, boshchali va ilmoqli suyaklar." },
+      { id: "metacarpal_bones", nameUz: "Kaft suyaklari (5 ta)", nameLat: "Ossa metacarpi I-V", desc: "Panja kaftini hosil qiluvchi naysimon suyaklar; boshchalari orqali barmoqlarga ulanadi." },
+      { id: "phalanges_proximal", nameUz: "Proksimal falangalar", nameLat: "Phalanges proximales", desc: "Barmoqlarning kaftga tutashgan eng uzun asosiy suyaklari." },
+      { id: "phalanges_middle", nameUz: "O'rta falangalar", nameLat: "Phalanges mediae", desc: "II-V barmoqlarda mavjud oraliq suyaklar (bosh barmoqda bo'lmaydi)." },
+      { id: "phalanges_distal", nameUz: "Distal (Tirnoq) falangalar", nameLat: "Phalanges distales", desc: "Tirnoq plastinkasiga tayanch bo'luvchi eng chekka sezuvchan suyakchalar." }
+    ],
+    functions: [
+      "Nozik va yuqori aniqlikdagi motorikani (yozish, asboblarni ushlash, musiqa chalish) bajarish",
+      "Katta kuch talab qiluvchi siqish va ushlash harakatlari",
+      "Taktil (sezish) axborotlarini barmoq uchlari orqali qabul qilish"
+    ],
+    clinical: [
+      "Karpal kanal sindromi - o'rta nervning (nervus medianus) kaft usti sohasida qisilib qolishi.",
+      "Falangalar sinishlari va bo'g'im chiqishlari.",
+      "Revmotoid artrit - barmoq mayda bo'g'imlarining deformatsiyasi."
+    ],
+    quiz: [
+      {
+        question: "Inson bosh barmog'ida (Pollex) nechta falanga suyagi mavjud?",
+        options: ["1 ta", "2 ta (Proksimal va Distal)", "3 ta", "4 ta"],
+        correct: 1,
+        answerIndex: 1,
+        explanation: "Bosh barmoqda faqat 2 ta falanga (proksimal va distal) bo'ladi, qolgan 4 ta barmoqda 3 tadan bo'ladi."
+      }
+    ]
+  },
+
+  // 9. NERV SISTEMASI / TO'LIQ TIZIM
+  nervous_system: {
+    id: "nervous_system",
+    nameUz: "Nerv sistemasi (To'liq tizim)",
+    nameLat: "Systema nervosum",
+    nameEn: "Human Nervous System 3D",
+    systemKey: "nervous",
+    system: "Nerv sistemasi: Bosh miya, orqa miya va nervlar",
+    category: "Tana faoliyatini muvofiqlashtiruvchi yaxlit tizim",
+    bonesCount: "Markaziy va Periferik tizim",
+    weight: "~2000 g",
+    keywords: ["nerv sistemasi", "nerv tizimi", "asab tizimi", "orqa miya", "bosh miya", "nervlar", "nerv", "systema nervosum", "periferik nervlar", "refleks", "neyron"],
+    description: "Inson yaxlit asab tizimining to'liq 3D modeli: Bosh miya, umurtqa kanali bo'ylab o'tuvchi Orqa miya (Medulla spinalis), 12 juft kalla nervlari, yelka, bel va dumg'aza asab chigallari hamda oyoq-qo'llarga tarqaluvchi yirik periferik nervlar tarmog'i.",
+    parts: [
+      { id: "brain_core", nameUz: "Bosh miya (Encephalon)", nameLat: "Encephalon", desc: "Miya yarimsharlari, po'stloq osti tugunlari va tahlil markazlari." },
+      { id: "spinal_cord", nameUz: "Orqa miya (Medulla spinalis)", nameLat: "Medulla spinalis", desc: "Umurtqa kanali ichida yotuvchi, 31 segmentdan iborat reflektor va o'tkazuvchi markaz." },
+      { id: "brachial_plexus", nameUz: "Yelka asab chigali", nameLat: "Plexus brachialis", desc: "Qo'l mushaklari va terisini innervatsiya qiluvchi radial, ulnar va median nervlar manbai." },
+      { id: "sciatic_nerve", nameUz: "Quyumg'ich nervi (N. ischiadicus)", nameLat: "Nervus ischiadicus", desc: "Inson tanasidagi eng yo'g'on va uzun periferik nerv; butun oyoq bo'ylab tarqaladi." },
+      { id: "autonomic_system", nameUz: "Simpatik va Parasimpatik nervlar", nameLat: "Systema nervosum autonomicum", desc: "Ichki a'zolar, yurak urishi va qon tomirlar tonusini avtomatik tartibga soluvchi tizim." }
+    ],
+    functions: [
+      "Barcha to'qima va a'zolar faoliyatini bir butun qilib muvofiqlashtirish",
+      "Tashqi muhit signallariga tezkor reflektor javob qaytarish",
+      "Oliy asab faoliyati: tafakkur, xotira, his-tuyg'ular va xulq-atvorni shakllantirish"
+    ],
+    clinical: [
+      "Radikulit va Ishias - orqa miya nerv ildizlarining disk churrasi tufayli qisilishi.",
+      "Ko'p tarmoqli skleroz - markaziy nerv tolalari miyelin qobig'ining autoimmun yemirilishi."
+    ],
+    quiz: [
+      {
+        question: "Inson orqa miyasidan jami nechta juft orqa miya nervlari chiqadi?",
+        options: ["12 juft", "24 juft", "31 juft", "40 juft"],
+        correct: 2,
+        answerIndex: 2,
+        explanation: "Orqa miyadan 31 juft spinal nervlar (8 bo'yin, 12 ko'krak, 5 bel, 5 dumg'aza, 1 dum) chiqadi."
+      }
+    ]
+  },
+
+  // 10. QON AYLANISH SISTEMASI / TO'LIQ TIZIM
+  circulatory_system: {
+    id: "circulatory_system",
+    nameUz: "Qon aylanish sistemasi (Yurak, Arteriyalar, Venalar)",
+    nameLat: "Systema cardiovasculare",
+    nameEn: "Circulatory & Cardiovascular System 3D",
+    systemKey: "circulatory",
+    system: "Qon aylanish sistemasi: Yurak, arteriyalar, venalar va kapillyarlar",
+    category: "Gemodinamik vaskulyar tizim",
+    bonesCount: "100 000 km qon tomirlari",
+    weight: "~5 litr qon",
+    keywords: ["qon aylanish sistemasi", "qon aylanish", "qon tomir", "arteriya", "vena", "kapillyar", "yurak", "aorta", "kovak vena", "qon tomirlari", "systema cardiovasculare"],
+    description: "Yaxlit qon aylanish tizimining 3D modeli: markaziy urib turuvchi Yurak, kislorodga boy qon eltuvchi qizil Arteriyalar daraxti (Aorta, uyqu, o'mrov osti, son va tizza arteriyalari), karbonat angidridli qonni qaytaruvchi ko'k Venalar tarmog'i (Yuqori va pastki kovak venalar) hamda mikroskopik kapillyarlar to'ri.",
+    parts: [
+      { id: "heart_engine", nameUz: "Yurak nasosi", nameLat: "Cor", desc: "4 kamerali ritmik qisqaruvchi mushak organi; doimiy qon bosimini yaratadi." },
+      { id: "arterial_tree", nameUz: "Arterial daraxt (Qizil)", nameLat: "Arteriae", desc: "Kislorod va glyukoza eltuvchi yuqori bosimli qalin elastik devorli tomirlar." },
+      { id: "venous_network", nameUz: "Venoz tarmoq (Ko'k)", nameLat: "Venae", desc: "Qonni a'zolardan yurakka qaytaruvchi, ichki yarimoysimon klapanlarga ega tomirlar." },
+      { id: "capillary_bed", nameUz: "Mikrosirkulyator kapillyarlar", nameLat: "Vasa capillaria", desc: "Moddalar va gazlar almashinuvi to'g'ridan-to'g'ri to'qima bilan yuz beradigan mikroskopik naychalar." }
+    ],
+    functions: [
+      "Kislorodni o'pkalardan to'qimalarga va CO2 ni to'qimalardan o'pkalarga tashish",
+      "Oziq moddalar, vitaminlar va gormonlarni barcha hujayralarga yetkazish",
+      "Tana haroratini bir me'yorda saqlash (termoregulyatsiya) va immunitet himoyasi"
+    ],
+    clinical: [
+      "Ateroskleroz - arteriya devorlarida xolesterin pilakchalari to'planishi.",
+      "Gipertoniya - arterial qon bosimining surunkali ko'tarilishi.",
+      "Varikoz - venalar klapanlarining bo'shashishi va qon dimlanishi."
+    ],
+    quiz: [
+      {
+        question: "Qonni yurakdan a'zolarga olib boruvchi tomirlar nima deb ataladi?",
+        options: ["Venalar", "Arteriyalar", "Kapillyarlar", "Limfa tomirlari"],
+        correct: 1,
+        answerIndex: 1,
+        explanation: "Qonni yurakdan a'zo va to'qimalarga olib boruvchi tomirlar arteriyalar deb ataladi."
+      }
+    ]
+  },
+
+  // 11. NAFAS OLISH SISTEMASI / TO'LIQ TIZIM
+  respiratory_system: {
+    id: "respiratory_system",
+    nameUz: "Nafas olish sistemasi (Burun, Hiqildoq, Traxeya, O'pka)",
+    nameLat: "Systema respiratorium",
+    nameEn: "Respiratory System 3D",
+    systemKey: "respiratory",
+    system: "Nafas olish sistemasi: Burun bo‘shlig‘i, hiqildoq, traxeya va o‘pka",
+    category: "Gaz almashinuvi a'zolari",
+    bonesCount: "0 ta suyak",
+    weight: "~1100 g",
+    keywords: ["nafas olish sistemasi", "nafas", "burun boshligi", "burun", "hiqildoq", "traxeya", "o'pka", "opka", "bronx", "alveola", "systema respiratorium", "larynx", "pulmones"],
+    description: "Nafas olish tizimining mukammal 3D modeli: havoni isituvchi Burun bo'shlig'i, ovoz boylamlariga ega Hiqildoq (Larynx), tog'ay halqali Kengirdak (Trachea), daraxtsimon shoxlanuvchi Bronxlar va gaz almashinuvchi O'pkalar (Pulmones).",
+    parts: [
+      { id: "nasal_cavity", nameUz: "Burun bo'shlig'i (Cavitas nasi)", nameLat: "Cavitas nasi", desc: "Nafas olingan havoni changlardan tozalaydi, namlaydi va qon tomirlar orqali tana haroratigacha isitadi." },
+      { id: "larynx_organ", nameUz: "Hiqildoq (Larynx)", nameLat: "Larynx", desc: "Qalqonsimon va uzuksimon tog'aylardan iborat ovoz hosil qiluvchi murakkab a'zo." },
+      { id: "trachea_tube", nameUz: "Kengirdak (Trachea)", nameLat: "Trachea", desc: "16-20 ta gialin tog'ay yarimhalqalaridan tashkil topgan, doim ochiq turuvchi nafas nayi." },
+      { id: "bronchial_tree", nameUz: "Bronxial daraxt", nameLat: "Arbor bronchialis", desc: "Traxeyadan boshlanib, alveolalargacha shoxlanuvchi havo o'tkazuvchi kanallar tarmog'i." },
+      { id: "lungs_alveoli", nameUz: "O'pkalar va Alveolalar", nameLat: "Pulmones & Alveoli", desc: "300-500 millionta mikroskopik pufakchalar; qonga kislorod o'tib, CO2 ajraladigan sirt." }
+    ],
+    functions: [
+      "Organizmni atmosfera kislorodi bilan uzluksiz to'yintirish",
+      "Hujayralar almashinuvi chiqindisi bo'lgan karbonat angidridni chiqarish",
+      "Ovoz hosil qilish (fonatsiya) va qon pH muvozanatini saqlash"
+    ],
+    clinical: [
+      "Bronxial astma - bronxlar silliq mushaklari spazmi va shilliq to'planishi.",
+      "Pnevmoniya - alveolalarning infektsion suyuqlik bilan to'lib yallig'lanishi.",
+      "Laringit - hiqildoq ovoz boylamlarining shamollashi va ovoz bo'g'ilishi."
+    ],
+    quiz: [
+      {
+        question: "Gazlar almashinuvi (O2 va CO2) bevosita o'pkaning qaysi mikroskopik tuzilmalarida sodir bo'ladi?",
+        options: ["Bronxialarda", "Traxeyada", "Alveolalarda", "Hiqildoqda"],
+        correct: 2,
+        answerIndex: 2,
+        explanation: "Alveolalar yupqa devorli kapillyarlar bilan o'ralgan bo'lib, gaz almashinuvi aynan ularda kechadi."
+      }
+    ]
+  },
+
+  // 12. OVQAT HAZM QILISH SISTEMASI / TO'LIQ TIZIM
+  digestive_system: {
+    id: "digestive_system",
+    nameUz: "Ovqat hazm qilish sistemasi (To'liq trakt)",
+    nameLat: "Systema digestorium",
+    nameEn: "Digestive System Complete 3D",
+    systemKey: "digestive",
+    system: "Ovqat hazm qilish: Og‘iz, qizilo‘ngach, oshqozon, ichaklar, jigar va oshqozon osti bezi",
+    category: "Hazm va oziqlanish trakti",
+    bonesCount: "8-9 metr uzunlikdagi trakt",
+    weight: "~3500 g a'zolar",
+    keywords: ["ovqat hazm qilish sistemasi", "ovqat hazm", "hazm", "qizilo'ngach", "qizilongach", "oshqozon", "ichaklar", "ingichka ichak", "yog'on ichak", "jigar", "oshqozon osti bezi", "systema digestorium", "esophagus", "gaster"],
+    description: "Ovqat hazm qilish traktining yaxlit 3D modeli: Og'iz bo'shlig'i, mushakli Qizilo'ngach (Esophagus), J-shaklli Oshqozon, eng yirik filtr a'zosi Jigar va O't pufagi, Oshqozon osti bezi, oziq so'ruvchi Ingichka ichak hamda Yo'g'on ichak.",
+    parts: [
+      { id: "esophagus_tube", nameUz: "Qizilo'ngach (Esophagus)", nameLat: "Esophagus", desc: "Ovqat luqmasini halqumdan oshqozonga peristaltik to'lqinlar orqali yetkazuvchi mushakli nay (25 sm)." },
+      { id: "stomach_chamber", nameUz: "Oshqozon (Gaster)", nameLat: "Gaster", desc: "Xlorid kislotasi va fermentlar yordamida ovqatni kimyoviy hamda mexanik suyuq bo'tqaga aylantiradi." },
+      { id: "liver_gallbladder", nameUz: "Jigar va O't pufagi", nameLat: "Hepar & Vesica biliaris", desc: "O't ishlab chiqaruvchi eng yirik laboratoriya va organizmning asosiy detoksikatori." },
+      { id: "pancreas_gland", nameUz: "Oshqozon osti bezi", nameLat: "Pancreas", desc: "Oqsillar, yog'lar va uglevodlarni parchalovchi eng qudratli hazm fermentlarini beradi." },
+      { id: "small_intestine", nameUz: "Ingichka ichak (Enteron)", nameLat: "Intestinum tenue", desc: "12 barmoqli, och va yonbosh ichaklar; oziq moddalar vorsinkalar orqali to'liq qonga so'riladi (5-6 metr)." },
+      { id: "large_intestine", nameUz: "Yo'g'on ichak (Colon)", nameLat: "Intestinum crassum", desc: "Ko'r ichak (appendiks bilan), chambar ichak va to'g'ri ichak; suvni qayta so'radi va najasni shakllantiradi." }
+    ],
+    functions: [
+      "Ovqatni mexanik maydalash va kimyoviy fermentativ parchalash",
+      "Oziq moddalar, aminokislotalar, glyukoza va vitaminlarni qonga so'rish",
+      "Zaharli metabolitlarni jigarda zararsizlantirish va qoldiqlarni chiqarish"
+    ],
+    clinical: [
+      "Appenditsit - ko'r ichak chuvalchangsimon o'simtasining o'tkir yallig'lanishi.",
+      "Gastrit va Oshqozon yarasi kasalligi.",
+      "Kolit va Enterit - ichak shilliq qavati yallig'lanishi."
+    ],
+    quiz: [
+      {
+        question: "Inson hazm traktida oziq moddalarning qonga asosiy so'rilishi qaysi bo'limda yuz beradi?",
+        options: ["Oshqozonda", "Ingichka ichakda (Intestinum tenue)", "Yo'g'on ichakda", "Qizilo'ngachda"],
+        correct: 1,
+        answerIndex: 1,
+        explanation: "Ingichka ichakdagi millionlab vorsinkalar (villi) orqali hazm bo'lgan ozuqalar to'liq qonga so'riladi."
+      }
+    ]
+  },
+
+  // 13. TAYANCH-HARAKAT SISTEMASI / TO'LIQ TIZIM
+  musculoskeletal_system: {
+    id: "musculoskeletal_system",
+    nameUz: "Tayanch-harakat a'zolari (Suyaklar, Bo'g'imlar, Mushaklar)",
+    nameLat: "Systema musculoskeletale",
+    nameEn: "Musculoskeletal System 3D",
+    systemKey: "musculoskeletal",
+    system: "Tayanch-harakat a’zolari: Suyaklar, bo‘g‘imlar va skelet mushaklari",
+    category: "Lokomotor biomekanik tizim",
+    bonesCount: "206 ta suyak & 600+ mushaklar",
+    weight: "~40-50% tana vazni",
+    keywords: ["tayanch-harakat a'zolari", "tayanch harakat", "tayanch", "harakat", "suyaklar", "bogimlar", "bo'g'imlar", "skelet", "mushaklar", "muskullar", "systema musculoskeletale", "skeleton", "muscles"],
+    description: "Inson tayanch-harakat apparatining to'liq 3D modeli: 206 ta suyakdan iborat qattiq Skelet karkasi, erkin harakatlanuvchi Bo'g'imlar (artikulyatsiyalar) va kuch hamda harakat hosil qiluvchi qizil Skelet mushaklari (biceps, triceps, deltasimon, qorin pressi, to'rt boshli son mushaklari).",
+    parts: [
+      { id: "axial_skeleton", nameUz: "Aksial skelet", nameLat: "Skeleton axiale", desc: "Bosh suyagi, umurtqa pog'onasi, qovurg'alar va to'sh suyagi; hayotiy a'zolar himoya karkasi." },
+      { id: "appendicular_skeleton", nameUz: "Qo'shimcha skelet", nameLat: "Skeleton appendiculare", desc: "Qo'l va oyoq kamarlari hamda erkin suyaklari; fazoda faol siljishni ta'minlaydi." },
+      { id: "synovial_joints", nameUz: "Sinovial bo'g'imlar", nameLat: "Articulationes synoviales", desc: "Yelka, tirsak, chanoq-son va tizza bo'g'imlari; sirpanuvchi tog'ay va bo'g'im suyuqligi bilan qoplangan." },
+      { id: "skeletal_muscles", nameUz: "Skelet mushaklari", nameLat: "Musculi skeleti", desc: "Ko'ndalang-targ'il mushak tolalari; asab impulslari ta'sirida qisqarib suyaklarni harakatga keltiradi." }
+    ],
+    functions: [
+      "Gavdaga mustahkam shakl berish va vertikal tayanchni saqlash",
+      "Fazoda turli xil harakatlar (yurish, yugurish, sakrash, mehnat qilish)ni amalga oshirish",
+      "Mineral moddalar (kaltsiy, fosfor) deposi va qon yaratish (qizil ilik)"
+    ],
+    clinical: [
+      "Osteoporoz - suyak to'qimasi zichligining pasayishi va mo'rtlashishi.",
+      "Artroz va Artrit - bo'g'im tog'aylarining yemirilishi va yallig'lanishi.",
+      "Miopatiya va mushaklar distrofiyasi."
+    ],
+    quiz: [
+      {
+        question: "Voyaga yetgan inson skeleti o'rtacha nechta suyakdan tashkil topgan?",
+        options: ["150 ta", "206 ta", "250 ta", "300 ta"],
+        correct: 1,
+        answerIndex: 1,
+        explanation: "Voyaga yetgan odam skeletida o'rtacha 206 ta suyak bo'ladi (chaqaloqlarda 270 dan ortiq bo'lib, keyinchalik birikib ketadi)."
+      }
+    ]
+  },
+
+  // 14. SIYDIK CHIQARISH SISTEMASI / TO'LIQ TIZIM
+  urinary_system: {
+    id: "urinary_system",
+    nameUz: "Siydik chiqarish sistemasi (Buyraklar, Siydik yo'llari, Pufak)",
+    nameLat: "Systema urinarium",
+    nameEn: "Urinary System 3D",
+    systemKey: "urinary",
+    system: "Siydik chiqarish sistemasi: Buyraklar, siydik yo‘llari va siydik pufagi",
+    category: "Ekskretor suyuqlik balansi",
+    bonesCount: "0 ta suyak",
+    weight: "~350 g",
+    keywords: ["siydik chiqarish sistemasi", "siydik chiqarish", "siydik", "buyraklar", "buyrak", "siydik yollari", "siydik yo'llari", "siydik pufagi", "qovuq", "nefron", "ureter", "uretra", "systema urinarium"],
+    description: "Siydik ayirish tizimining to'liq 3D modeli: qonni filtrlovchi juft loviyasimon Buyraklar (Ren), buyrak usti bezlari, buyrak jomlaridan boshlanuvchi Siydik naylari (Ureter - o'ng va chap), elastik mushakli Siydik pufagi (qovuq - Vesica urinaria) va chiqaruvchi Uretra.",
+    parts: [
+      { id: "kidneys_pair", nameUz: "Juft buyraklar (Ren dexter & sinister)", nameLat: "Renes", desc: "Har birida 1 milliondan ortiq nefronlar qonni doimiy filtrlab ikkilamchi siydik hosil qiladi." },
+      { id: "ureters_pair", nameUz: "Siydik yo'llari (Ureterlar)", nameLat: "Ureter dexter et sinister", desc: "Siydikni buyrak jomidan qovuqqa uzluksiz haydovchi silliq mushakli naychalar (25-30 sm)." },
+      { id: "urinary_bladder", nameUz: "Siydik pufagi (Qovuq)", nameLat: "Vesica urinaria", desc: "Detruzor mushagiga ega, 500-700 ml siydik to'play oluvchi rezervuar a'zo." },
+      { id: "urethra_tube", nameUz: "Siydik chiqarish kanali (Uretra)", nameLat: "Urethra", desc: "Siydikni organizmdan tashqariga chiqaruvchi sfinkterli yo'l." }
+    ],
+    functions: [
+      "Qon plazmasini metabolizm qoldiqlari (mochevina, kreatinin, siydik kislotasi)dan tozalash",
+      "Organizmda suv-tuz, elektrolit va kislota-ishqor (pH) muvozanatini saqlash",
+      "Renin va eritropoetin gormonlarini ishlab chiqarish orqali qon bosimi va eritrotsitlar sintezini nazorat qilish"
+    ],
+    clinical: [
+      "Piyelonefrit - buyrak jomi va buyrak to'qimalarining bakterial yallig'lanishi.",
+      "Sistit - siydik pufagi (qovuq) devorining o'tkir shamollashi.",
+      "Urolitiaz - buyrak va siydik yo'llarida tosh hosil bo'lishi."
+    ],
+    quiz: [
+      {
+        question: "Buyraklarda hosil bo'lgan ikkilamchi siydik qovuqqa qaysi a'zo orqali oqib boradi?",
+        options: ["Uretra", "Siydik yo'li (Ureter)", "Buyrak arteriyasi", "Kovak vena"],
+        correct: 1,
+        answerIndex: 1,
+        explanation: "Siydik yo'li (Ureter) buyrak jomini siydik pufagi bilan bog'lovchi naydir."
+      }
+    ]
+  },
+
+  // 15. ENDOKRIN SISTEMA / TO'LIQ TIZIM
+  endocrine_system: {
+    id: "endocrine_system",
+    nameUz: "Endokrin sistema (Ichki sekretsiya bezlari)",
+    nameLat: "Systema endocrinum",
+    nameEn: "Endocrine System 3D",
+    systemKey: "endocrine",
+    system: "Endokrin sistema: Ichki sekretsiya bezlari va gormonal regulyatsiya",
+    category: "Gumoral boshqaruv tizimi",
+    bonesCount: "0 ta suyak",
+    weight: "~100 g barcha bezlar",
+    keywords: ["endokrin sistema", "endokrin", "ichki sekretsiya", "gipofiz", "qalqonsimon bez", "buyrak usti bezi", "gormon", "gormonlar", "qalqonsimon", "systema endocrinum", "thyroid", "adrenal"],
+    description: "Inson endokrin tizimining to'liq 3D modeli: Bosh miya asosidagi boshqaruvchi Gipofiz va Epifiz bezlari, bo'yindagi kapalaksimon Qalqonsimon bez (Glandula thyroidea), ko'krak qafasidagi Timus, buyraklar tepasidagi Buyrak usti bezlari (Glandulae suprarenales) va oshqozon osti bezi orolchalari.",
+    parts: [
+      { id: "pituitary_gland", nameUz: "Gipofiz bezi (Hypophysis)", nameLat: "Hypophysis", desc: "Bosh miya turk egarchasida joylashgan boshqaruvchi bosh bez; o'sish gormoni va trop gormonlar ajratadi." },
+      { id: "thyroid_gland", nameUz: "Qalqonsimon bez", nameLat: "Glandula thyroidea", desc: "Bo'yinda traxeya oldida yotuvchi kapalaksimon bez; tiroksin (T4) va triyodtironin (T3) orqali asosiy moddalar almashinuvini tezlashtiradi." },
+      { id: "parathyroid_glands", nameUz: "Qalqonoldi bezlari", nameLat: "Glandulae parathyroideae", desc: "Qonda kaltsiy va fosfor darajasini paratgormon orqali qat'iy nazorat qiluvchi 4 ta mayda bez." },
+      { id: "adrenal_glands", nameUz: "Buyrak usti bezlari", nameLat: "Glandulae suprarenales", desc: "Po'stloq qavatida kortizol va aldosteron, mag'zida adrenalin va noradrenalin (stress gormonlari) ishlab chiqaradi." },
+      { id: "thymus_gland", nameUz: "Ayrisimon bez (Timus)", nameLat: "Thymus", desc: "Immunitet hujayralari (T-limfotsitlar) pishib yetiladigan muhim immunitet-endokrin bezi." }
+    ],
+    functions: [
+      "Organizmda moddalar almashinuvi (metabolizm) tezligini muvozanatlash",
+      "Jismoniy va aqliy o'sish, balog'atga yetish va reproduktiv funksiyalarni ta'minlash",
+      "Stress va tashqi xavflarga qarshi tezkor moslashuv (adrenalin/kortizol) reaksiyasini yoqish"
+    ],
+    clinical: [
+      "Bazedov kasalligi (Gipertireoz) - qalqonsimon bez gormonlarining ortiqcha ajralishi.",
+      "Gipotireoz va endemik bo'qoq - yod yetishmovchiligi oqibatida gormonlar tanqisligi.",
+      "Gipofizar gigantizm yoki pakanalik - o'sish gormoni (somatotrop) anomaliyalari."
+    ],
+    quiz: [
+      {
+        question: "Qalqonsimon bez gormonlari (T3 va T4) sintezi uchun qaysi mikroelement hayotiy zarur?",
+        options: ["Temir", "Yod (Iodum)", "Sink", "Mis"],
+        correct: 1,
+        answerIndex: 1,
+        explanation: "Yod mikroelementi tiroksin va triyodtironin gormonlari tarkibiga kiruvchi asosiy elementdir."
+      }
+    ]
+  },
+
+  // 16. O'PKA (YAKKA MODEL)
   lung: {
     id: "lung",
     nameUz: "O'pkalar",
     nameLat: "Pulmones",
     nameEn: "Human Lungs 3D",
+    systemKey: "respiratory",
     system: "Nafas olish tizimi (Systema respiratorium)",
-    category: "Nafas a'zolari",
+    category: "Gaz almashinuv organi",
     bonesCount: "0 ta suyak",
     weight: "~1000 - 1200 g",
-    description: "Inson o'pkalarining 3D modeli: 3 bo'lakli o'ng o'pka, 2 bo'lakli chap o'pka, traxeya, bosh bronxlar va alveolyar gaz almashinuv sathi.",
+    keywords: ["o'pka", "opka", "lung", "pulmones", "o'pkalar", "bronx", "alveola", "nafas", "o'ng o'pka", "chap o'pka"],
+    description: "Inson o'pkalarining batafsil 3D modeli: 3 bo'lakli o'ng o'pka, 2 bo'lakli chap o'pka, kengirdak, bosh bronxlar va alveolyar gaz almashinuv sathi.",
     parts: [
       { id: "right_lung", nameUz: "O'ng o'pka (3 bo'lakli)", nameLat: "Pulmo dexter", desc: "Yuqori, o'rta va pastki bo'laklardan tashkil topgan kattaroq o'pka." },
       { id: "left_lung", nameUz: "Chap o'pka (2 bo'lakli)", nameLat: "Pulmo sinister", desc: "Yurak o'ymasiga ega bo'lgan 2 bo'lakli o'pka." },
@@ -170,21 +653,25 @@ export const ANATOMY_DATA = {
       {
         question: "Chap o'pka nechta bo'lakdan (lobi) iborat?",
         options: ["1 ta", "2 ta", "3 ta", "4 ta"],
+        correct: 1,
         answerIndex: 1,
         explanation: "Chap o'pka yurak joylashuvi sababli 2 bo'lakdan iborat."
       }
     ]
   },
 
+  // 17. OSHQOZON (YAKKA MODEL)
   stomach: {
     id: "stomach",
     nameUz: "Oshqozon",
     nameLat: "Gaster",
     nameEn: "Human Stomach 3D",
+    systemKey: "digestive",
     system: "Ovqat hazm qilish tizimi (Systema digestorium)",
     category: "Qorin bo'shlig'i a'zosi",
     bonesCount: "0 ta suyak",
     weight: "~150 - 200 g",
+    keywords: ["oshqozon", "me'da", "meda", "stomach", "gaster", "gastrit", "hazm", "xlorid kislota", "pepsin"],
     description: "Inson oshqozonining 3D modeli: kirish qismi (cardia), tubi (fundus), tanasi (corpus) va pilorik chiqish qismi (pylorus).",
     parts: [
       { id: "fundus", nameUz: "Oshqozon tubi va tanasi", nameLat: "Fundus et Corpus gastricum", desc: "Ovqat to'planadigan va xlorid kislota ajraladigan asosiy soha." },
@@ -203,25 +690,29 @@ export const ANATOMY_DATA = {
       {
         question: "Oshqozon shirasidagi asosiy kislota qaysi?",
         options: ["Xlorid kislotasi (HCl)", "Sulfat kislotasi", "Sirka kislotasi", "Fosfat kislotasi"],
+        correct: 0,
         answerIndex: 0,
         explanation: "Xlorid kislotasi (HCl) oqsillarni parchalash va mikroblarni o'ldirishda asosiy vositadir."
       }
     ]
   },
 
+  // 18. JIGAR (YAKKA MODEL)
   liver: {
     id: "liver",
     nameUz: "Jigar",
     nameLat: "Hepar",
     nameEn: "Human Liver 3D",
+    systemKey: "digestive",
     system: "Ovqat hazm qilish va moddalar almashinuvi",
     category: "Eng yirik bez",
     bonesCount: "0 ta suyak",
     weight: "~1400 - 1600 g",
+    keywords: ["jigar", "liver", "hepar", "safro", "detoks", "gepatit", "hazm", "o't pufagi"],
     description: "Inson jigarining 3D modeli: o'ng va chap bo'laklar, darvoza venasi tizimi, o't pufagi va jigarning detoksikatsiya mikro-anatomiyasi.",
     parts: [
       { id: "lobes_liver", nameUz: "O'ng va chap bo'laklar", nameLat: "Lobus dexter et sinister", desc: "O'roqsimon boylam orqali ajralgan asosiy jigar massasi." },
-      { id: "gallbladder", nameUz: "O't pufagi", nameLat: "Vesica biliaris", desc: "Jigar ishlab chiqargan o't suyuqligini to'plovchi rezervuar." }
+      { id: "gallbladder_site", nameUz: "O't pufagi o'rni", nameLat: "Vesica biliaris", desc: "Jigar ishlab chiqargan o't suyuqligini to'plovchi rezervuar." }
     ],
     functions: [
       "Qonni toksinlar va zaharlardan tozalash (detoksikatsiya)",
@@ -236,21 +727,25 @@ export const ANATOMY_DATA = {
       {
         question: "Inson organizmidagi eng yirik ichki a'zo va bez qaysi?",
         options: ["Taloq", "Jigar (Hepar)", "Oshqozon osti bezi", "Buyrak"],
+        correct: 1,
         answerIndex: 1,
         explanation: "Jigar (Hepar) inson tanasidagi eng yirik bez bo'lib, o'rtacha 1.5 kg tosh bosadi."
       }
     ]
   },
 
+  // 19. BUYRAK (YAKKA MODEL)
   kidney: {
     id: "kidney",
     nameUz: "Buyrak",
     nameLat: "Ren",
     nameEn: "Human Kidney 3D",
+    systemKey: "urinary",
     system: "Siydik ayirish tizimi (Systema urinarium)",
     category: "Ekskretor a'zo",
     bonesCount: "0 ta suyak",
     weight: "~130 - 160 g",
+    keywords: ["buyrak", "kidney", "ren", "siydik", "nefron", "siydik ayirish", "filtr", "glomerula"],
     description: "Inson buyragining 3D modeli: po'stloq modda, mag'iz piramidalari, buyrak jomi, nefronlar va siydik yo'li (ureter).",
     parts: [
       { id: "cortex_renal", nameUz: "Buyrak po'stloq qavati", nameLat: "Cortex renalis", desc: "Birlamchi siydik filtratsiyasi amalga oshuvchi qon tomirli soha." },
@@ -269,21 +764,25 @@ export const ANATOMY_DATA = {
       {
         question: "Buyrakning struktur-funktsional birligi nima deb ataladi?",
         options: ["Neyron", "Nefron (Nephron)", "Alveola", "Osteon"],
+        correct: 1,
         answerIndex: 1,
         explanation: "Nefron (Nephron) buyrakning qon filtrlovchi asosiy mikroskopik birligidir."
       }
     ]
   },
 
+  // 20. UMURTQA POG'ONASI (YAKKA MODEL)
   spine: {
     id: "spine",
     nameUz: "Umurtqa pog'onasi",
     nameLat: "Columna vertebralis",
     nameEn: "Human Spine 3D",
+    systemKey: "musculoskeletal",
     system: "Skelet tizimi (Systema skeletale)",
     category: "Aksial skelet o'qi",
     bonesCount: "32-34 ta umurtqa",
     weight: "~1800 - 2000 g",
+    keywords: ["umurtqa", "spine", "columna vertebralis", "bel", "boyin", "kokrak", "umurtqa pogonasi", "disk", "orqa miya"],
     description: "Inson umurtqa pog'onasi va orqa miya kanalining 3D modeli: bo'yin (C1-C7), ko'krak (Th1-Th12), bel (L1-L5), umurtqalararo disklar va dumg'aza suyagi.",
     parts: [
       { id: "cervical", nameUz: "Bo'yin umurtqalari (7 ta)", nameLat: "Vertebrae cervicales", desc: "Boshni tutib turuvchi eng erkin umurtqalar (Atlant va Aksis)." },
@@ -303,6 +802,7 @@ export const ANATOMY_DATA = {
       {
         question: "Inson bo'yin bo'limida nechta umurtqa bor?",
         options: ["5 ta", "7 ta (C1-C7)", "8 ta", "12 ta"],
+        correct: 1,
         answerIndex: 1,
         explanation: "Barcha sutemizuvchilarda 7 ta bo'yin umurtqasi mavjud."
       }
