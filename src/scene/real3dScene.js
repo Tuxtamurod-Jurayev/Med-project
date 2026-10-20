@@ -23,32 +23,47 @@ export class Real3DSceneManager {
       skull: {
         path: '/models/skull.glb',
         targetScale: 1.8,
-        yOffset: 0.0,
-        rotationOffset: [0, 0, 0]
+        yOffset: 0.0
       },
       brain: {
         path: '/models/brain.glb',
         targetScale: 2.2,
-        yOffset: 0.0,
-        rotationOffset: [0, 0, 0]
+        yOffset: 0.0
+      },
+      eye: {
+        path: '/models/eye.glb',
+        targetScale: 2.3,
+        yOffset: 0.0
       },
       heart: {
         path: '/models/heart.glb',
         targetScale: 2.2,
-        yOffset: 0.0,
-        rotationOffset: [0, 0, 0]
+        yOffset: 0.0
       },
-      eye: {
-        path: '/models/eye.glb',
-        targetScale: 2.5,
-        yOffset: 0.0,
-        rotationOffset: [0, 0, 0]
+      lung: {
+        path: '/models/lung.glb',
+        targetScale: 2.1,
+        yOffset: 0.0
+      },
+      stomach: {
+        path: '/models/stomach.glb',
+        targetScale: 2.2,
+        yOffset: 0.0
+      },
+      liver: {
+        path: '/models/liver.glb',
+        targetScale: 2.2,
+        yOffset: 0.0
+      },
+      kidney: {
+        path: '/models/kidney.glb',
+        targetScale: 2.2,
+        yOffset: 0.0
       },
       spine: {
         path: '/models/spine.glb',
-        targetScale: 2.6,
-        yOffset: -0.1,
-        rotationOffset: [0, 0, 0]
+        targetScale: 2.5,
+        yOffset: -0.1
       }
     };
 
@@ -62,7 +77,7 @@ export class Real3DSceneManager {
 
   initScene() {
     this.scene = new THREE.Scene();
-    this.scene.background = new THREE.Color(0x070b14);
+    this.scene.background = new THREE.Color(0x060a14);
 
     const width = this.container.clientWidth || window.innerWidth;
     const height = this.container.clientHeight || window.innerHeight;
@@ -78,28 +93,28 @@ export class Real3DSceneManager {
     this.renderer.setSize(width, height);
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    this.renderer.toneMappingExposure = 1.3;
+    this.renderer.toneMappingExposure = 1.35;
 
     this.container.appendChild(this.renderer.domElement);
   }
 
   initLights() {
-    this.ambientLight = new THREE.AmbientLight(0xffffff, 1.2);
+    this.ambientLight = new THREE.AmbientLight(0xffffff, 1.3);
     this.scene.add(this.ambientLight);
 
-    this.hemiLight = new THREE.HemisphereLight(0xffffff, 0x1e293b, 1.0);
+    this.hemiLight = new THREE.HemisphereLight(0xffffff, 0x1e293b, 1.1);
     this.hemiLight.position.set(0, 20, 0);
     this.scene.add(this.hemiLight);
 
-    this.keyLight = new THREE.DirectionalLight(0xffffff, 2.2);
+    this.keyLight = new THREE.DirectionalLight(0xffffff, 2.4);
     this.keyLight.position.set(6, 8, 7);
     this.scene.add(this.keyLight);
 
-    this.fillLight = new THREE.DirectionalLight(0x38bdf8, 1.2);
+    this.fillLight = new THREE.DirectionalLight(0x38bdf8, 1.3);
     this.fillLight.position.set(-6, 2, -4);
     this.scene.add(this.fillLight);
 
-    this.rimLight = new THREE.DirectionalLight(0xfef08a, 1.2);
+    this.rimLight = new THREE.DirectionalLight(0xfef08a, 1.3);
     this.rimLight.position.set(0, -6, -5);
     this.scene.add(this.rimLight);
   }
@@ -108,7 +123,7 @@ export class Real3DSceneManager {
     this.controls = new OrbitControls(this.camera, this.renderer.domElement);
     this.controls.enableDamping = true;
     this.controls.dampingFactor = 0.06;
-    this.controls.minDistance = 1.0;
+    this.controls.minDistance = 0.8;
     this.controls.maxDistance = 14;
     this.controls.enablePan = true;
   }
@@ -117,14 +132,14 @@ export class Real3DSceneManager {
     if (!this.modelConfigs[key]) return;
     this.currentModelKey = key;
 
-    // Check Cache
+    // Use cached model if available
     if (this.loadedModelsCache[key]) {
       this.displayModel(this.loadedModelsCache[key], key);
       return;
     }
 
     const cfg = this.modelConfigs[key];
-    this.onProgress(true, `3D ${key} modeli yuklanmoqda...`);
+    this.onProgress(true, `3D model yuklanmoqda...`);
 
     try {
       const gltf = await new Promise((resolve, reject) => {
@@ -143,7 +158,7 @@ export class Real3DSceneManager {
 
       const modelRoot = gltf.scene;
 
-      // Center and normalize size with BoundingBox
+      // Center and normalize bounding box
       const bbox = new THREE.Box3().setFromObject(modelRoot);
       const size = bbox.getSize(new THREE.Vector3());
       const center = bbox.getCenter(new THREE.Vector3());
@@ -152,16 +167,14 @@ export class Real3DSceneManager {
       const scale = (cfg.targetScale || 2.0) / maxDim;
       modelRoot.scale.set(scale, scale, scale);
 
-      // Re-center around (0,0,0)
       modelRoot.position.x = -center.x * scale;
       modelRoot.position.y = -center.y * scale + (cfg.yOffset || 0);
       modelRoot.position.z = -center.z * scale;
 
-      // Wrap in pivot group
       const pivotGroup = new THREE.Group();
       pivotGroup.add(modelRoot);
 
-      // Enhance materials for realistic medical shading
+      // PBR optimization
       pivotGroup.traverse((child) => {
         if (child.isMesh && child.material) {
           child.castShadow = true;
@@ -170,7 +183,7 @@ export class Real3DSceneManager {
             child.material.metalness = Math.min(child.material.metalness, 0.2);
           }
           if (child.material.roughness !== undefined) {
-            child.material.roughness = Math.max(child.material.roughness, 0.4);
+            child.material.roughness = Math.max(child.material.roughness, 0.35);
           }
         }
       });
@@ -180,7 +193,7 @@ export class Real3DSceneManager {
       this.onProgress(false, 'Tayyor');
     } catch (err) {
       console.error(`Failed to load GLB model ${key}:`, err);
-      this.onProgress(false, 'Yuklashda xatolik');
+      this.onProgress(false, 'Yuklashda xatolik yuz berdi');
     }
   }
 
@@ -192,7 +205,7 @@ export class Real3DSceneManager {
     this.currentModelGroup = pivotGroup;
     this.scene.add(this.currentModelGroup);
 
-    this.isPulsing = (key === 'heart');
+    this.isPulsing = (key === 'heart' || key === 'lung');
     this.applyXRayState();
     this.applyWireframeState();
     this.resetCamera();
@@ -203,8 +216,8 @@ export class Real3DSceneManager {
       this.scene.background = null;
       this.renderer.setClearColor(0x000000, 0);
     } else {
-      this.scene.background = new THREE.Color(0x070b14);
-      this.renderer.setClearColor(0x070b14, 1);
+      this.scene.background = new THREE.Color(0x060a14);
+      this.renderer.setClearColor(0x060a14, 1);
     }
   }
 
@@ -277,14 +290,18 @@ export class Real3DSceneManager {
   animate() {
     requestAnimationFrame(() => this.animate());
 
-    const delta = this.clock.getDelta();
     const elapsedTime = this.clock.getElapsedTime();
 
-    // Heartbeat realistic pulsation
-    if (this.currentModelKey === 'heart' && this.currentModelGroup && this.isPulsing) {
-      const beat = Math.sin(elapsedTime * 6.0);
-      const pulse = 1 + (beat > 0.4 ? Math.pow(beat, 4) * 0.08 : 0);
-      this.currentModelGroup.scale.set(pulse, pulse, pulse);
+    // Heartbeat pulsation or lungs breathing animation
+    if (this.currentModelGroup && this.isPulsing) {
+      if (this.currentModelKey === 'heart') {
+        const beat = Math.sin(elapsedTime * 6.0);
+        const pulse = 1 + (beat > 0.4 ? Math.pow(beat, 4) * 0.08 : 0);
+        this.currentModelGroup.scale.set(pulse, pulse, pulse);
+      } else if (this.currentModelKey === 'lung') {
+        const breath = 1 + Math.sin(elapsedTime * 2.0) * 0.04;
+        this.currentModelGroup.scale.set(breath, breath, breath);
+      }
     }
 
     this.controls.update();

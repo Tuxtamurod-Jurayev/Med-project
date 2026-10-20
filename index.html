@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <title>MedAnatomy 3D — Haqiqiy 3D Modellash & AR Atlasi</title>
-  <meta name="description" content="Tibbiyot talabalari uchun aniq 3D modellar va telefondan kamerada belgilash (AR) anatomiya platformasi" />
+  <meta name="description" content="Tibbiyot talabalari uchun 3D modellar va kamera AR anatomiya platformasi" />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -15,162 +15,256 @@
 
   <div class="app-container">
 
-    <!-- TOP APP BAR -->
+    <!-- TOP HEADER -->
     <header class="app-header">
       <div class="header-left">
         <div class="app-logo">
-          <div class="logo-badge">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+          <div class="logo-icon-wrap">
+            <svg class="react-icon logo-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+              <circle cx="12" cy="12" r="9"/>
             </svg>
           </div>
-          <div>
-            <div class="logo-title">
-              <span>MedAnatomy</span>
-              <span class="chip-3d">3D • AR</span>
+          <div class="logo-text">
+            <div class="logo-title-row">
+              <span class="brand-name">MedAnatomy</span>
+              <span class="brand-badge">3D • AR</span>
             </div>
-            <span class="logo-subtitle">Aniq anatomik 3D modellar</span>
+            <span class="brand-sub">Interaktiv anatomiya atlasi</span>
           </div>
         </div>
       </div>
 
-      <!-- MAIN MODE SELECTOR (3D Studio / Kamera AR / Rasm Belgilash) -->
-      <div class="mode-switch-wrapper">
-        <div class="mode-switch">
-          <button class="mode-btn active" data-mode="studio">
-            <span class="m-icon">🏛️</span>
-            <span class="m-text">3D Studio</span>
+      <!-- MAIN MODE SWITCHER (3D STUDIO vs AR KAMERA) -->
+      <div class="header-center">
+        <div class="mode-switch-bar">
+          <button class="mode-tab-btn active" data-mode="studio" id="modeStudioBtn" title="3D Studio rejimi">
+            <svg class="react-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m21 16-9 5-9-5V8l9-5 9 5v8Z"/>
+              <path d="M3.27 6.96 12 12.01l8.73-5.05"/>
+              <path d="M12 22.08V12"/>
+            </svg>
+            <span class="btn-text">3D Studio</span>
           </button>
-          <button class="mode-btn" data-mode="camera">
-            <span class="m-icon">📷</span>
-            <span class="m-text">Kamera (AR)</span>
-          </button>
-          <button class="mode-btn" data-mode="image">
-            <span class="m-icon">🖼️</span>
-            <span class="m-text">Rasm & 3D</span>
+
+          <button class="mode-tab-btn" data-mode="camera" id="modeCameraBtn" title="Telefon kamerasida AR rejim">
+            <svg class="react-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+              <circle cx="12" cy="13" r="4"/>
+            </svg>
+            <span class="btn-text">AR Kamera</span>
           </button>
         </div>
       </div>
 
       <!-- HEADER ACTIONS -->
       <div class="header-right">
-        <!-- Latin Pronunciation Audio -->
-        <button id="speakNameBtn" class="action-btn" title="Lotincha nomini talaffuz qilish">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+        <!-- Pronounce Latin Name -->
+        <button id="speakNameBtn" class="icon-action-btn" title="Lotincha nomini eshitish" aria-label="Talaffuz qilish">
+          <svg class="react-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+            <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+          </svg>
+        </button>
+
+        <!-- Toggle Info Sidebar on Desktop/Tablet -->
+        <button id="toggleSidebarBtn" class="icon-action-btn" title="Ma'lumotlar paneli" aria-label="Ma'lumotlar">
+          <svg class="react-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect width="18" height="18" x="3" y="3" rx="2"/>
+            <path d="M15 3v18"/>
+            <path d="m9 9-3 3 3 3"/>
           </svg>
         </button>
 
         <!-- Fullscreen Button -->
-        <button id="fullscreenBtn" class="action-btn desktop-only" title="To'liq ekran">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+        <button id="fullscreenBtn" class="icon-action-btn desktop-only" title="To'liq ekran rejimi" aria-label="To'liq ekran">
+          <svg class="react-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
           </svg>
         </button>
       </div>
     </header>
 
-    <!-- MAIN BODY -->
+    <!-- HORIZONTAL 3D ORGAN SELECTION STRIP (ALL 9 ORGANS WITH REACT ICONS) -->
+    <nav class="organ-strip-bar custom-scrollbar" id="organStripBar">
+      <div class="organ-strip-inner">
+        <!-- 1. BOSH SUYAGI -->
+        <button class="organ-tab-btn active" data-model="skull" title="Bosh suyagi">
+          <svg class="react-icon organ-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/>
+            <path d="M8 20v2h8v-2"/>
+            <path d="M12 16v1"/>
+            <path d="M4 11a8 8 0 1 1 16 0c0 3-1.5 5.5-3 6.5V20H7v-2.5C5.5 16.5 4 14 4 11z"/>
+          </svg>
+          <span class="organ-tab-name">Bosh suyagi</span>
+          <span class="organ-tab-sub">Cranium</span>
+        </button>
+
+        <!-- 2. BOSH MIYA -->
+        <button class="organ-tab-btn" data-model="brain" title="Bosh miya">
+          <svg class="react-icon organ-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9.5 2A4.5 4.5 0 0 0 5 6.5c0 .7.17 1.36.46 1.95A4.5 4.5 0 0 0 4 12c0 1.25.5 2.39 1.33 3.22A4.5 4.5 0 0 0 5 17.5a4.5 4.5 0 0 0 4.5 4.5c1.17 0 2.22-.45 3-1.18.78.73 1.83 1.18 3 1.18a4.5 4.5 0 0 0 4.5-4.5c0-.68-.15-1.32-.42-1.9A4.5 4.5 0 0 0 20 12c0-1.13-.42-2.16-1.1-2.95.38-.7.6-1.5.6-2.35A4.5 4.5 0 0 0 14.5 2c-1.22 0-2.32.49-3.12 1.28A4.48 4.48 0 0 0 9.5 2z"/>
+            <path d="M12 4v16"/>
+          </svg>
+          <span class="organ-tab-name">Bosh miya</span>
+          <span class="organ-tab-sub">Encephalon</span>
+        </button>
+
+        <!-- 3. YURAK -->
+        <button class="organ-tab-btn" data-model="heart" title="Yurak">
+          <svg class="react-icon organ-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
+            <path d="M3.22 12H9.5l.5-1 2 4.5 2-7 1.5 3.5h4.28"/>
+          </svg>
+          <span class="organ-tab-name">Yurak</span>
+          <span class="organ-tab-sub">Cor</span>
+        </button>
+
+        <!-- 4. O'PKA -->
+        <button class="organ-tab-btn" data-model="lung" title="O'pka">
+          <svg class="react-icon organ-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2v7"/>
+            <path d="M12 9l-3 3"/>
+            <path d="M12 9l3 3"/>
+            <path d="M17 10c2 1 3 3.5 3 6.5a6.5 6.5 0 0 1-6.5 6.5c-1 0-1.5-.5-1.5-1.5V12"/>
+            <path d="M7 10c-2 1-3 3.5-3 6.5A6.5 6.5 0 0 0 10.5 23c1 0 1.5-.5 1.5-1.5V12"/>
+          </svg>
+          <span class="organ-tab-name">O'pka</span>
+          <span class="organ-tab-sub">Pulmones</span>
+        </button>
+
+        <!-- 5. OSHQOZON -->
+        <button class="organ-tab-btn" data-model="stomach" title="Oshqozon">
+          <svg class="react-icon organ-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2v4"/>
+            <path d="M12 6c-3 0-6 2-6 6 0 5 4 10 9 10s7-4 7-9c0-5-4-7-8-7"/>
+            <path d="M16 22v-3a2 2 0 0 1 2-2h2"/>
+          </svg>
+          <span class="organ-tab-name">Oshqozon</span>
+          <span class="organ-tab-sub">Gaster</span>
+        </button>
+
+        <!-- 6. JIGAR -->
+        <button class="organ-tab-btn" data-model="liver" title="Jigar">
+          <svg class="react-icon organ-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 11c0-4 4-7 11-7 4 0 6 2 6 5 0 5-3 11-8 11-5 0-9-4-9-9z"/>
+            <path d="M4 11h11"/>
+          </svg>
+          <span class="organ-tab-name">Jigar</span>
+          <span class="organ-tab-sub">Hepar</span>
+        </button>
+
+        <!-- 7. BUYRAK -->
+        <button class="organ-tab-btn" data-model="kidney" title="Buyrak">
+          <svg class="react-icon organ-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M7 4c-3.5 3-4 8-2 12s6 5 9 4 5-3 6-7-1-9-6-10c-3-.6-5 .5-7 1z"/>
+            <path d="M14 11a3 3 0 0 0-3 3"/>
+          </svg>
+          <span class="organ-tab-name">Buyrak</span>
+          <span class="organ-tab-sub">Ren</span>
+        </button>
+
+        <!-- 8. KO'Z OLMASI -->
+        <button class="organ-tab-btn" data-model="eye" title="Ko'z olmasi">
+          <svg class="react-icon organ-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
+            <circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="1"/>
+          </svg>
+          <span class="organ-tab-name">Ko'z olmasi</span>
+          <span class="organ-tab-sub">Bulbus oculi</span>
+        </button>
+
+        <!-- 9. UMURTQA POG'ONASI -->
+        <button class="organ-tab-btn" data-model="spine" title="Umurtqa pog'onasi">
+          <svg class="react-icon organ-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2v20"/>
+            <circle cx="12" cy="4" r="2"/><circle cx="12" cy="9" r="2"/><circle cx="12" cy="15" r="2"/><circle cx="12" cy="20" r="2"/>
+            <path d="M8 9h8"/><path d="M7 15h10"/><path d="M9 4h6"/>
+          </svg>
+          <span class="organ-tab-name">Umurtqa</span>
+          <span class="organ-tab-sub">Spine</span>
+        </button>
+      </div>
+    </nav>
+
+    <!-- MAIN INTERACTIVE CANVAS & SIDEBAR LAYOUT -->
     <main class="main-content">
 
-      <!-- VIEWPORT (THREE.JS 3D + CAMERA + IMAGE) -->
+      <!-- VIEWPORT (THREE.JS 3D CANVAS + AR CAMERA STREAM) -->
       <section class="viewport-box" id="viewportContainer">
 
-        <!-- LAYER 1: LIVE VIDEO CAMERA FEED (AR BACKGROUND) -->
+        <!-- LAYER 1: LIVE AR CAMERA VIDEO (Shown only in Camera mode) -->
         <video id="cameraFeed" class="bg-feed-video" autoplay playsinline muted></video>
 
-        <!-- LAYER 2: TARGET IMAGE FEED (When Image Mode is active) -->
-        <div id="imageFeedContainer" class="bg-feed-image hidden">
-          <img id="targetImageDisplay" src="" alt="Belgilangan rasm" />
-          <div class="image-scan-laser"></div>
-          <div class="image-watermark">
-            <span id="targetImageLabel">Belgilangan anatomik rasm</span>
-          </div>
-        </div>
+        <!-- LAYER 2: THREE.JS WEBGL 3D CANVAS -->
+        <div id="canvasContainer" class="canvas-3d-wrapper"></div>
 
-        <!-- LAYER 3: AR RETICLE & ALIGNMENT GUIDE -->
+        <!-- LAYER 3: AR TARGET RETICLE & LAUNCH BUTTON -->
         <div id="arReticle" class="ar-reticle-overlay hidden">
-          <div class="reticle-frame">
+          <div class="reticle-target-box">
+            <div class="reticle-corners"></div>
             <div class="reticle-crosshair"></div>
-            <span class="reticle-label">Tanani yoki kitob rasmini nishonga to'g'irlang</span>
+            <div class="reticle-scan-line"></div>
+            <span class="reticle-instruction">Kamerani gavdaga yoki kitobga yo'naltiring</span>
           </div>
 
-          <!-- AR LAUNCH BUTTON: TELEFON KAMERASIDA BELGILASH VA 3D MODELNI CHIQARISH -->
+          <!-- PROMINENT AR TRIGGER BUTTON ("Telefondan kamerada belgilanganda 3D model ishga tushurilsin") -->
           <button id="btnArDetect" class="btn-ar-detect">
-            <span class="sonar-ring"></span>
-            <span>🎯 Tanani belgilash va 3D modelni chiqarish</span>
+            <svg class="react-icon ar-btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="22" y1="12" x2="18" y2="12"/>
+              <line x1="6" y1="12" x2="2" y2="12"/>
+              <line x1="12" y1="6" x2="12" y2="2"/>
+              <line x1="12" y1="22" x2="12" y2="18"/>
+            </svg>
+            <span class="ar-btn-label">Tanani belgilash & 3D modelni chiqarish</span>
           </button>
         </div>
-
-        <!-- LAYER 4: THREE.JS 3D WEBGL CANVAS -->
-        <div id="canvasContainer" class="canvas-3d-wrapper"></div>
 
         <!-- FLOATING 3D TOOLS (LEFT DOCK) -->
         <div class="floating-tools">
           <button id="resetCamBtn" class="tool-btn" title="Kamerani boshlang'ich holatga qaytarish">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            <svg class="react-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+              <path d="M3 3v5h5"/>
             </svg>
             <span class="t-label">Qaytarish</span>
           </button>
 
           <button id="xrayBtn" class="tool-btn" title="Rentgen (Shaffof) 3D ko'rinish">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-              <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+            <svg class="react-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/>
+              <path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"/>
+              <path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"/>
             </svg>
             <span class="t-label">Rentgen</span>
           </button>
 
           <button id="wireframeBtn" class="tool-btn" title="3D Poligon to'ri (Wireframe)">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+            <svg class="react-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect width="18" height="18" x="3" y="3" rx="2"/>
+              <path d="M3 9h18M3 15h18M9 3v18M15 3v18"/>
             </svg>
             <span class="t-label">To'r</span>
           </button>
 
           <button id="autoRotateBtn" class="tool-btn" title="360° Avtomatik aylanish">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            <svg class="react-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/>
+              <path d="M21 3v5h-5"/>
             </svg>
             <span class="t-label">360°</span>
           </button>
 
-          <button id="snapshotBtn" class="tool-btn" title="Surat yuklab olish">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-              <path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+          <button id="snapshotBtn" class="tool-btn" title="Suratni saqlab olish">
+            <svg class="react-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="7 10 12 15 17 10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
             </svg>
             <span class="t-label">Surat</span>
           </button>
-        </div>
-
-        <!-- IMAGE SELECTION DOCK (When Image Mode is active) -->
-        <div id="imageSelectDock" class="image-select-dock hidden">
-          <div class="dock-header">
-            <span>🖼️ Belgilanadigan rasmni tanlang yoki yuklang:</span>
-            <label class="btn-upload">
-              <input type="file" id="imageFileInput" accept="image/*" hidden />
-              <span>📁 O'z rasmingizni yuklang</span>
-            </label>
-          </div>
-          <div class="sample-cards-row">
-            <button class="sample-card active" data-img-key="skull">
-              <span>💀 Bosh suyagi 3D</span>
-            </button>
-            <button class="sample-card" data-img-key="brain">
-              <span>🧠 Bosh miya 3D</span>
-            </button>
-            <button class="sample-card" data-img-key="heart">
-              <span>❤️ Yurak 3D</span>
-            </button>
-            <button class="sample-card" data-img-key="eye">
-              <span>👁️ Ko'z olmasi 3D</span>
-            </button>
-            <button class="sample-card" data-img-key="spine">
-              <span>🧬 Umurtqa 3D</span>
-            </button>
-          </div>
         </div>
 
         <!-- CAMERA CONTROLS BAR (When Camera Mode is active) -->
@@ -178,8 +272,11 @@
           <span class="ctrl-label">Shaffoflik:</span>
           <input type="range" id="arOpacitySlider" min="0.2" max="1" step="0.05" value="0.9" class="range-slider" />
           <button id="switchCameraBtn" class="btn-mini" title="Kamerani almashtirish (Old/Orqa)">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            <svg class="react-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M11 19H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h5"/>
+              <path d="m13 5 4 4-4 4"/>
+              <path d="M21 13v4a2 2 0 0 1-2 2h-5"/>
+              <path d="m11 15-4-4 4-4"/>
             </svg>
           </button>
         </div>
@@ -192,7 +289,10 @@
 
         <!-- TOUCH GESTURE HINT -->
         <div class="touch-hint">
-          <span>💡 3D modelni 360° aylantirish uchun bosing va suring • Kattalashtirish uchun ikki barmoq bilan cho'zing</span>
+          <svg class="react-icon hint-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>
+          </svg>
+          <span>360° aylantirish uchun bosing va suring • Kattalashtirish uchun ikki barmoq bilan cho'zing</span>
         </div>
 
       </section>
@@ -213,9 +313,10 @@
               <h2 id="organNameUz" class="organ-heading">Bosh suyagi</h2>
               <p id="organNameLat" class="organ-latin-sub">Cranium • Human Skull</p>
             </div>
-            <button id="closeSidebarBtn" class="btn-close-drawer">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            <button id="closeSidebarBtn" class="btn-close-drawer" aria-label="Yopish">
+              <svg class="react-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"/>
+                <line x1="6" y1="6" x2="18" y2="18"/>
               </svg>
             </button>
           </div>
@@ -227,7 +328,7 @@
               <span id="organSystem" class="s-val">Skelet tizimi</span>
             </div>
             <div class="stat-box">
-              <span class="s-label">Suyaklar / Og'irlik</span>
+              <span class="s-label">Parametr</span>
               <span id="organSpecs" class="s-val">22 ta suyak</span>
             </div>
           </div>
@@ -235,10 +336,40 @@
 
         <!-- Tabs -->
         <nav class="sidebar-tabs-nav">
-          <button class="nav-s-tab active" data-tab="parts">Tuzilishi</button>
-          <button class="nav-s-tab" data-tab="functions">Vazifasi</button>
-          <button class="nav-s-tab" data-tab="clinical">Klinika</button>
-          <button class="nav-s-tab tab-quiz-glow" data-tab="quiz">Test 🏆</button>
+          <button class="nav-s-tab active" data-tab="parts">
+            <svg class="react-icon tab-mini-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect width="7" height="7" x="3" y="3" rx="1"/>
+              <rect width="7" height="7" x="14" y="3" rx="1"/>
+              <rect width="7" height="7" x="14" y="14" rx="1"/>
+              <rect width="7" height="7" x="3" y="14" rx="1"/>
+            </svg>
+            <span>Tuzilishi</span>
+          </button>
+          <button class="nav-s-tab" data-tab="functions">
+            <svg class="react-icon tab-mini-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+            </svg>
+            <span>Vazifasi</span>
+          </button>
+          <button class="nav-s-tab" data-tab="clinical">
+            <svg class="react-icon tab-mini-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="12" y1="8" x2="12" y2="12"/>
+              <line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+            <span>Klinika</span>
+          </button>
+          <button class="nav-s-tab tab-quiz-glow" data-tab="quiz">
+            <svg class="react-icon tab-mini-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
+              <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
+              <path d="M4 22h16"/>
+              <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/>
+              <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/>
+              <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>
+            </svg>
+            <span>Test</span>
+          </button>
         </nav>
 
         <!-- Tab Body -->
@@ -247,7 +378,7 @@
           <!-- TAB 1: TUZILISHI & QISMLARI -->
           <div id="tabParts" class="tab-panel active">
             <div class="description-card">
-              <p id="organDescription">Bosh suyagi inson bosh skeleti bo'lib...</p>
+              <p id="organDescription">Bosh suyagi inson bosh skeleti bo'lib, bosh miyani himoyalash va yuz shaklini hosil qilish xizmatini bajaradi.</p>
             </div>
 
             <div class="panel-section-title">
@@ -280,10 +411,10 @@
           <div id="tabQuiz" class="tab-panel hidden">
             <div class="quiz-banner">
               <div class="quiz-banner-top">
-                <span class="quiz-title">🧠 Bilimingizni sinang</span>
+                <span class="quiz-title">Bilimingizni sinang</span>
                 <span id="quizScoreBadge" class="quiz-pill">Ball: 0/3</span>
               </div>
-              <p class="quiz-desc">Ushbu bo'lim bo'yicha talabalik bilimingizni tekshirib ko'ring!</p>
+              <p class="quiz-desc">Ushbu a'zo bo'yicha talabalik bilimingizni tekshirib ko'ring!</p>
             </div>
 
             <div id="quizContainer" class="quiz-container">
@@ -291,7 +422,11 @@
             </div>
 
             <button id="resetQuizBtn" class="btn-reset-quiz">
-              Testni qaytadan boshlash
+              <svg class="react-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+                <path d="M3 3v5h5"/>
+              </svg>
+              <span>Testni qaytadan boshlash</span>
             </button>
           </div>
 
@@ -303,69 +438,164 @@
             <span class="status-dot"></span>
             <span>3D Studio Rejimi</span>
           </div>
-          <span class="footer-ver">MedTech Pro 3D</span>
+          <span class="footer-ver">MedAnatomy 3D Pro</span>
         </div>
 
       </aside>
 
     </main>
 
-    <!-- MOBILE BOTTOM NAVIGATION BAR -->
+    <!-- MOBILE BOTTOM NAVIGATION BAR (REACT ICONS) -->
     <nav class="mobile-bottom-bar">
       <button class="m-nav-item active" id="mNavOrgan">
-        <span class="m-nav-icon">🦴</span>
+        <svg class="react-icon m-nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/>
+          <path d="M8 20v2h8v-2"/>
+          <path d="M12 16v1"/>
+          <path d="M4 11a8 8 0 1 1 16 0c0 3-1.5 5.5-3 6.5V20H7v-2.5C5.5 16.5 4 14 4 11z"/>
+        </svg>
         <span class="m-nav-label">3D A'zolar</span>
       </button>
 
       <button class="m-nav-item" id="mNavMode">
-        <span class="m-nav-icon">📷</span>
-        <span class="m-nav-label">Kamera / AR</span>
+        <svg class="react-icon m-nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+          <circle cx="12" cy="13" r="4"/>
+        </svg>
+        <span class="m-nav-label">AR Kamera</span>
       </button>
 
       <button class="m-nav-item" id="mNavInfo">
-        <span class="m-nav-icon">📖</span>
+        <svg class="react-icon m-nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/>
+        </svg>
         <span class="m-nav-label">Ma'lumot</span>
       </button>
 
       <button class="m-nav-item" id="mNavQuiz">
-        <span class="m-nav-icon">🏆</span>
+        <svg class="react-icon m-nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
+          <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
+          <path d="M4 22h16"/>
+          <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/>
+          <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/>
+          <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>
+        </svg>
         <span class="m-nav-label">Test</span>
       </button>
     </nav>
 
-    <!-- MOBILE ORGAN SELECTOR POPUP MODAL -->
+    <!-- MOBILE ORGAN SELECTOR POPUP MODAL (ALL 9 ORGANS WITH REACT ICONS) -->
     <div id="mobileOrganModal" class="modal-backdrop hidden">
       <div class="modal-card">
         <div class="modal-header">
-          <h3>3D Anatomik a'zoni tanlang:</h3>
-          <button id="closeOrganModal" class="btn-close-modal">✕</button>
+          <div class="modal-title-row">
+            <svg class="react-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m21 16-9 5-9-5V8l9-5 9 5v8Z"/>
+              <path d="M3.27 6.96 12 12.01l8.73-5.05"/>
+              <path d="M12 22.08V12"/>
+            </svg>
+            <h3>3D Anatomik a'zolar:</h3>
+          </div>
+          <button id="closeOrganModal" class="btn-close-modal" aria-label="Yopish">
+            <svg class="react-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
         </div>
-        <div class="modal-organ-grid">
+        <div class="modal-organ-grid custom-scrollbar">
+
           <button class="m-organ-choice active" data-model="skull">
-            <span class="m-o-emoji">💀</span>
-            <span class="m-o-name">Bosh suyagi (3D skan)</span>
-            <span class="m-o-lat">Cranium</span>
+            <svg class="react-icon m-choice-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/><path d="M8 20v2h8v-2"/><path d="M12 16v1"/><path d="M4 11a8 8 0 1 1 16 0c0 3-1.5 5.5-3 6.5V20H7v-2.5C5.5 16.5 4 14 4 11z"/>
+            </svg>
+            <div class="m-choice-text">
+              <span class="m-o-name">Bosh suyagi</span>
+              <span class="m-o-lat">Cranium • Skelet</span>
+            </div>
           </button>
+
           <button class="m-organ-choice" data-model="brain">
-            <span class="m-o-emoji">🧠</span>
-            <span class="m-o-name">Bosh miya (3D model)</span>
-            <span class="m-o-lat">Encephalon</span>
+            <svg class="react-icon m-choice-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9.5 2A4.5 4.5 0 0 0 5 6.5c0 .7.17 1.36.46 1.95A4.5 4.5 0 0 0 4 12c0 1.25.5 2.39 1.33 3.22A4.5 4.5 0 0 0 5 17.5a4.5 4.5 0 0 0 4.5 4.5c1.17 0 2.22-.45 3-1.18.78.73 1.83 1.18 3 1.18a4.5 4.5 0 0 0 4.5-4.5c0-.68-.15-1.32-.42-1.9A4.5 4.5 0 0 0 20 12c0-1.13-.42-2.16-1.1-2.95.38-.7.6-1.5.6-2.35A4.5 4.5 0 0 0 14.5 2c-1.22 0-2.32.49-3.12 1.28A4.48 4.48 0 0 0 9.5 2z"/><path d="M12 4v16"/>
+            </svg>
+            <div class="m-choice-text">
+              <span class="m-o-name">Bosh miya</span>
+              <span class="m-o-lat">Encephalon • Markaziy asab</span>
+            </div>
           </button>
+
           <button class="m-organ-choice" data-model="heart">
-            <span class="m-o-emoji">❤️</span>
-            <span class="m-o-name">Inson yuragi (3D kardiologiya)</span>
-            <span class="m-o-lat">Cor</span>
+            <svg class="react-icon m-choice-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/><path d="M3.22 12H9.5l.5-1 2 4.5 2-7 1.5 3.5h4.28"/>
+            </svg>
+            <div class="m-choice-text">
+              <span class="m-o-name">Yurak</span>
+              <span class="m-o-lat">Cor • Qon aylanish</span>
+            </div>
           </button>
+
+          <button class="m-organ-choice" data-model="lung">
+            <svg class="react-icon m-choice-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2v7"/><path d="M12 9l-3 3"/><path d="M12 9l3 3"/><path d="M17 10c2 1 3 3.5 3 6.5a6.5 6.5 0 0 1-6.5 6.5c-1 0-1.5-.5-1.5-1.5V12"/><path d="M7 10c-2 1-3 3.5-3 6.5A6.5 6.5 0 0 0 10.5 23c1 0 1.5-.5 1.5-1.5V12"/>
+            </svg>
+            <div class="m-choice-text">
+              <span class="m-o-name">O'pka</span>
+              <span class="m-o-lat">Pulmones • Nafas olish</span>
+            </div>
+          </button>
+
+          <button class="m-organ-choice" data-model="stomach">
+            <svg class="react-icon m-choice-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2v4"/><path d="M12 6c-3 0-6 2-6 6 0 5 4 10 9 10s7-4 7-9c0-5-4-7-8-7"/><path d="M16 22v-3a2 2 0 0 1 2-2h2"/>
+            </svg>
+            <div class="m-choice-text">
+              <span class="m-o-name">Oshqozon</span>
+              <span class="m-o-lat">Gaster • Ovqat hazm</span>
+            </div>
+          </button>
+
+          <button class="m-organ-choice" data-model="liver">
+            <svg class="react-icon m-choice-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 11c0-4 4-7 11-7 4 0 6 2 6 5 0 5-3 11-8 11-5 0-9-4-9-9z"/><path d="M4 11h11"/>
+            </svg>
+            <div class="m-choice-text">
+              <span class="m-o-name">Jigar</span>
+              <span class="m-o-lat">Hepar • Metabolizm</span>
+            </div>
+          </button>
+
+          <button class="m-organ-choice" data-model="kidney">
+            <svg class="react-icon m-choice-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M7 4c-3.5 3-4 8-2 12s6 5 9 4 5-3 6-7-1-9-6-10c-3-.6-5 .5-7 1z"/><path d="M14 11a3 3 0 0 0-3 3"/>
+            </svg>
+            <div class="m-choice-text">
+              <span class="m-o-name">Buyrak</span>
+              <span class="m-o-lat">Ren • Siydik-ayirish</span>
+            </div>
+          </button>
+
           <button class="m-organ-choice" data-model="eye">
-            <span class="m-o-emoji">👁️</span>
-            <span class="m-o-name">Ko'z olmasi (3D model)</span>
-            <span class="m-o-lat">Bulbus oculi</span>
+            <svg class="react-icon m-choice-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="1"/>
+            </svg>
+            <div class="m-choice-text">
+              <span class="m-o-name">Ko'z olmasi</span>
+              <span class="m-o-lat">Bulbus oculi • Ko'rish</span>
+            </div>
           </button>
+
           <button class="m-organ-choice" data-model="spine">
-            <span class="m-o-emoji">🧬</span>
-            <span class="m-o-name">Umurtqa pog'onasi (3D model)</span>
-            <span class="m-o-lat">Columna vertebralis</span>
+            <svg class="react-icon m-choice-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2v20"/><circle cx="12" cy="4" r="2"/><circle cx="12" cy="9" r="2"/><circle cx="12" cy="15" r="2"/><circle cx="12" cy="20" r="2"/><path d="M8 9h8"/><path d="M7 15h10"/><path d="M9 4h6"/>
+            </svg>
+            <div class="m-choice-text">
+              <span class="m-o-name">Umurtqa</span>
+              <span class="m-o-lat">Columna vertebralis</span>
+            </div>
           </button>
+
         </div>
       </div>
     </div>
