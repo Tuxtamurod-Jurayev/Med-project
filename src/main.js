@@ -5,7 +5,7 @@ import { SAMPLE_ANATOMY_IMAGES } from './data/sampleImages.js';
 import { ARCameraManager } from './camera/arCamera.js';
 
 // Application State
-let currentModelKey = 'skull';
+let currentModelKey = 'head_neck';
 let currentMode = 'studio'; // 'studio' | 'camera' | 'image'
 let isXRayMode = false;
 let isShowingPins = true;
@@ -602,4 +602,4 @@ drawerHandle.addEventListener('click', () => {
 });
 
 // Initial Setup
-selectOrgan('skull');
+selectOrgan('head_neck');
