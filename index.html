@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>MedAnatomy 3D — Interaktiv Anatomiya & 3D Qidiruv Atlasi</title>
-  <meta name="description" content="Tibbiyot talabalari uchun 3D modellar, qidiruv va kamera AR anatomiya platformasi" />
+  <title>MedAnatomy — Interaktiv 3D Anatomiya Atlasi</title>
+  <meta name="description" content="Tibbiyot talabalari uchun 3D modellar va interaktiv anatomiya platformasi" />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -15,7 +15,7 @@
 
   <div class="app-container">
 
-    <!-- TOP HEADER -->
+    <!-- TOP HEADER (NO 3D PRO, NO AR SWITCHER) -->
     <header class="app-header">
       <div class="header-left">
         <div class="app-logo">
@@ -26,39 +26,24 @@
             </svg>
           </div>
           <div class="logo-text">
-            <div class="logo-title-row">
-              <span class="brand-name">MedAnatomy</span>
-              <span class="brand-badge">3D • PRO</span>
-            </div>
+            <span class="brand-name">MedAnatomy</span>
             <span class="brand-sub">Interaktiv anatomiya atlasi</span>
           </div>
         </div>
       </div>
 
-      <!-- MAIN MODE SWITCHER (3D STUDIO vs AR KAMERA) -->
-      <div class="header-center">
-        <div class="mode-switch-bar">
-          <button class="mode-tab-btn active" data-mode="studio" id="modeStudioBtn" title="3D Studio rejimi">
-            <svg class="react-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="m21 16-9 5-9-5V8l9-5 9 5v8Z"/>
-              <path d="M3.27 6.96 12 12.01l8.73-5.05"/>
-              <path d="M12 22.08V12"/>
-            </svg>
-            <span class="btn-text">3D Studio</span>
-          </button>
-
-          <button class="mode-tab-btn" data-mode="camera" id="modeCameraBtn" title="Telefon kamerasida AR rejim">
-            <svg class="react-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
-              <circle cx="12" cy="13" r="4"/>
-            </svg>
-            <span class="btn-text">AR Kamera</span>
-          </button>
-        </div>
-      </div>
-
-      <!-- HEADER ACTIONS -->
+      <!-- HEADER RIGHT ACTIONS -->
       <div class="header-right">
+        <!-- Mobile Menu Button (Hamburger) -->
+        <button id="openMobileMenuBtn" class="mobile-menu-trigger-btn" title="Anatomik menyular" aria-label="Menyu">
+          <svg class="react-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="3" y1="12" x2="21" y2="12"/>
+            <line x1="3" y1="6" x2="21" y2="6"/>
+            <line x1="3" y1="18" x2="21" y2="18"/>
+          </svg>
+          <span class="m-trigger-text">Menyular</span>
+        </button>
+
         <!-- Pronounce Latin Name -->
         <button id="speakNameBtn" class="icon-action-btn" title="Lotincha nomini eshitish" aria-label="Talaffuz qilish">
           <svg class="react-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -86,93 +71,33 @@
       </div>
     </header>
 
-    <!-- ANATOMY SEARCH & SYSTEM NAVIGATION BAR (REPLACES HORIZONTAL TAB STRIP) -->
-    <section class="anatomy-search-section" id="anatomySearchSection">
-      <div class="search-bar-container">
-        <!-- Search Input Box -->
-        <div class="search-input-box">
-          <svg class="react-icon search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="11" cy="11" r="8"/>
-            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
-          </svg>
-          <input 
-            type="text" 
-            id="anatomySearchInput" 
-            class="anatomy-search-input" 
-            placeholder="A'zo yoki sistemani qidiring... Masalan: yurak, bosh miya, tishlar, ot pufagi, nerv..."
-            autocomplete="off"
-            spellcheck="false"
-          />
-          <button id="clearSearchBtn" class="clear-search-btn hidden" title="Tozalash" aria-label="Tozalash">
-            <svg class="react-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="18" y1="6" x2="6" y2="18"/>
-              <line x1="6" y1="6" x2="18" y2="18"/>
-            </svg>
-          </button>
-          <span class="search-badge-hint desktop-only" title="Qidiruv tugmasi">/</span>
-        </div>
-
-        <!-- Currently Active Organ Indicator Badge -->
-        <div class="active-badge-display" id="activeBadgeDisplay">
-          <span class="active-dot"></span>
-          <span class="active-label">Faol model:</span>
-          <span class="active-title" id="activeOrganTitle">Bosh miya</span>
-          <span class="active-lat" id="activeOrganLatin">Encephalon</span>
-          <span class="active-sys" id="activeOrganSystem">Nerv sistemasi</span>
-        </div>
+    <!-- ANATOMICAL SYSTEMS MENU BAR (ALL 8 SYSTEMS FROM IMAGE 4) -->
+    <nav class="systems-menu-bar" id="systemsMenuBar">
+      <!-- LEVEL 1: MAIN SYSTEMS TABS -->
+      <div class="systems-tabs-scroll custom-scrollbar" id="systemsTabsList">
+        <button class="sys-menu-btn active" data-system="nervous">Nerv sistemasi</button>
+        <button class="sys-menu-btn" data-system="circulatory">Qon aylanish</button>
+        <button class="sys-menu-btn" data-system="respiratory">Nafas olish</button>
+        <button class="sys-menu-btn" data-system="digestive">Ovqat hazm</button>
+        <button class="sys-menu-btn" data-system="musculoskeletal">Tayanch-harakat</button>
+        <button class="sys-menu-btn" data-system="urinary">Siydik chiqarish</button>
+        <button class="sys-menu-btn" data-system="endocrine">Endokrin</button>
+        <button class="sys-menu-btn" data-system="sensory">Sezgi a'zolari</button>
       </div>
 
-      <!-- Quick System Filter Pills -->
-      <div class="system-chips-row custom-scrollbar" id="systemChipsRow">
-        <button class="sys-chip active" data-system="all">Barchasi (20+)</button>
-        <button class="sys-chip" data-system="nervous">Nerv sistemasi</button>
-        <button class="sys-chip" data-system="circulatory">Qon aylanish</button>
-        <button class="sys-chip" data-system="respiratory">Nafas olish</button>
-        <button class="sys-chip" data-system="digestive">Ovqat hazm</button>
-        <button class="sys-chip" data-system="musculoskeletal">Tayanch-harakat</button>
-        <button class="sys-chip" data-system="urinary">Siydik chiqarish</button>
-        <button class="sys-chip" data-system="endocrine">Endokrin</button>
-        <button class="sys-chip" data-system="sensory">Sezgi a'zolari</button>
+      <!-- LEVEL 2: SPECIFIC SUB-ORGANS ROW -->
+      <div class="sub-organs-bar custom-scrollbar" id="subOrgansBar">
+        <!-- Dynamically injected based on active system -->
       </div>
-
-      <!-- Live Search Results Dropdown -->
-      <div id="searchResultsDropdown" class="search-results-dropdown hidden custom-scrollbar">
-        <!-- Injected dynamically by main.js -->
-      </div>
-    </section>
+    </nav>
 
     <!-- MAIN INTERACTIVE CANVAS & SIDEBAR LAYOUT -->
     <main class="main-content">
 
-      <!-- VIEWPORT (THREE.JS 3D CANVAS + AR CAMERA STREAM) -->
+      <!-- 3D VIEWPORT (CLEAN 3D CANVAS, NO AR OVERLAYS) -->
       <section class="viewport-box" id="viewportContainer">
-
-        <!-- LAYER 1: LIVE AR CAMERA VIDEO (Shown only in Camera mode) -->
-        <video id="cameraFeed" class="bg-feed-video" autoplay playsinline muted></video>
-
-        <!-- LAYER 2: THREE.JS WEBGL 3D CANVAS -->
+        <!-- THREE.JS WEBGL CANVAS CONTAINER -->
         <div id="canvasContainer" class="canvas-3d-wrapper"></div>
-
-        <!-- LAYER 3: AR TARGET RETICLE & LAUNCH BUTTON -->
-        <div id="arReticle" class="ar-reticle-overlay hidden">
-          <div class="reticle-target-box">
-            <div class="reticle-corners"></div>
-            <div class="reticle-crosshair"></div>
-            <div class="reticle-scan-line"></div>
-            <span class="reticle-instruction">Kamerani gavdaga yoki kitobga yo'naltiring</span>
-          </div>
-
-          <button id="btnArDetect" class="btn-ar-detect">
-            <svg class="react-icon ar-btn-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="10"/>
-              <line x1="22" y1="12" x2="18" y2="12"/>
-              <line x1="6" y1="12" x2="2" y2="12"/>
-              <line x1="12" y1="6" x2="12" y2="2"/>
-              <line x1="12" y1="22" x2="12" y2="18"/>
-            </svg>
-            <span class="ar-btn-label">Tanani belgilash & 3D modelni chiqarish</span>
-          </button>
-        </div>
 
         <!-- FLOATING 3D TOOLS (LEFT DOCK) -->
         <div class="floating-tools">
@@ -216,20 +141,6 @@
               <line x1="12" y1="15" x2="12" y2="3"/>
             </svg>
             <span class="t-label">Surat</span>
-          </button>
-        </div>
-
-        <!-- CAMERA CONTROLS BAR (When Camera Mode is active) -->
-        <div id="cameraControlsDock" class="camera-controls-dock hidden">
-          <span class="ctrl-label">Shaffoflik:</span>
-          <input type="range" id="arOpacitySlider" min="0.2" max="1" step="0.05" value="0.9" class="range-slider" />
-          <button id="switchCameraBtn" class="btn-mini" title="Kamerani almashtirish (Old/Orqa)">
-            <svg class="react-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M11 19H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h5"/>
-              <path d="m13 5 4 4-4 4"/>
-              <path d="M21 13v4a2 2 0 0 1-2 2h-5"/>
-              <path d="m11 15-4-4 4-4"/>
-            </svg>
           </button>
         </div>
 
@@ -386,11 +297,11 @@
 
         <!-- Sidebar Footer -->
         <div class="sidebar-footer">
-          <div id="cameraStatusIndicator" class="footer-status">
-            <span class="status-dot"></span>
-            <span>3D Studio Rejimi</span>
+          <div class="footer-status">
+            <span class="status-dot" style="background:#10b981; box-shadow:0 0 8px #10b981;"></span>
+            <span style="color:#10b981; font-weight:700;">3D Studio</span>
           </div>
-          <span class="footer-ver">MedAnatomy 3D Pro</span>
+          <span class="footer-ver">MedAnatomy</span>
         </div>
 
       </aside>
@@ -401,18 +312,11 @@
     <nav class="mobile-bottom-bar">
       <button class="m-nav-item active" id="mNavOrgan">
         <svg class="react-icon m-nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="11" cy="11" r="8"/>
-          <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          <line x1="3" y1="12" x2="21" y2="12"/>
+          <line x1="3" y1="6" x2="21" y2="6"/>
+          <line x1="3" y1="18" x2="21" y2="18"/>
         </svg>
-        <span class="m-nav-label">Qidiruv</span>
-      </button>
-
-      <button class="m-nav-item" id="mNavMode">
-        <svg class="react-icon m-nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
-          <circle cx="12" cy="13" r="4"/>
-        </svg>
-        <span class="m-nav-label">AR Kamera</span>
+        <span class="m-nav-label">Menyular</span>
       </button>
 
       <button class="m-nav-item" id="mNavInfo">
@@ -435,18 +339,18 @@
       </button>
     </nav>
 
-    <!-- MOBILE ORGAN SELECTOR & SEARCH MODAL -->
-    <div id="mobileOrganModal" class="modal-backdrop hidden">
-      <div class="modal-card">
+    <!-- MOBILE FULL-FEATURED ACCORDION DRAWER MENU -->
+    <div id="mobileMenuDrawer" class="modal-backdrop hidden">
+      <div class="mobile-menu-card">
         <div class="modal-header">
           <div class="modal-title-row">
-            <svg class="react-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="11" cy="11" r="8"/>
-              <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            <svg class="react-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+              <circle cx="12" cy="12" r="9"/>
             </svg>
-            <h3>Anatomik A'zolar va Sistemalar:</h3>
+            <h3>Anatomik Tizimlar Menyusi</h3>
           </div>
-          <button id="closeOrganModal" class="btn-close-modal" aria-label="Yopish">
+          <button id="closeMobileMenuBtn" class="btn-close-modal" aria-label="Yopish">
             <svg class="react-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <line x1="18" y1="6" x2="6" y2="18"/>
               <line x1="6" y1="6" x2="18" y2="18"/>
@@ -454,18 +358,8 @@
           </button>
         </div>
 
-        <!-- Mobile search input -->
-        <div class="modal-search-box">
-          <input 
-            type="text" 
-            id="mobileSearchInput" 
-            placeholder="A'zo yoki sistemani yozing..." 
-            autocomplete="off"
-          />
-        </div>
-
-        <div id="mobileOrganGrid" class="modal-organ-grid custom-scrollbar">
-          <!-- Populated dynamically from ANATOMY_DATA -->
+        <div id="mobileSystemsAccordion" class="mobile-systems-accordion custom-scrollbar">
+          <!-- Populated dynamically with all 8 systems and their organs -->
         </div>
       </div>
     </div>

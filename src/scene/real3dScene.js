@@ -34,7 +34,7 @@ export class Real3DSceneManager {
       },
       eye: {
         path: '/models/eye.glb',
-        targetScale: 2.3,
+        targetScale: 2.2,
         yOffset: 0.0
       },
       heart: {
@@ -89,34 +89,41 @@ export class Real3DSceneManager {
 
     this.renderer = new THREE.WebGLRenderer({
       antialias: true,
-      alpha: true,
+      alpha: false,
+      powerPreference: 'high-performance',
       preserveDrawingBuffer: true
     });
     this.renderer.setSize(width, height);
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
     this.renderer.toneMappingExposure = 1.35;
+    this.renderer.outputColorSpace = THREE.SRGBColorSpace;
 
     this.container.appendChild(this.renderer.domElement);
   }
 
   initLights() {
-    this.ambientLight = new THREE.AmbientLight(0xffffff, 1.35);
+    // Ambient light - balanced illumination so no angle is pitch black
+    this.ambientLight = new THREE.AmbientLight(0xffffff, 1.4);
     this.scene.add(this.ambientLight);
 
-    this.hemiLight = new THREE.HemisphereLight(0xffffff, 0x1e293b, 1.2);
+    // Hemisphere light - subtle sky/ground natural tone
+    this.hemiLight = new THREE.HemisphereLight(0xffffff, 0x1e293b, 1.25);
     this.hemiLight.position.set(0, 20, 0);
     this.scene.add(this.hemiLight);
 
-    this.keyLight = new THREE.DirectionalLight(0xffffff, 2.5);
+    // Key front light
+    this.keyLight = new THREE.DirectionalLight(0xffffff, 2.4);
     this.keyLight.position.set(6, 8, 7);
     this.scene.add(this.keyLight);
 
-    this.fillLight = new THREE.DirectionalLight(0x38bdf8, 1.4);
-    this.fillLight.position.set(-6, 2, -4);
+    // Fill side light (soft cool blue)
+    this.fillLight = new THREE.DirectionalLight(0x93c5fd, 1.3);
+    this.fillLight.position.set(-6, 3, 4);
     this.scene.add(this.fillLight);
 
-    this.rimLight = new THREE.DirectionalLight(0xfef08a, 1.35);
+    // Rim back light for crisp edges
+    this.rimLight = new THREE.DirectionalLight(0xfef08a, 1.15);
     this.rimLight.position.set(0, -6, -5);
     this.scene.add(this.rimLight);
   }
@@ -131,7 +138,7 @@ export class Real3DSceneManager {
   }
 
   /**
-   * Load any 3D model (GLB or Procedural)
+   * Load any 3D model (GLB file or Procedural 3D model)
    */
   async loadModel(key) {
     this.currentModelKey = key;
@@ -144,7 +151,7 @@ export class Real3DSceneManager {
 
     this.onProgress(true, `3D model yuklanmoqda...`);
 
-    // Check if a GLB configuration exists
+    // 1. Try GLB if configured
     if (this.modelConfigs[key]) {
       try {
         const pivotGroup = await this.loadGLBModel(key);
@@ -157,7 +164,7 @@ export class Real3DSceneManager {
       }
     }
 
-    // Load Procedural Model
+    // 2. Load Procedural 3D Model
     if (PROCEDURAL_MODEL_BUILDERS[key]) {
       try {
         const pivotGroup = this.loadProceduralModel(key);
@@ -174,7 +181,7 @@ export class Real3DSceneManager {
   }
 
   /**
-   * Loads and enhances a GLB model with anatomical materials & tissue coloring
+   * Loads a GLB model and applies precise anatomical shader corrections
    */
   async loadGLBModel(key) {
     const cfg = this.modelConfigs[key];
@@ -195,24 +202,27 @@ export class Real3DSceneManager {
 
     const modelRoot = gltf.scene;
 
-    // Normalize Bounding Box
+    // Apply specialized Medical PBR Colorizing & Texture Preservations
+    this.colorizeModelTissues(modelRoot, key);
+
+    // Normalize Bounding Box and Center at (0, 0, 0)
+    modelRoot.updateMatrixWorld(true);
     const bbox = new THREE.Box3().setFromObject(modelRoot);
     const size = bbox.getSize(new THREE.Vector3());
     const center = bbox.getCenter(new THREE.Vector3());
 
-    const maxDim = Math.max(size.x, size.y, size.z);
-    const scale = (cfg.targetScale || 2.0) / maxDim;
+    const maxDim = Math.max(size.x, size.y, size.z) || 1.0;
+    const scale = (cfg.targetScale || 2.2) / maxDim;
     modelRoot.scale.set(scale, scale, scale);
 
-    modelRoot.position.x = -center.x * scale;
-    modelRoot.position.y = -center.y * scale + (cfg.yOffset || 0);
-    modelRoot.position.z = -center.z * scale;
+    modelRoot.position.set(
+      -center.x * scale,
+      -center.y * scale + (cfg.yOffset || 0),
+      -center.z * scale
+    );
 
     const pivotGroup = new THREE.Group();
     pivotGroup.add(modelRoot);
-
-    // Apply specialized Medical PBR Colorizing
-    this.colorizeModelTissues(pivotGroup, key);
 
     return pivotGroup;
   }
@@ -224,19 +234,22 @@ export class Real3DSceneManager {
     const builderFn = PROCEDURAL_MODEL_BUILDERS[key];
     const modelRoot = builderFn();
 
-    // Normalize Bounding Box
+    // Normalize Bounding Box and Center at (0, 0, 0)
+    modelRoot.updateMatrixWorld(true);
     const bbox = new THREE.Box3().setFromObject(modelRoot);
     const size = bbox.getSize(new THREE.Vector3());
     const center = bbox.getCenter(new THREE.Vector3());
 
-    const maxDim = Math.max(size.x, size.y, size.z) || 2.0;
+    const maxDim = Math.max(size.x, size.y, size.z) || 1.0;
     const targetScale = 2.2;
     const scale = targetScale / maxDim;
     modelRoot.scale.set(scale, scale, scale);
 
-    modelRoot.position.x = -center.x * scale;
-    modelRoot.position.y = -center.y * scale;
-    modelRoot.position.z = -center.z * scale;
+    modelRoot.position.set(
+      -center.x * scale,
+      -center.y * scale,
+      -center.z * scale
+    );
 
     const pivotGroup = new THREE.Group();
     pivotGroup.add(modelRoot);
@@ -245,6 +258,9 @@ export class Real3DSceneManager {
       if (child.isMesh && child.material) {
         child.castShadow = true;
         child.receiveShadow = true;
+        if (child.material.metalness !== undefined) {
+          child.material.metalness = Math.min(child.material.metalness, 0.15);
+        }
       }
     });
 
@@ -252,27 +268,28 @@ export class Real3DSceneManager {
   }
 
   /**
-   * Colorizes anatomical tissues for Brain, Skull, Eye, Heart, and Organs
+   * Anatomically accurate shading & tissue coloring without stripping textures
    */
   colorizeModelTissues(group, key) {
     if (key === 'brain') {
-      // Vivid anatomical coloring for brain lobes & structures
+      // Natural medical atlas colors for distinct cerebral lobes & structures
       const brainLobeColors = {
-        'Frontal lobe': { color: 0x2563eb, roughness: 0.4, metalness: 0.05 }, // Royal Blue (Peshona bo'lagi)
-        'Parietal lobe': { color: 0x10b981, roughness: 0.4, metalness: 0.05 }, // Emerald Green (Tepa bo'lagi)
-        'Occipital lobe': { color: 0xf59e0b, roughness: 0.4, metalness: 0.05 }, // Amber / Gold (Ensa bo'lagi)
-        'Temporal lobe': { color: 0x8b5cf6, roughness: 0.4, metalness: 0.05 }, // Violet / Purple (Chakka bo'lagi)
-        'Cerebellum': { color: 0xef4444, roughness: 0.42, metalness: 0.05 }, // Coral Red (Miyacha)
-        'White matter': { color: 0xf8fafc, roughness: 0.35, metalness: 0.05 }, // Pearl White
-        'Nerve': { color: 0xfacc15, roughness: 0.25, metalness: 0.1, emissive: 0xca8a04, emissiveIntensity: 0.3 }, // Glowing Nerve Yellow
-        'Brain-Inner': { color: 0xec4899, roughness: 0.4, metalness: 0.05 }, // Deep Rose Pink
-        'Insula': { color: 0x06b6d4, roughness: 0.4, metalness: 0.05 }, // Cyan
-        'Limbic lobe': { color: 0x14b8a6, roughness: 0.4, metalness: 0.05 }, // Teal
-        'Nucleus': { color: 0xf97316, roughness: 0.35, metalness: 0.08 },
-        'Nucleus (afferent fibers)': { color: 0xe11d48, roughness: 0.35, metalness: 0.08 },
-        'Nucleus (efferent fibers)': { color: 0x0284c7, roughness: 0.35, metalness: 0.08 },
-        'LCR': { color: 0x93c5fd, roughness: 0.15, metalness: 0.1, transparent: true, opacity: 0.75 },
-        'Brain': { color: 0x38bdf8, roughness: 0.4, metalness: 0.05 }
+        'Frontal lobe': { color: 0x38bdf8, roughness: 0.4 }, // Soft Cerulean Blue (Peshona bo'lagi)
+        'Parietal lobe': { color: 0x34d399, roughness: 0.4 }, // Pastel Emerald Green (Tepa bo'lagi)
+        'Occipital lobe': { color: 0xfbbf24, roughness: 0.4 }, // Warm Amber Gold (Ensa bo'lagi)
+        'Temporal lobe': { color: 0xa78bfa, roughness: 0.4 }, // Soft Lavender Purple (Chakka bo'lagi)
+        'Cerebellum': { color: 0xf87171, roughness: 0.42 }, // Anatomical Coral Red (Miyacha)
+        'White matter': { color: 0xf8fafc, roughness: 0.35 }, // Pearl White
+        'Nerve': { color: 0xfacc15, roughness: 0.25, emissive: 0xca8a04, emissiveIntensity: 0.3 }, // Bright golden nerves
+        'Brain-Inner': { color: 0xf5d0c5, roughness: 0.45 }, // Natural deep cerebral tissue flesh tone
+        'Insula': { color: 0x22d3ee, roughness: 0.4 }, // Cyan
+        'Limbic lobe': { color: 0x2dd4bf, roughness: 0.4 }, // Teal
+        'Nucleus': { color: 0xfb923c, roughness: 0.38 }, // Soft Orange
+        'Nucleus (afferent fibers)': { color: 0xf43f5e, roughness: 0.38 },
+        'Nucleus (efferent fibers)': { color: 0x0ea5e9, roughness: 0.38 },
+        'LCR': { color: 0x7dd3fc, roughness: 0.15, transparent: true, opacity: 0.65, depthWrite: false },
+        'Interlobar sulci': { color: 0x334155, roughness: 0.6 },
+        'Brain': { color: 0xf1e5df, roughness: 0.42 }
       };
 
       group.traverse((child) => {
@@ -285,25 +302,28 @@ export class Real3DSceneManager {
             child.material = new THREE.MeshStandardMaterial({
               color: cfg.color,
               roughness: cfg.roughness,
-              metalness: cfg.metalness,
+              metalness: 0.05,
               emissive: cfg.emissive || 0x000000,
               emissiveIntensity: cfg.emissiveIntensity || 0,
               transparent: !!cfg.transparent,
-              opacity: cfg.opacity || 1.0
+              opacity: cfg.opacity || 1.0,
+              depthWrite: cfg.depthWrite !== undefined ? cfg.depthWrite : true,
+              side: THREE.DoubleSide
             });
           } else if (nodeName.includes('medulla') || nodeName.includes('pons') || nodeName.includes('stem') || nodeName.includes('pyramid')) {
             // Brainstem / Medulla Oblongata
             child.material = new THREE.MeshStandardMaterial({
               color: 0xfef08a,
-              roughness: 0.38,
-              metalness: 0.05
+              roughness: 0.4,
+              metalness: 0.05,
+              side: THREE.DoubleSide
             });
           } else {
-            // Default soft cortical hue
             child.material = new THREE.MeshStandardMaterial({
-              color: 0x38bdf8,
-              roughness: 0.4,
-              metalness: 0.05
+              color: 0xf1e5df,
+              roughness: 0.42,
+              metalness: 0.05,
+              side: THREE.DoubleSide
             });
           }
           child.castShadow = true;
@@ -311,41 +331,56 @@ export class Real3DSceneManager {
         }
       });
     } else if (key === 'skull') {
-      // Natural warm ivory bone shading with organic depth
+      // Natural warm ivory bone osteo-material
       group.traverse((child) => {
         if (child.isMesh && child.material) {
           child.material = new THREE.MeshStandardMaterial({
-            color: 0xf6efe2,
-            roughness: 0.42,
-            metalness: 0.08
+            color: 0xf5eedb,
+            roughness: 0.45,
+            metalness: 0.05,
+            side: THREE.DoubleSide
           });
           child.castShadow = true;
           child.receiveShadow = true;
         }
       });
     } else if (key === 'eye') {
-      // Vivid Ocular Tissues: Cornea glass, Sapphire Iris, Clean Sclera
+      // Correct ocular shaders: crystal clear glass cornea with depthWrite=false so textured eye shines through!
       group.traverse((child) => {
         if (child.isMesh && child.material) {
           const matName = child.material.name || '';
           if (matName.toLowerCase().includes('glass') || child.name.toLowerCase().includes('glass')) {
-            child.material = new THREE.MeshPhysicalMaterial({
+            child.material = new THREE.MeshStandardMaterial({
               color: 0xffffff,
               transparent: true,
-              opacity: 0.32,
+              opacity: 0.16,
               roughness: 0.05,
-              transmission: 0.9,
-              ior: 1.376
+              metalness: 0.0,
+              depthWrite: false, // Essential: never occlude inner eye!
+              side: THREE.FrontSide
             });
           } else {
-            child.material.roughness = Math.max(child.material.roughness, 0.25);
-            child.material.metalness = Math.min(child.material.metalness || 0, 0.1);
+            // Inner eyeball (with high-res baked iris, pupil and sclera texture)
+            if (child.material.map) {
+              child.material.roughness = 0.25;
+              child.material.metalness = 0.0;
+              child.material.depthWrite = true;
+              child.material.side = THREE.DoubleSide;
+              child.material.needsUpdate = true;
+            } else {
+              child.material = new THREE.MeshStandardMaterial({
+                color: 0xf8fafc,
+                roughness: 0.25,
+                metalness: 0.0,
+                side: THREE.DoubleSide
+              });
+            }
           }
           child.castShadow = true;
         }
       });
     } else if (key === 'heart') {
-      // Optimized Cardiology: Aorta Red, Vena Cava Blue, Pulmonary Cyan, Muscle Crimson
+      // Cardiology: Aorta arterial red, Pulmonary trunk cyan-blue, Myocardium rich crimson, Valves pearl white
       group.traverse((child) => {
         if (child.isMesh && child.material) {
           const matName = child.material.name || '';
@@ -353,52 +388,76 @@ export class Real3DSceneManager {
 
           if (matName === 'Artery' || nodeName.includes('aorta') || nodeName.includes('artery')) {
             child.material = new THREE.MeshStandardMaterial({
-              color: 0xdc2626, // Vivid Arterial Red
+              color: 0xdc2626, // Arterial red
               roughness: 0.28,
-              metalness: 0.15
+              metalness: 0.1,
+              side: THREE.DoubleSide
             });
           } else if (matName === 'Pulmonary artery' || nodeName.includes('pulmonary')) {
             child.material = new THREE.MeshStandardMaterial({
-              color: 0x0284c7, // Cyan-Blue
+              color: 0x0284c7, // Cyan-blue
               roughness: 0.3,
-              metalness: 0.12
+              metalness: 0.1,
+              side: THREE.DoubleSide
             });
-          } else if (nodeName.includes('vena') || nodeName.includes('vein')) {
+          } else if (matName === 'Trapezius.001' || nodeName.includes('ventricle') || nodeName.includes('atrium')) {
             child.material = new THREE.MeshStandardMaterial({
-              color: 0x1d4ed8, // Royal Blue
-              roughness: 0.28,
-              metalness: 0.15
+              color: 0x991b1b, // Rich Myocardium crimson
+              roughness: 0.35,
+              metalness: 0.08,
+              side: THREE.DoubleSide
             });
-          } else if (matName === 'Trapezius.001' || nodeName.includes('ventricle') || nodeName.includes('surface')) {
+          } else if (matName === 'Ligament.002' || matName === 'Cartilage.002' || nodeName.includes('valve') || nodeName.includes('leaflet')) {
             child.material = new THREE.MeshStandardMaterial({
-              color: 0x991b1b, // Rich Myocardium Crimson
-              roughness: 0.32,
-              metalness: 0.1
-            });
-          } else if (matName === 'Ligament.002' || matName === 'Cartilage.002') {
-            child.material = new THREE.MeshStandardMaterial({
-              color: 0xf1f5f9,
+              color: 0xf8fafc, // Pearl white valve leaflets
               roughness: 0.25,
-              metalness: 0.05
+              metalness: 0.05,
+              side: THREE.DoubleSide
             });
           } else {
             child.material.roughness = 0.35;
+            child.material.side = THREE.DoubleSide;
           }
           child.castShadow = true;
           child.receiveShadow = true;
         }
       });
     } else {
-      // General PBR optimization
+      // For all models with textures (lung, liver, stomach): PRESERVE TEXTURES & optimize PBR!
       group.traverse((child) => {
         if (child.isMesh && child.material) {
           child.castShadow = true;
           child.receiveShadow = true;
-          if (child.material.metalness !== undefined) {
-            child.material.metalness = Math.min(child.material.metalness, 0.2);
-          }
-          if (child.material.roughness !== undefined) {
-            child.material.roughness = Math.max(child.material.roughness, 0.35);
+
+          if (child.material.map) {
+            // High-res texture present: keep it, fix lighting & side!
+            child.material.roughness = 0.38;
+            child.material.metalness = 0.05;
+            child.material.side = THREE.DoubleSide;
+            if (child.material.color) {
+              child.material.color.setHex(0xffffff); // Neutral base so texture colors show purely
+            }
+            child.material.needsUpdate = true;
+          } else {
+            // Procedural bone or tissue fallback
+            if (key === 'spine') {
+              child.material = new THREE.MeshStandardMaterial({
+                color: 0xf6efe2,
+                roughness: 0.42,
+                metalness: 0.05,
+                side: THREE.DoubleSide
+              });
+            } else if (key === 'kidney') {
+              child.material = new THREE.MeshStandardMaterial({
+                color: 0x881337,
+                roughness: 0.35,
+                metalness: 0.05,
+                side: THREE.DoubleSide
+              });
+            } else {
+              child.material.roughness = 0.35;
+              child.material.side = THREE.DoubleSide;
+            }
           }
         }
       });
@@ -417,16 +476,6 @@ export class Real3DSceneManager {
     this.applyXRayState();
     this.applyWireframeState();
     this.resetCamera();
-  }
-
-  setTransparentBackground(isTransparent) {
-    if (isTransparent) {
-      this.scene.background = null;
-      this.renderer.setClearColor(0x000000, 0);
-    } else {
-      this.scene.background = new THREE.Color(0x060a14);
-      this.renderer.setClearColor(0x060a14, 1);
-    }
   }
 
   toggleXRay() {
