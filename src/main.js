@@ -11,15 +11,15 @@ const SYSTEM_ORGANS_MAP = {
   respiratory: {
     title: 'Nafas olish',
     organs: [
-      { id: 'lung', label: "O'pka (3D Anatomiya)" },
+      { id: 'lung', label: "O'pka" },
       { id: 'larynx_vocal_cords', label: "Hiqildoq va ovoz boylamlari" },
-      { id: 'trachea_bronchi', label: "Traxeya va bronxlar daraxti" }
+      { id: 'trachea_bronchi', label: "Traxeya va bronxlar" }
     ]
   },
   digestive: {
     title: 'Ovqat hazm',
     organs: [
-      { id: 'gallbladder', label: "O't pufagi va o't yo'llari" },
+      { id: 'gallbladder', label: "O't pufagi va yo'llari" },
       { id: 'esophagus_pharynx', label: "Qizilo'ngach va halqum" },
       { id: 'salivary_glands', label: "So'lak bezlari" },
       { id: 'small_intestine', label: "Ingichka ichak" },
@@ -27,23 +27,23 @@ const SYSTEM_ORGANS_MAP = {
       { id: 'stomach', label: "Oshqozon" },
       { id: 'liver', label: "Jigar" },
       { id: 'pancreas', label: "Oshqozon osti bezi" },
-      { id: 'oral_cavity', label: "Og'iz bo'shlig'i va tishlar" }
+      { id: 'oral_cavity', label: "Og'iz bo'shlig'i" }
     ]
   },
   sensory: {
     title: 'Sezgi a\'zolari',
     organs: [
-      { id: 'eye_layers', label: "Ko'z olmasi ichki qatlamlari" },
-      { id: 'ear', label: "Quloq (tashqi, o'rta, ichki)" },
-      { id: 'skin_layers', label: "Teri qatlamlari va soch" },
-      { id: 'eye', label: "Ko'z olmasi (Tashqi tuzilishi)" }
+      { id: 'eye_layers', label: "Ko'z qatlamlari" },
+      { id: 'ear', label: "Quloq" },
+      { id: 'skin_layers', label: "Teri qatlamlari" },
+      { id: 'eye', label: "Ko'z olmasi" }
     ]
   },
   nervous: {
     title: 'Nerv sistemasi',
     organs: [
       { id: 'brain', label: "Bosh miya" },
-      { id: 'nervous_system', label: "Yaxlit nerv tizimi" },
+      { id: 'nervous_system', label: "Nerv sistemasi" },
       { id: 'spine', label: "Umurtqa pog'onasi" }
     ]
   },
@@ -65,30 +65,30 @@ const SYSTEM_ORGANS_MAP = {
   urinary: {
     title: 'Siydik chiqarish',
     organs: [
-      { id: 'kidney', label: "Buyraklar (kesimi va nefron)" },
-      { id: 'ureters', label: "Siydik naylari (ureterlar)" },
+      { id: 'kidney', label: "Buyraklar" },
+      { id: 'ureters', label: "Siydik naylari" },
       { id: 'bladder_urethra', label: "Qovuq va uretra" },
-      { id: 'urinary_system', label: "Yaxlit siydik tizimi" }
+      { id: 'urinary_system', label: "Siydik chiqarish sistemasi" }
     ]
   },
   lymphatic: {
     title: 'Limfa va immun',
     organs: [
-      { id: 'lymphatic_system', label: "Taloq va limfa tarmog'i" }
+      { id: 'lymphatic_system', label: "Limfa va immun sistemasi" }
     ]
   },
   microbiology: {
     title: 'Hujayra va mikro',
     organs: [
-      { id: 'cell_structure', label: "Hujayra tuzilishi (organellalar)" },
-      { id: 'dna_helix', label: "DNK qo'sh spirali" },
-      { id: 'blood_cells', label: "Qon hujayralari (eritrotsit, leykotsit)" }
+      { id: 'cell_structure', label: "Hujayra tuzilishi" },
+      { id: 'dna_helix', label: "DNK spirali" },
+      { id: 'blood_cells', label: "Qon hujayralari" }
     ]
   },
   endocrine: {
     title: 'Endokrin',
     organs: [
-      { id: 'endocrine_system', label: "Endokrin bezlar" },
+      { id: 'endocrine_system', label: "Endokrin sistema" },
       { id: 'pancreas', label: "Oshqozon osti bezi" }
     ]
   }
@@ -127,6 +127,11 @@ const openMobileMenuBtn = document.getElementById('openMobileMenuBtn');
 const closeMobileMenuBtn = document.getElementById('closeMobileMenuBtn');
 const mobileMenuDrawer = document.getElementById('mobileMenuDrawer');
 const mobileSystemsAccordion = document.getElementById('mobileSystemsAccordion');
+
+// Mobile Bottom Navigation Tabs (Ko'rinishi, Tuzilishi, Kasalliklar)
+const mobTab3D = document.getElementById('mobTab3D');
+const mobTabStructure = document.getElementById('mobTabStructure');
+const mobTabDiseases = document.getElementById('mobTabDiseases');
 
 // 3D Tool Buttons
 const resetCamBtn = document.getElementById('resetCamBtn');
@@ -182,7 +187,7 @@ function updateFloatingBadge(data) {
     badgeModelName.textContent = data.nameUz;
   }
   if (badgeModelLat && data) {
-    badgeModelLat.textContent = `${data.nameLat} • 3D Anatomiya`;
+    badgeModelLat.textContent = data.nameLat;
   }
 }
 
@@ -193,7 +198,11 @@ function updateSystemsTabsUI() {
   if (!systemsTabsList) return;
   const tabs = systemsTabsList.querySelectorAll('.sys-menu-btn');
   tabs.forEach(tab => {
-    tab.classList.toggle('active', tab.getAttribute('data-system') === activeSystemKey);
+    const isActive = tab.getAttribute('data-system') === activeSystemKey;
+    tab.classList.toggle('active', isActive);
+    if (isActive) {
+      tab.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+    }
   });
 }
 
@@ -230,7 +239,8 @@ function renderSubOrgansBar() {
 
   sysConfig.organs.forEach(organ => {
     const chip = document.createElement('button');
-    chip.className = `sub-organ-chip ${organ.id === currentModelKey ? 'active' : ''}`;
+    const isActive = organ.id === currentModelKey;
+    chip.className = `sub-organ-chip ${isActive ? 'active' : ''}`;
     chip.setAttribute('data-id', organ.id);
     chip.textContent = organ.label;
 
@@ -239,6 +249,9 @@ function renderSubOrgansBar() {
     });
 
     subOrgansBar.appendChild(chip);
+    if (isActive) {
+      chip.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+    }
   });
 }
 
@@ -386,7 +399,7 @@ function updateInfoSidebar(data) {
   if (!data) return;
   if (organCategory) organCategory.textContent = data.category || data.system || "Anatomiya";
   if (organNameUz) organNameUz.textContent = data.nameUz;
-  if (organNameLat) organNameLat.textContent = `${data.nameLat} • 3D Anatomiya`;
+  if (organNameLat) organNameLat.textContent = data.nameLat;
   if (organDescription) organDescription.textContent = data.description || "Ushbu a'zo haqida aniq tibbiy ma'lumot.";
 
   renderParts(data.parts || []);
@@ -467,13 +480,55 @@ function renderClinical(clinical) {
 }
 
 /**
+ * MOBILE BOTTOM NAVIGATION (3 TABS) & SIDEBAR DRAWER CONTROLLER
+ */
+function setMobileNavActive(activeView) {
+  if (mobTab3D) mobTab3D.classList.toggle('active', activeView === '3d');
+  if (mobTabStructure) mobTabStructure.classList.toggle('active', activeView === 'structure');
+  if (mobTabDiseases) mobTabDiseases.classList.toggle('active', activeView === 'diseases');
+}
+
+function switchSidebarTab(tabKey) {
+  const tabParts = document.getElementById('tabParts');
+  const tabClinical = document.getElementById('tabClinical');
+
+  if (navSTabs && navSTabs.length > 0) {
+    navSTabs.forEach(t => {
+      const match = t.getAttribute('data-tab') === tabKey;
+      t.classList.toggle('active', match);
+    });
+  }
+
+  if (tabKey === 'parts') {
+    if (tabParts) tabParts.classList.remove('hidden');
+    if (tabClinical) tabClinical.classList.add('hidden');
+    setMobileNavActive('structure');
+  } else if (tabKey === 'clinical') {
+    if (tabParts) tabParts.classList.add('hidden');
+    if (tabClinical) tabClinical.classList.remove('hidden');
+    setMobileNavActive('diseases');
+  }
+}
+
+/**
  * TOGGLE SIDEBAR / DRAWER
  */
 function toggleInfoSidebar() {
   if (!infoSidebar) return;
   const isMobile = window.innerWidth <= 900;
   if (isMobile) {
-    infoSidebar.classList.toggle('open-drawer');
+    const willOpen = !infoSidebar.classList.contains('open-drawer');
+    infoSidebar.classList.toggle('open-drawer', willOpen);
+    if (!willOpen) {
+      setMobileNavActive('3d');
+    } else {
+      const tabClinical = document.getElementById('tabClinical');
+      if (tabClinical && !tabClinical.classList.contains('hidden')) {
+        setMobileNavActive('diseases');
+      } else {
+        setMobileNavActive('structure');
+      }
+    }
   } else {
     infoSidebar.classList.toggle('hidden-sidebar');
     setTimeout(() => sceneManager.onResize(), 150);
@@ -484,6 +539,7 @@ function closeInfoSidebar() {
   if (!infoSidebar) return;
   infoSidebar.classList.remove('open-drawer');
   infoSidebar.classList.add('hidden-sidebar');
+  setMobileNavActive('3d');
   setTimeout(() => sceneManager.onResize(), 150);
 }
 
@@ -514,21 +570,39 @@ if (modelFloatingBadge) {
 if (navSTabs && navSTabs.length > 0) {
   navSTabs.forEach(tab => {
     tab.addEventListener('click', () => {
-      navSTabs.forEach(t => t.classList.remove('active'));
-      tab.classList.add('active');
-
       const tabKey = tab.getAttribute('data-tab');
-      const tabParts = document.getElementById('tabParts');
-      const tabClinical = document.getElementById('tabClinical');
-
-      if (tabKey === 'parts') {
-        if (tabParts) tabParts.classList.remove('hidden');
-        if (tabClinical) tabClinical.classList.add('hidden');
-      } else {
-        if (tabParts) tabParts.classList.add('hidden');
-        if (tabClinical) tabClinical.classList.remove('hidden');
-      }
+      switchSidebarTab(tabKey);
     });
+  });
+}
+
+// Mobile Bottom Navigation Buttons
+if (mobTab3D) {
+  mobTab3D.addEventListener('click', () => {
+    if (infoSidebar) {
+      infoSidebar.classList.remove('open-drawer');
+    }
+    setMobileNavActive('3d');
+  });
+}
+
+if (mobTabStructure) {
+  mobTabStructure.addEventListener('click', () => {
+    if (infoSidebar) {
+      infoSidebar.classList.remove('hidden-sidebar');
+      infoSidebar.classList.add('open-drawer');
+    }
+    switchSidebarTab('parts');
+  });
+}
+
+if (mobTabDiseases) {
+  mobTabDiseases.addEventListener('click', () => {
+    if (infoSidebar) {
+      infoSidebar.classList.remove('hidden-sidebar');
+      infoSidebar.classList.add('open-drawer');
+    }
+    switchSidebarTab('clinical');
   });
 }
 

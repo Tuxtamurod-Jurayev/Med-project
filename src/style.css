@@ -240,15 +240,15 @@ html, body {
   gap: 8px;
 }
 
-/* LEVEL 1: MAIN SYSTEM TABS (MATCHING USER SCREENSHOT EXACTLY) */
+/* LEVEL 1: MAIN SYSTEM TABS (OPTIMIZED FOR RESPONSIVE SCROLL) */
 .systems-tabs-scroll {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 10px;
   overflow-x: auto;
   white-space: nowrap;
-  padding: 4px 4px;
+  padding: 4px 6px;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
   -ms-overflow-style: none;
@@ -262,7 +262,7 @@ html, body {
   background: #111a2e;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: var(--radius-full);
-  padding: 8px 20px;
+  padding: 8px 18px;
   font-size: 13.5px;
   font-weight: 600;
   color: #94a3b8;
@@ -292,11 +292,11 @@ html, body {
 .sub-organs-bar {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 8px;
   overflow-x: auto;
   white-space: nowrap;
-  padding: 2px 0 4px 0;
+  padding: 2px 6px 4px;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
   -ms-overflow-style: none;
@@ -1328,6 +1328,10 @@ html, body {
 /* ==========================================================================
    6. RESPONSIVE BREAKPOINTS (MOBILE & TABLET ADAPTATION)
    ========================================================================== */
+.mobile-bottom-nav {
+  display: none;
+}
+
 @media (max-width: 900px) {
   :root {
     --header-height: 54px;
@@ -1337,14 +1341,33 @@ html, body {
     display: none !important;
   }
 
-  /* Level 2 Sub-organs chips bar hidden on mobile as requested */
-  .sub-organs-bar {
-    display: none !important;
+  /* Level 1 & 2 Systems tabs and sub-organs horizontal scroll */
+  .systems-menu-bar {
+    padding: 8px 8px 6px;
+    gap: 6px;
   }
 
-  .systems-menu-bar {
-    padding: 8px 10px 8px;
-    gap: 0;
+  .systems-tabs-scroll {
+    justify-content: flex-start;
+    gap: 8px;
+    padding: 2px 4px;
+  }
+
+  .sys-menu-btn {
+    padding: 6px 14px;
+    font-size: 12.5px;
+  }
+
+  .sub-organs-bar {
+    display: flex !important;
+    justify-content: flex-start;
+    gap: 6px;
+    padding: 2px 4px 4px;
+  }
+
+  .sub-organ-chip {
+    padding: 4px 12px;
+    font-size: 11.5px;
   }
 
   .mobile-menu-trigger-btn {
@@ -1365,22 +1388,26 @@ html, body {
     height: auto;
     min-height: 0;
     flex: 1;
+    padding-bottom: 60px; /* Space for fixed bottom nav */
   }
 
-  /* Info sidebar becomes bottom sheet drawer */
+  /* Info sidebar becomes bottom sheet drawer sitting above the bottom nav */
   .info-sidebar {
-    position: absolute;
-    bottom: 0;
+    position: fixed;
+    bottom: 60px;
     left: 0;
+    right: 0;
     width: 100%;
-    height: 65vh;
+    height: calc(75vh - 60px);
+    max-height: 580px;
     border-left: none;
-    border-top: 1px solid var(--border-card);
-    border-top-left-radius: var(--radius-lg);
-    border-top-right-radius: var(--radius-lg);
-    box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.6);
-    transform: translateY(105%);
-    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    border-top: 1px solid rgba(56, 189, 248, 0.35);
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.75);
+    transform: translateY(120%);
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 55;
   }
 
   .info-sidebar.open-drawer {
@@ -1395,9 +1422,96 @@ html, body {
     display: block;
   }
 
-  .mobile-bottom-bar {
+  /* MOBILE FOOTER NAVIGATION BAR (3 TABS) */
+  .mobile-bottom-nav {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    background: rgba(9, 15, 28, 0.96);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+    z-index: 60;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
+  }
+
+  .mob-bottom-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    background: transparent;
+    border: none;
+    color: #94a3b8;
+    font-size: 11px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .mob-bottom-btn .react-icon {
+    width: 20px;
+    height: 20px;
+    transition: transform 0.2s ease, color 0.2s ease;
+  }
+
+  .mob-bottom-btn:active {
+    transform: scale(0.94);
+  }
+
+  .mob-bottom-btn.active {
+    color: #38bdf8;
+    font-weight: 700;
+  }
+
+  .mob-bottom-btn.active::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 20%;
+    right: 20%;
+    height: 3px;
+    background: linear-gradient(90deg, #0284c7, #38bdf8);
+    border-radius: 0 0 4px 4px;
+    box-shadow: 0 0 10px #38bdf8;
+  }
+
+  .mob-bottom-btn.active .react-icon {
+    color: #38bdf8;
+    filter: drop-shadow(0 0 8px rgba(56, 189, 248, 0.6));
+  }
+
+  /* Floating badges & tools mobile scaling */
+  .model-floating-badge {
+    top: 10px;
+    right: 10px;
+    padding: 6px 12px;
+    gap: 8px;
+    max-width: 50vw;
+  }
+
+  .model-floating-badge .badge-title {
+    font-size: 12px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .model-floating-badge .badge-lat {
+    font-size: 10px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .floating-tools {
@@ -1417,7 +1531,7 @@ html, body {
 
   .touch-hint {
     font-size: 10px;
-    bottom: 8px;
+    bottom: 68px;
     max-width: 90%;
     overflow: hidden;
     text-overflow: ellipsis;

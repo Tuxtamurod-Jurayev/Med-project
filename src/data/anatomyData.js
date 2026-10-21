@@ -185,7 +185,7 @@ export const ANATOMY_DATA = {
   // 4. QON AYLANISH / YURAK
   heart: {
     id: "heart",
-    nameUz: "Inson yuragi (Optimallashtirilgan)",
+    nameUz: "Inson yuragi",
     nameLat: "Cor",
     nameEn: "Human Heart 3D Optimized",
     systemKey: "circulatory",
@@ -308,7 +308,7 @@ export const ANATOMY_DATA = {
   // 7. OVQAT HAZM / OG'IZ BO'SHLIG'I (TISHLAR, TIL)
   oral_cavity: {
     id: "oral_cavity",
-    nameUz: "Og'iz bo'shlig'i: Tishlar va Til",
+    nameUz: "Og'iz bo'shlig'i",
     nameLat: "Cavitas oris, Dentes et Lingua",
     nameEn: "Oral Cavity, Teeth & Tongue 3D",
     systemKey: "digestive",
@@ -350,7 +350,7 @@ export const ANATOMY_DATA = {
   // 8. TAYANCH-HARAKAT / BARMOG'LAR VA QO'L TUZILISHI
   hand_fingers: {
     id: "hand_fingers",
-    nameUz: "Barmoqlar va qo'l panjasi tuzilishi",
+    nameUz: "Panja va barmoqlar",
     nameLat: "Digiti manus & Skeleton manus",
     nameEn: "Hand & Finger Anatomy 3D",
     systemKey: "musculoskeletal",
@@ -391,7 +391,7 @@ export const ANATOMY_DATA = {
   // 9. NERV SISTEMASI / TO'LIQ TIZIM
   nervous_system: {
     id: "nervous_system",
-    nameUz: "Nerv sistemasi (To'liq tizim)",
+    nameUz: "Nerv sistemasi",
     nameLat: "Systema nervosum",
     nameEn: "Human Nervous System 3D",
     systemKey: "nervous",
@@ -431,7 +431,7 @@ export const ANATOMY_DATA = {
   // 10. QON AYLANISH SISTEMASI / TO'LIQ TIZIM
   circulatory_system: {
     id: "circulatory_system",
-    nameUz: "Qon aylanish sistemasi (Yurak, Arteriyalar, Venalar)",
+    nameUz: "Qon aylanish sistemasi",
     nameLat: "Systema cardiovasculare",
     nameEn: "Circulatory & Cardiovascular System 3D",
     systemKey: "circulatory",
@@ -655,7 +655,7 @@ export const ANATOMY_DATA = {
   // 12. OVQAT HAZM QILISH SISTEMASI / TO'LIQ TIZIM
   digestive_system: {
     id: "digestive_system",
-    nameUz: "Ovqat hazm qilish sistemasi (To'liq trakt)",
+    nameUz: "Ovqat hazm qilish sistemasi",
     nameLat: "Systema digestorium",
     nameEn: "Digestive System Complete 3D",
     systemKey: "digestive",
@@ -697,7 +697,7 @@ export const ANATOMY_DATA = {
   // 13. TAYANCH-HARAKAT SISTEMASI / INSON SKELETI
   musculoskeletal_system: {
     id: "musculoskeletal_system",
-    nameUz: "Tayanch-harakat a'zolari: Inson skeleti (To'liq karkas)",
+    nameUz: "Inson skeleti",
     nameLat: "Systema skeletale humanum",
     nameEn: "Human Skeleton 3D",
     systemKey: "musculoskeletal",
@@ -738,7 +738,7 @@ export const ANATOMY_DATA = {
   // 14. SIYDIK CHIQARISH SISTEMASI / TO'LIQ TIZIM
   urinary_system: {
     id: "urinary_system",
-    nameUz: "Siydik chiqarish sistemasi (Buyraklar, Siydik yo'llari, Pufak)",
+    nameUz: "Siydik chiqarish sistemasi",
     nameLat: "Systema urinarium",
     nameEn: "Urinary System 3D",
     systemKey: "urinary",
@@ -778,7 +778,7 @@ export const ANATOMY_DATA = {
   // 15. ENDOKRIN SISTEMA / TO'LIQ TIZIM
   endocrine_system: {
     id: "endocrine_system",
-    nameUz: "Endokrin sistema (Ichki sekretsiya bezlari)",
+    nameUz: "Endokrin sistema",
     nameLat: "Systema endocrinum",
     nameEn: "Endocrine System 3D",
     systemKey: "endocrine",
@@ -819,7 +819,7 @@ export const ANATOMY_DATA = {
   // 16. O'PKA (YAKKA MODEL)
   lung: {
     id: "lung",
-    nameUz: "O'pkalar",
+    nameUz: "O'pka",
     nameLat: "Pulmones",
     nameEn: "Human Lungs 3D",
     systemKey: "respiratory",
@@ -931,7 +931,7 @@ export const ANATOMY_DATA = {
   // 19. BUYRAKLAR (KESIMI VA NEFRON MIKROTUZILISHI)
   kidney: {
     id: "kidney",
-    nameUz: "Buyraklar (kesimi va nefron mikrotuzilishi)",
+    nameUz: "Buyraklar",
     nameLat: "Ren (Sectio & Nephron)",
     nameEn: "Kidney Section & Nephron 3D",
     systemKey: "urinary",
@@ -962,7 +962,7 @@ export const ANATOMY_DATA = {
   // 21. SIYDIK NAYLARI (URETERLAR)
   ureters: {
     id: "ureters",
-    nameUz: "Siydik naylari (ureterlar)",
+    nameUz: "Siydik naylari",
     nameLat: "Ureter dexter et sinister",
     nameEn: "Ureters 3D",
     systemKey: "urinary",
@@ -986,7 +986,7 @@ export const ANATOMY_DATA = {
   // 22. QOVUQ VA URETRA
   bladder_urethra: {
     id: "bladder_urethra",
-    nameUz: "Qovuq (siydik pufagi) va uretra",
+    nameUz: "Qovuq va uretra",
     nameLat: "Vesica urinaria et Urethra",
     nameEn: "Urinary Bladder & Urethra 3D",
     systemKey: "urinary",
@@ -1010,7 +1010,7 @@ export const ANATOMY_DATA = {
   // 23. QULOQ (TASHQI, O'RTA, ICHKI)
   ear: {
     id: "ear",
-    nameUz: "Quloq (tashqi, o‘rta va ichki quloq — chig‘anoq hamda yarimaylana kanallar)",
+    nameUz: "Quloq",
     nameLat: "Auris (externa, media, interna & Cochlea)",
     nameEn: "Ear Anatomy, Ossicles & Cochlea 3D",
     systemKey: "sensory",
@@ -1035,7 +1035,7 @@ export const ANATOMY_DATA = {
   // 24. TERI QATLAMLARI
   skin_layers: {
     id: "skin_layers",
-    nameUz: "Teri qatlamlari (epidermis, derma, yog‘ to‘qimasi, retseptorlar va soch ildizi)",
+    nameUz: "Teri qatlamlari",
     nameLat: "Cutis: Epidermis, Dermis & Subcutis",
     nameEn: "Human Skin Layers & Hair Follicle 3D",
     systemKey: "sensory",
@@ -1060,7 +1060,7 @@ export const ANATOMY_DATA = {
   // 25. LIMFA VA IMMUN SISTEMASI
   lymphatic_system: {
     id: "lymphatic_system",
-    nameUz: "Limfa va immun sistemasi (Taloq, limfa tugunlari va tomirlari)",
+    nameUz: "Limfa va immun sistemasi",
     nameLat: "Systema lymphaticum et Splen",
     nameEn: "Lymphatic System & Spleen 3D",
     systemKey: "lymphatic",
@@ -1084,7 +1084,7 @@ export const ANATOMY_DATA = {
   // 26. HUJAYRA TUZILISHI (MITOXONDRIYA, YADRO, ORGANELLALAR)
   cell_structure: {
     id: "cell_structure",
-    nameUz: "Hujayra tuzilishi (mitoxondriya, yadro, organellalar)",
+    nameUz: "Hujayra tuzilishi",
     nameLat: "Structura cellulae eukarioticae",
     nameEn: "Eukaryotic Cell Structure & Organelles 3D",
     systemKey: "microbiology",
@@ -1109,7 +1109,7 @@ export const ANATOMY_DATA = {
   // 27. DNK SPIRALI
   dna_helix: {
     id: "dna_helix",
-    nameUz: "DNK spirali (Qo'sh spiral genetik kodi)",
+    nameUz: "DNK spirali",
     nameLat: "Helix duplex acidi desoxyribonucleici (B-DNA)",
     nameEn: "DNA Double Helix Structure 3D",
     systemKey: "microbiology",
@@ -1133,7 +1133,7 @@ export const ANATOMY_DATA = {
   // 28. QON HUJAYRALARI (ERITROTSIT, LEYKOTSIT, TROMBOTSIT)
   blood_cells: {
     id: "blood_cells",
-    nameUz: "Qon hujayralari (eritrotsit, leykotsit, trombotsit)",
+    nameUz: "Qon hujayralari",
     nameLat: "Cellulae sanguinis: Erythrocyti, Leucocyti & Thrombocyti",
     nameEn: "Blood Cells: RBC, WBC & Platelets 3D",
     systemKey: "microbiology",
