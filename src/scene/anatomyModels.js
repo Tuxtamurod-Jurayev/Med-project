@@ -1,4 +1,25 @@
 import * as THREE from 'three';
+import {
+  createGallbladderBiliaryModel,
+  createEyeInternalLayersModel,
+  createEsophagusPharynxModel,
+  createSalivaryGlandsModel,
+  createSmallIntestineModel,
+  createLargeIntestineAppendixModel,
+  createLarynxVocalCordsModel,
+  createTracheaBronchialTreeModel
+} from './detailedOrgans.js';
+
+export {
+  createGallbladderBiliaryModel,
+  createEyeInternalLayersModel,
+  createEsophagusPharynxModel,
+  createSalivaryGlandsModel,
+  createSmallIntestineModel,
+  createLargeIntestineAppendixModel,
+  createLarynxVocalCordsModel,
+  createTracheaBronchialTreeModel
+};
 
 // -------------------------------------------------------------
 // ANATOMICAL MATERIALS & PALETTE
@@ -2792,8 +2813,9 @@ export const PROCEDURAL_MODEL_BUILDERS = {
   skull: createSkullModel,
   heart: createHeartModel,
   eye: createEyeTissuesModel,
-  eye_tissues: createEyeTissuesModel,
-  gallbladder: createGallbladderModel,
+  eye_tissues: createEyeInternalLayersModel,
+  eye_layers: createEyeInternalLayersModel,
+  gallbladder: createGallbladderBiliaryModel,
   pancreas: createPancreasModel,
   oral_cavity: createOralCavityModel,
   hand_fingers: createHandFingersModel,
@@ -2804,5 +2826,12 @@ export const PROCEDURAL_MODEL_BUILDERS = {
   musculoskeletal_system: createMusculoskeletalSystemModel,
   urinary_system: createUrinarySystemModel,
   endocrine_system: createEndocrineSystemModel,
-  spine: createSpineModel
+  spine: createSpineModel,
+  // Detailed models:
+  esophagus_pharynx: createEsophagusPharynxModel,
+  salivary_glands: createSalivaryGlandsModel,
+  small_intestine: createSmallIntestineModel,
+  large_intestine: createLargeIntestineAppendixModel,
+  larynx_vocal_cords: createLarynxVocalCordsModel,
+  trachea_bronchi: createTracheaBronchialTreeModel
 };

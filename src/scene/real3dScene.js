@@ -95,11 +95,6 @@ export class Real3DSceneManager {
         targetScale: 2.3,
         yOffset: 0.0
       },
-      gallbladder: {
-        path: '/models/gallbladder.glb',
-        targetScale: 2.5,
-        yOffset: 0.0
-      },
       urinary_system: {
         path: '/models/urinary_system.glb',
         targetScale: 2.6,

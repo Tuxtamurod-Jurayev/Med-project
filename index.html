@@ -15,7 +15,7 @@
 
   <div class="app-container">
 
-    <!-- TOP HEADER (NO 3D PRO, NO AR SWITCHER) -->
+    <!-- TOP HEADER -->
     <header class="app-header">
       <div class="header-left">
         <div class="app-logo">
@@ -53,15 +53,6 @@
           </svg>
         </button>
 
-        <!-- Toggle Info Sidebar on Desktop/Tablet -->
-        <button id="toggleSidebarBtn" class="icon-action-btn" title="Ma'lumotlar paneli" aria-label="Ma'lumotlar">
-          <svg class="react-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect width="18" height="18" x="3" y="3" rx="2"/>
-            <path d="M15 3v18"/>
-            <path d="m9 9-3 3 3 3"/>
-          </svg>
-        </button>
-
         <!-- Fullscreen Button -->
         <button id="fullscreenBtn" class="icon-action-btn desktop-only" title="To'liq ekran rejimi" aria-label="To'liq ekran">
           <svg class="react-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -71,18 +62,18 @@
       </div>
     </header>
 
-    <!-- ANATOMICAL SYSTEMS MENU BAR (ALL 8 SYSTEMS FROM IMAGE 4) -->
+    <!-- ANATOMICAL SYSTEMS MENU BAR -->
     <nav class="systems-menu-bar" id="systemsMenuBar">
       <!-- LEVEL 1: MAIN SYSTEMS TABS -->
       <div class="systems-tabs-scroll custom-scrollbar" id="systemsTabsList">
-        <button class="sys-menu-btn active" data-system="nervous">Nerv sistemasi</button>
-        <button class="sys-menu-btn" data-system="circulatory">Qon aylanish</button>
-        <button class="sys-menu-btn" data-system="respiratory">Nafas olish</button>
+        <button class="sys-menu-btn active" data-system="respiratory">Nafas olish</button>
         <button class="sys-menu-btn" data-system="digestive">Ovqat hazm</button>
+        <button class="sys-menu-btn" data-system="sensory">Sezgi a'zolari</button>
+        <button class="sys-menu-btn" data-system="nervous">Nerv sistemasi</button>
+        <button class="sys-menu-btn" data-system="circulatory">Qon aylanish</button>
         <button class="sys-menu-btn" data-system="musculoskeletal">Tayanch-harakat</button>
         <button class="sys-menu-btn" data-system="urinary">Siydik chiqarish</button>
         <button class="sys-menu-btn" data-system="endocrine">Endokrin</button>
-        <button class="sys-menu-btn" data-system="sensory">Sezgi a'zolari</button>
       </div>
 
       <!-- LEVEL 2: SPECIFIC SUB-ORGANS ROW -->
@@ -91,13 +82,20 @@
       </div>
     </nav>
 
-    <!-- MAIN INTERACTIVE CANVAS & SIDEBAR LAYOUT -->
+    <!-- MAIN 3D FULL-SCREEN VIEWPORT -->
     <main class="main-content">
-
-      <!-- 3D VIEWPORT (CLEAN 3D CANVAS, NO AR OVERLAYS) -->
       <section class="viewport-box" id="viewportContainer">
         <!-- THREE.JS WEBGL CANVAS CONTAINER -->
         <div id="canvasContainer" class="canvas-3d-wrapper"></div>
+
+        <!-- FLOATING MODEL IDENTIFICATION BADGE -->
+        <div class="model-floating-badge" id="modelFloatingBadge">
+          <span class="badge-dot"></span>
+          <div class="badge-text">
+            <span class="badge-title" id="badgeModelName">O'pka</span>
+            <span class="badge-lat" id="badgeModelLat">Pulmones • 3D Anatomiya</span>
+          </div>
+        </div>
 
         <!-- FLOATING 3D TOOLS (LEFT DOCK) -->
         <div class="floating-tools">
@@ -157,187 +155,8 @@
           </svg>
           <span>360° aylantirish uchun bosing va suring • Kattalashtirish uchun ikki barmoq bilan cho'zing</span>
         </div>
-
       </section>
-
-      <!-- RIGHT SIDEBAR (DESKTOP) / BOTTOM DRAWER (MOBILE) -->
-      <aside class="info-sidebar" id="infoSidebar">
-
-        <!-- Drag handle for mobile drawer -->
-        <div class="drawer-handle" id="drawerHandle">
-          <div class="handle-bar"></div>
-        </div>
-
-        <!-- Sidebar Header -->
-        <div class="sidebar-header">
-          <div class="sidebar-title-wrap">
-            <div>
-              <span id="organCategory" class="category-chip">Oliy boshqaruv markazi</span>
-              <h2 id="organNameUz" class="organ-heading">Bosh miya</h2>
-              <p id="organNameLat" class="organ-latin-sub">Encephalon • Human Brain 3D</p>
-            </div>
-            <button id="closeSidebarBtn" class="btn-close-drawer" aria-label="Yopish">
-              <svg class="react-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="18" y1="6" x2="6" y2="18"/>
-                <line x1="6" y1="6" x2="18" y2="18"/>
-              </svg>
-            </button>
-          </div>
-
-          <!-- Quick Stat Cards -->
-          <div class="stats-row">
-            <div class="stat-box">
-              <span class="s-label">Tizim</span>
-              <span id="organSystem" class="s-val">Nerv sistemasi</span>
-            </div>
-            <div class="stat-box">
-              <span class="s-label">Parametr</span>
-              <span id="organSpecs" class="s-val">100 mlrd neyron</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Tabs -->
-        <nav class="sidebar-tabs-nav">
-          <button class="nav-s-tab active" data-tab="parts">
-            <svg class="react-icon tab-mini-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <rect width="7" height="7" x="3" y="3" rx="1"/>
-              <rect width="7" height="7" x="14" y="3" rx="1"/>
-              <rect width="7" height="7" x="14" y="14" rx="1"/>
-              <rect width="7" height="7" x="3" y="14" rx="1"/>
-            </svg>
-            <span>Tuzilishi</span>
-          </button>
-          <button class="nav-s-tab" data-tab="functions">
-            <svg class="react-icon tab-mini-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
-            </svg>
-            <span>Vazifasi</span>
-          </button>
-          <button class="nav-s-tab" data-tab="clinical">
-            <svg class="react-icon tab-mini-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="10"/>
-              <line x1="12" y1="8" x2="12" y2="12"/>
-              <line x1="12" y1="16" x2="12.01" y2="16"/>
-            </svg>
-            <span>Klinika</span>
-          </button>
-          <button class="nav-s-tab tab-quiz-glow" data-tab="quiz">
-            <svg class="react-icon tab-mini-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
-              <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
-              <path d="M4 22h16"/>
-              <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/>
-              <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/>
-              <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>
-            </svg>
-            <span>Test</span>
-          </button>
-        </nav>
-
-        <!-- Tab Body -->
-        <div class="sidebar-scroll-body custom-scrollbar">
-
-          <!-- TAB 1: TUZILISHI & QISMLARI -->
-          <div id="tabParts" class="tab-panel active">
-            <div class="description-card">
-              <p id="organDescription">Inson bosh miyasi organizmning oliy boshqaruv markazidir.</p>
-            </div>
-
-            <div class="panel-section-title">
-              <span>Anatomik Qismlar</span>
-              <span class="sub-tip">Tuzilishlar ro'yxati</span>
-            </div>
-
-            <div id="partsList" class="parts-grid">
-              <!-- Dynamically populated -->
-            </div>
-          </div>
-
-          <!-- TAB 2: VAZIFALARI -->
-          <div id="tabFunctions" class="tab-panel hidden">
-            <div class="panel-section-title">Fiziologik Vazifalari</div>
-            <ul id="functionsList" class="detail-list">
-              <!-- Dynamically populated -->
-            </ul>
-          </div>
-
-          <!-- TAB 3: KLINIKA -->
-          <div id="tabClinical" class="tab-panel hidden">
-            <div class="panel-section-title title-amber">Klinik Ahamiyat & Kasalliklar</div>
-            <ul id="clinicalList" class="detail-list warning-list">
-              <!-- Dynamically populated -->
-            </ul>
-          </div>
-
-          <!-- TAB 4: QUIZ (BILIMNI SINASH) -->
-          <div id="tabQuiz" class="tab-panel hidden">
-            <div class="quiz-banner">
-              <div class="quiz-banner-top">
-                <span class="quiz-title">Bilimingizni sinang</span>
-                <span id="quizScoreBadge" class="quiz-pill">Ball: 0/2</span>
-              </div>
-              <p class="quiz-desc">Ushbu a'zo bo'yicha talabalik bilimingizni tekshirib ko'ring!</p>
-            </div>
-
-            <div id="quizContainer" class="quiz-container">
-              <!-- Dynamically populated -->
-            </div>
-
-            <button id="resetQuizBtn" class="btn-reset-quiz">
-              <svg class="react-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
-                <path d="M3 3v5h5"/>
-              </svg>
-              <span>Testni qaytadan boshlash</span>
-            </button>
-          </div>
-
-        </div>
-
-        <!-- Sidebar Footer -->
-        <div class="sidebar-footer">
-          <div class="footer-status">
-            <span class="status-dot" style="background:#10b981; box-shadow:0 0 8px #10b981;"></span>
-            <span style="color:#10b981; font-weight:700;">3D Studio</span>
-          </div>
-          <span class="footer-ver">MedAnatomy</span>
-        </div>
-
-      </aside>
-
     </main>
-
-    <!-- MOBILE BOTTOM NAVIGATION BAR -->
-    <nav class="mobile-bottom-bar">
-      <button class="m-nav-item active" id="mNavOrgan">
-        <svg class="react-icon m-nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="3" y1="12" x2="21" y2="12"/>
-          <line x1="3" y1="6" x2="21" y2="6"/>
-          <line x1="3" y1="18" x2="21" y2="18"/>
-        </svg>
-        <span class="m-nav-label">Menyular</span>
-      </button>
-
-      <button class="m-nav-item" id="mNavInfo">
-        <svg class="react-icon m-nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/>
-        </svg>
-        <span class="m-nav-label">Ma'lumot</span>
-      </button>
-
-      <button class="m-nav-item" id="mNavQuiz">
-        <svg class="react-icon m-nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
-          <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
-          <path d="M4 22h16"/>
-          <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/>
-          <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/>
-          <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>
-        </svg>
-        <span class="m-nav-label">Test</span>
-      </button>
-    </nav>
 
     <!-- MOBILE FULL-FEATURED ACCORDION DRAWER MENU -->
     <div id="mobileMenuDrawer" class="modal-backdrop hidden">

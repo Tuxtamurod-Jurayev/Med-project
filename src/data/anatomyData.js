@@ -468,45 +468,188 @@ export const ANATOMY_DATA = {
     ]
   },
 
-  // 11. NAFAS OLISH SISTEMASI / TO'LIQ TIZIM
-  respiratory_system: {
-    id: "respiratory_system",
-    nameUz: "Nafas olish sistemasi (Burun, Hiqildoq, Traxeya, O'pka)",
-    nameLat: "Systema respiratorium",
-    nameEn: "Respiratory System 3D",
+  // 11. HIQILDOQ VA OVOZ BOYLAMLARI (LARYNX & PLICA VOCALIS)
+  larynx_vocal_cords: {
+    id: "larynx_vocal_cords",
+    nameUz: "Hiqildoq va ovoz boylamlari",
+    nameLat: "Larynx & Plica vocalis",
+    nameEn: "Larynx & Vocal Cords 3D",
     systemKey: "respiratory",
-    system: "Nafas olish sistemasi: Burun bo‘shlig‘i, hiqildoq, traxeya va o‘pka",
-    category: "Gaz almashinuvi a'zolari",
-    bonesCount: "0 ta suyak",
-    weight: "~1100 g",
-    keywords: ["nafas olish sistemasi", "nafas", "burun boshligi", "burun", "hiqildoq", "traxeya", "o'pka", "opka", "bronx", "alveola", "systema respiratorium", "larynx", "pulmones"],
-    description: "Nafas olish tizimining mukammal 3D modeli: havoni isituvchi Burun bo'shlig'i, ovoz boylamlariga ega Hiqildoq (Larynx), tog'ay halqali Kengirdak (Trachea), daraxtsimon shoxlanuvchi Bronxlar va gaz almashinuvchi O'pkalar (Pulmones).",
+    system: "Nafas olish sistemasi (Systema respiratorium)",
+    category: "Ovoz va nafas o'tkazuvchi a'zo",
+    bonesCount: "Tog'ayli a'zo (Til osti suyagi bilan)",
+    weight: "~40 - 50 g",
+    keywords: ["hiqildoq", "larynx", "ovoz boylami", "vocal cords", "qalqonsimon tog'ay", "uzuksimon tog'ay", "epiglottis", "cho'michoqsimon", "ovoz yorig'i"],
+    description: "Hiqildoq va ovoz boylamlarining aniq anatomik 3D modeli: Qalqonsimon tog'ay (Adam olmasi), Uzuksimon tog'ay, Cho'michoqsimon tog'aylar, Hiqildoq usti tog'ayi (Epiglottis) hamda marvariddek oq elastik Haqiqiy Ovoz Boylamlari (Plica vocalis) va ovoz yorig'i (Rima glottidis).",
     parts: [
-      { id: "nasal_cavity", nameUz: "Burun bo'shlig'i (Cavitas nasi)", nameLat: "Cavitas nasi", desc: "Nafas olingan havoni changlardan tozalaydi, namlaydi va qon tomirlar orqali tana haroratigacha isitadi." },
-      { id: "larynx_organ", nameUz: "Hiqildoq (Larynx)", nameLat: "Larynx", desc: "Qalqonsimon va uzuksimon tog'aylardan iborat ovoz hosil qiluvchi murakkab a'zo." },
-      { id: "trachea_tube", nameUz: "Kengirdak (Trachea)", nameLat: "Trachea", desc: "16-20 ta gialin tog'ay yarimhalqalaridan tashkil topgan, doim ochiq turuvchi nafas nayi." },
-      { id: "bronchial_tree", nameUz: "Bronxial daraxt", nameLat: "Arbor bronchialis", desc: "Traxeyadan boshlanib, alveolalargacha shoxlanuvchi havo o'tkazuvchi kanallar tarmog'i." },
-      { id: "lungs_alveoli", nameUz: "O'pkalar va Alveolalar", nameLat: "Pulmones & Alveoli", desc: "300-500 millionta mikroskopik pufakchalar; qonga kislorod o'tib, CO2 ajraladigan sirt." }
+      { id: "thyroid_cartilage", nameUz: "Qalqonsimon tog'ay (Cartilago thyroidea)", nameLat: "Cartilago thyroidea", desc: "Hiqildoqning eng yirik tog'ayi, oldingi burchagida Adam olmasi (laryngeal prominence) joylashgan." },
+      { id: "cricoid_cartilage", nameUz: "Uzuksimon tog'ay (Cartilago cricoidea)", nameLat: "Cartilago cricoidea", desc: "Traxeyaning ustida joylashgan poydevor uzuksimon tog'ay." },
+      { id: "arytenoid_cartilage", nameUz: "Cho'michoqsimon tog'aylar (Cartilagines arytenoideae)", nameLat: "Cartilagines arytenoideae", desc: "Ovoz boylamlarini harakatlantiruvchi piramidasimon juft tog'aylar." },
+      { id: "true_vocal_cords", nameUz: "Haqiqiy ovoz boylamlari (Plica vocalis)", nameLat: "Plica vocalis", desc: "Ovoz hosil qilishda tebranuvchi yaltiroq oq elastik tolalar." },
+      { id: "epiglottis", nameUz: "Hiqildoq usti tog'ayi (Epiglottis)", nameLat: "Epiglottis", desc: "Yutish vaqtida hiqildoq kirishini yopib, ovqatning nafas yo'liga tushishidan himoyalovchi bargsimon klapan." }
     ],
     functions: [
-      "Organizmni atmosfera kislorodi bilan uzluksiz to'yintirish",
-      "Hujayralar almashinuvi chiqindisi bo'lgan karbonat angidridni chiqarish",
-      "Ovoz hosil qilish (fonatsiya) va qon pH muvozanatini saqlash"
+      "Fonatsiya: Ovoz hosil qilish va nutq tovushlarini yaratish",
+      "Nafas o'tkazish: O'pkaga toza havo oqimini yo'naltirish",
+      "Himoya refleksi: Nafas yo'llariga begona jism tushishiga yo'l qo'ymaslik"
     ],
     clinical: [
-      "Bronxial astma - bronxlar silliq mushaklari spazmi va shilliq to'planishi.",
-      "Pnevmoniya - alveolalarning infektsion suyuqlik bilan to'lib yallig'lanishi.",
-      "Laringit - hiqildoq ovoz boylamlarining shamollashi va ovoz bo'g'ilishi."
+      "Laringit - ovoz boylamlari yallig'lanishi va ovoz yo'qolishi (afoniya).",
+      "Hiqildoq shishi (Krup sindromi) - stenoz va nafas qisishi."
     ],
-    quiz: [
-      {
-        question: "Gazlar almashinuvi (O2 va CO2) bevosita o'pkaning qaysi mikroskopik tuzilmalarida sodir bo'ladi?",
-        options: ["Bronxialarda", "Traxeyada", "Alveolalarda", "Hiqildoqda"],
-        correct: 2,
-        answerIndex: 2,
-        explanation: "Alveolalar yupqa devorli kapillyarlar bilan o'ralgan bo'lib, gaz almashinuvi aynan ularda kechadi."
-      }
-    ]
+    quiz: []
+  },
+
+  // 12. TRAXEYA VA BRONXLAR DARAXTI
+  trachea_bronchi: {
+    id: "trachea_bronchi",
+    nameUz: "Traxeya va bronxlar daraxti",
+    nameLat: "Trachea & Arbor bronchialis",
+    nameEn: "Trachea & Bronchial Tree 3D",
+    systemKey: "respiratory",
+    system: "Nafas olish sistemasi (Systema respiratorium)",
+    category: "Havo o'tkazuvchi nafas yo'llari",
+    bonesCount: "16-20 ta gialin tog'ay yarimhalqasi",
+    weight: "~120 g",
+    keywords: ["traxeya", "kengirdak", "bronx", "bronxial daraxt", "carina", "bronchus", "lobar bronx", "segmentar bronx"],
+    description: "Traxeya (Kengirdak) va bronxlar daraxtining 3D modeli: 16-20 ta C-simon tog'ay halqalar, Karina bifurkatsiyasi, O'ng va chap bosh bronxlar, 5 ta bo'lak bronxlari hamda 18-20 ta segmentar bronxlar shoxlanishi.",
+    parts: [
+      { id: "trachea_rings", nameUz: "Kengirdak tog'ay yarimhalqalari", nameLat: "Cartilagines tracheales", desc: "Nafas yo'li doimo ochiq turishini ta'minlovchi C-simon gialin tog'aylar." },
+      { id: "carina", nameUz: "Traxeya karinasi (Bifurkatsiya)", nameLat: "Carina tracheae", desc: "Kengirdakning o'ng va chap bosh bronxlarga ajralish chegarasi." },
+      { id: "main_bronchi", nameUz: "Bosh bronxlar (O'ng va chap)", nameLat: "Bronchi principales", desc: "O'pka darvozasiga kiruvchi asosiy havo magistrallari." },
+      { id: "bronchial_tree", nameUz: "Segmentar bronxial daraxt", nameLat: "Arbor bronchialis", desc: "O'pkaning har bir segmentiga kislorod yetkazuvchi shoxlanuvchi kanallar." }
+    ],
+    functions: [
+      "Atmosfera havosini o'pka alveolalariga to'siqsiz o'tkazish",
+      "Xillpillovchi epiteliy orqali chang va mikroblarni chiqarib yuborish"
+    ],
+    clinical: [
+      "Traxeit va o'tkir bronxit - nafas naylarining shilliq yallig'lanishi.",
+      "Begona jism aspiratsiyasi - ko'pincha vertikalroq bo'lgan o'ng bosh bronxga tushishi."
+    ],
+    quiz: []
+  },
+
+  // 13. QIZILO'NGACH VA HALQUM
+  esophagus_pharynx: {
+    id: "esophagus_pharynx",
+    nameUz: "Qizilo'ngach va halqum",
+    nameLat: "Esophagus & Pharynx",
+    nameEn: "Esophagus & Pharynx 3D",
+    systemKey: "digestive",
+    system: "Ovqat hazm qilish sistemasi (Systema digestorium)",
+    category: "Hazm trakti o'tkazuvchi bo'limi",
+    bonesCount: "Mushakli nay",
+    weight: "~160 g",
+    keywords: ["qizilongach", "halqum", "esophagus", "pharynx", "yutish", "sfinkter", "peristaltika"],
+    description: "Halqum (burun-halqum, og'iz-halqum, hiqildoq-halqum konstriktor mushaklari) va 25 sm uzunlikdagi Qizilo'ngachning yuqori hamda pastki kardial sfinkterlari bilan 3D anatomik modeli.",
+    parts: [
+      { id: "pharynx_constrictors", nameUz: "Halqum konstriktor mushaklari", nameLat: "Musculi constrictores pharyngis", desc: "Ovqat luqmasini qizilo'ngachga siqib kirituvchi halqa mushaklar." },
+      { id: "ues", nameUz: "Yuqori qizilo'ngach sfinkteri", nameLat: "Sphincter esophagi superior", desc: "Krikofaringeal mushak klapani." },
+      { id: "esophagus_body", nameUz: "Qizilo'ngach tanasi", nameLat: "Corpus esophagi", desc: "Ko'krak bo'shlig'i orqali peristaltik to'lqinlar bilan ovqatni oshqozonga yetkazuvchi nay." },
+      { id: "les", nameUz: "Pastki qizilo'ngach sfinkteri (Kardial klapan)", nameLat: "Sphincter esophagi inferior", desc: "Oshqozon kislotasi qaytib chiqishiga to'sqinlik qiluvchi Z-chiziq sfinkteri." }
+    ],
+    functions: ["Ovqat luqmasini yutish va oshqozonga peristaltik yetkazish"],
+    clinical: ["Gastroezofageal reflyuks kasalligi (GERD) - kislota chiqishi va jig'ildon qaynashi."],
+    quiz: []
+  },
+
+  // 14. SO'LAK BEZLARI
+  salivary_glands: {
+    id: "salivary_glands",
+    nameUz: "So'lak bezlari",
+    nameLat: "Glandulae salivariae",
+    nameEn: "Salivary Glands 3D",
+    systemKey: "digestive",
+    system: "Ovqat hazm qilish sistemasi (Systema digestorium)",
+    category: "Hazm shiralari bezlari",
+    bonesCount: "0 ta suyak (Pastki jag' suyagi chegarasida)",
+    weight: "~60 g",
+    keywords: ["solak bezlari", "so'lak", "parotis", "submandibularis", "sublingualis", "stensen", "wharton", "amilaza"],
+    description: "Insonning 3 juft yirik so'lak bezlari: Quloqoldi bezi (Glandula parotidea) va Stensen yo'li, Jag'osti bezi (Glandula submandibularis) va Uorton yo'li, Tilosti bezi (Glandula sublingualis) 3D modeli.",
+    parts: [
+      { id: "parotid_gland", nameUz: "Quloqoldi so'lak bezi", nameLat: "Glandula parotidea", desc: "Eng yirik so'lak bezi, quloq suprasi oldida joylashgan." },
+      { id: "stensen_duct", nameUz: "Stensen (Quloqoldi) yo'li", nameLat: "Ductus parotideus", desc: "Chaynash mushagi ustidan o'tib, yuqori 2-katta oziq tish qarshisiga ochiluvchi yo'l." },
+      { id: "submandibular_gland", nameUz: "Jag'osti so'lak bezi", nameLat: "Glandula submandibularis", desc: "Pastki jag' burchagi ostida joylashgan yong'oqdek bez." },
+      { id: "sublingual_gland", nameUz: "Tilosti so'lak bezi", nameLat: "Glandula sublingualis", desc: "Til osti shilliq qavati ostida joylashgan bodomsimon bez." }
+    ],
+    functions: ["So'lak ajratish, amilaza fermenti bilan uglevodlarni parchalash, luqmani namlash"],
+    clinical: ["Parotit (Tepki) - quloqoldi bezining virusli yallig'lanishi.", "Sialolitiaz - so'lak yo'llarida tosh paydo bo'lishi."],
+    quiz: []
+  },
+
+  // 15. INGICHKA ICHAK
+  small_intestine: {
+    id: "small_intestine",
+    nameUz: "Ingichka ichak",
+    nameLat: "Intestinum tenue",
+    nameEn: "Small Intestine 3D",
+    systemKey: "digestive",
+    system: "Ovqat hazm qilish sistemasi (Systema digestorium)",
+    category: "Oziq moddalarni so'rish a'zosi",
+    bonesCount: "Ichak qovuzloqlari",
+    weight: "~1.5 kg",
+    keywords: ["ingichka ichak", "intestinum tenue", "duodenum", "jejunum", "ileum", "och ichak", "yonbosh ichak", "tutqich", "vorsinkalar"],
+    description: "Ingichka ichakning 3D anatomik modeli: O'n ikki barmoqli ichak (Duodenum), Och ichak (Jejunum), Yonbosh ichak (Ileum) qovuzloqlari hamda ularni qon bilan ta'minlovchi tutqich qon tomir kamarlari (Mesenteric arcades).",
+    parts: [
+      { id: "duodenum_part", nameUz: "O'n ikki barmoqli ichak", nameLat: "Duodenum", desc: "Oshqozondan chiqqan ximus o't suyuqligi va me'da osti bezi fermentlari bilan aralashadigan C-simon bo'lim." },
+      { id: "jejunum_part", nameUz: "Och ichak", nameLat: "Jejunum", desc: "Qon tomirlarga boy, qalin devorli, oziq moddalarni faol so'ruvchi qovuzloqlar." },
+      { id: "ileum_part", nameUz: "Yonbosh ichak", nameLat: "Ileum", desc: "Ingichka ichakning oxirgi bo'limi, Baugin klapani orqali ko'r ichakka quyiladi." },
+      { id: "mesentery", nameUz: "Ichak tutqichi va qon tomir kamarlari", nameLat: "Mesenterium & Vasa recta", desc: "Ichak qovuzloqlarini qorin orqa devoriga tutashtiruvchi va qon bilan ta'minlovchi tomirlar tarmog'i." }
+    ],
+    functions: ["Oqsillar, yog'lar va uglevodlarni yakuniy parchalash hamda vorsinkalar orqali qonga so'rish"],
+    clinical: ["Enterit - ingichka ichak shilliq qavati yallig'lanishi.", "Ichak tutilishi (Ileus)."],
+    quiz: []
+  },
+
+  // 16. YO'G'ON ICHAK VA APPENDIKS
+  large_intestine: {
+    id: "large_intestine",
+    nameUz: "Yo'g'on ichak va appendiks",
+    nameLat: "Intestinum crassum & Appendix",
+    nameEn: "Large Intestine & Appendix 3D",
+    systemKey: "digestive",
+    system: "Ovqat hazm qilish sistemasi (Systema digestorium)",
+    category: "Suv so'rish va najas shakllantirish",
+    bonesCount: "Xarakterli gaustralar va teniyalar",
+    weight: "~1.2 kg",
+    keywords: ["yo'g'on ichak", "appendiks", "ko'r ichak", "chambar ichak", "to'g'ri ichak", "colon", "cecum", "appendix", "haustra", "taenia"],
+    description: "Yo'g'on ichakning to'liq 3D modeli: Ko'r ichak (Cecum) va Chuvalchangsimon o'simta (Appendiks), Ko'tariluvchi, Ko'ndalang, Tushuvchi, Sigmasimon chambar ichak va To'g'ri ichak; gaustralar (bo'rtiqlar) va 3 ta bo'ylama mushak tasmasi (Taenia coli).",
+    parts: [
+      { id: "cecum_organ", nameUz: "Ko'r ichak", nameLat: "Caecum", desc: "O'ng yonbosh chuqurchasida joylashgan yo'g'on ichakning boshlang'ich xaltasimon kengaymasi." },
+      { id: "appendix_organ", nameUz: "Chuvalchangsimon o'simta (Appendiks)", nameLat: "Appendix vermiformis", desc: "Ko'r ichakdan chiquvchi, limfoid to'qimaga boy immun a'zo." },
+      { id: "colon_segments", nameUz: "Chambar ichak (Ko'tariluvchi, Ko'ndalang, Tushuvchi, Sigmasimon)", nameLat: "Colon", desc: "Qorin bo'shlig'ini to'rtburchak kabi o'rab turuvchi gaustralli yo'g'on ichak bo'limlari." },
+      { id: "rectum_organ", nameUz: "To'g'ri ichak", nameLat: "Rectum", desc: "Kichik chanoqda joylashgan najas to'planuvchi va chiqaruvchi oxirgi qism." },
+      { id: "taenia_coli", nameUz: "Ichak lentalari (Teniyalar)", nameLat: "Taeniae coli", desc: "Yo'g'on ichak bo'ylab o'tuvchi 3 ta bo'ylama silliq mushak lentalari." }
+    ],
+    functions: ["Suv va elektrolitlarni qayta so'rish, axlat massalarini shakllantirish, vitaminlar (K, B) sintezi"],
+    clinical: ["O'tkir appenditsit - zudlik bilan jarrohlik talab etuvchi yallig'lanish.", "Kolit va divertikuloz."],
+    quiz: []
+  },
+
+  // 17. KO'Z OLMASI ICHKI QATLAMLARI
+  eye_layers: {
+    id: "eye_layers",
+    nameUz: "Ko'z olmasi ichki qatlamlari",
+    nameLat: "Bulbus oculi & Tunicae oculi",
+    nameEn: "Internal Layers of the Eye 3D",
+    systemKey: "sensory",
+    system: "Sezgi a'zolari (Organa sensuum)",
+    category: "Ko'rish analizatori qatlamlari",
+    bonesCount: "Parda va optik muhitlar",
+    weight: "~7 - 8 g",
+    keywords: ["ko'z", "shox parda", "oq parda", "to'r parda", "retina", "gavhar", "shishasimon tana", "qorachiq", "uvea", "xorioidea"],
+    description: "Ko'z olmasining sagittal kesimdagi ichki qatlamlari 3D modeli: Oq parda (Sclera), Shox parda (Cornea), Tomirli parda (Chorioidea), Kipriksimon tana va belbog', Rangdor parda (Iris), Billur gavhar (Lens), To'r parda (Retina, sariq dog' va tomirlar) hamda Ko'rish nervi.",
+    parts: [
+      { id: "sclera_cornea", nameUz: "Tashqi tolali qobiq: Sklera va Kornea", nameLat: "Tunica fibrosa bulbi", desc: "Orqa 5/6 oq sklera va oldingi 1/6 tiniq shaffof shox parda." },
+      { id: "choroid_ciliary", nameUz: "O'rta tomirli qobiq: Xorioidea va Kipriksimon tana", nameLat: "Uvea & Corpus ciliare", desc: "Ko'zni oziqlantiruvchi qon tomirlar va gavharni ushlab turuvchi Zinn boylamlari." },
+      { id: "crystalline_lens", nameUz: "Billur gavhar", nameLat: "Lens crystallina", desc: "Ikki tomoni qavariq, yorug'likni sindiruvchi tirik shaffof linza." },
+      { id: "retina_layer", nameUz: "Ichki to'r parda", nameLat: "Retina", desc: "Fotoretseptorlar (tayoqcha va kolbachalar) joylashgan, yorug'likni nerv impulsiga aylantiruvchi qatlam." },
+      { id: "optic_nerve", nameUz: "Ko'rish nervi (II juft)", nameLat: "Nervus opticus", desc: "Ko'rish signallarini miyaning ensa po'stlog'iga uzatuvchi qalin nerv tutami." }
+    ],
+    functions: ["Yorug'likni sindirish, fokuslash va ko'rish signallarini miyaga uzatish"],
+    clinical: ["Katarakta - gavharning xiralashishi.", "Glaukoma - ko'z ichi bosimi oshishi va ko'rish nervi atrofiyasi."],
+    quiz: []
   },
 
   // 12. OVQAT HAZM QILISH SISTEMASI / TO'LIQ TIZIM
