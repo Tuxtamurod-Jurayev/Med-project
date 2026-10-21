@@ -40,9 +40,19 @@ export class Real3DSceneManager {
         targetScale: 1.85,
         yOffset: 0.0
       },
+      eye_layers: {
+        path: '/models/eye.glb',
+        targetScale: 2.35,
+        yOffset: 0.0
+      },
+      eye_tissues: {
+        path: '/models/eye.glb',
+        targetScale: 2.35,
+        yOffset: 0.0
+      },
       eye: {
         path: '/models/eye.glb',
-        targetScale: 2.2,
+        targetScale: 2.35,
         yOffset: 0.0
       },
       heart: {
@@ -582,7 +592,7 @@ export class Real3DSceneManager {
           child.receiveShadow = true;
         }
       });
-    } else if (key === 'eye') {
+    } else if (key === 'eye' || key === 'eye_layers' || key === 'eye_tissues') {
       // Ocular Internal Layers: Cornea, Sclera, Choroid, Retina, Macula, Lens, Ciliary body, Iris, Pupil, Optic nerve, Extraocular muscles
       group.traverse((child) => {
         if (child.isMesh && child.material) {

@@ -19,7 +19,6 @@ const SYSTEM_ORGANS_MAP = {
   digestive: {
     title: 'Ovqat hazm',
     organs: [
-      { id: 'gallbladder', label: "O't pufagi" },
       { id: 'esophagus_pharynx', label: "Qizilo'ngach" },
       { id: 'salivary_glands', label: "So'lak bezlari" },
       { id: 'small_intestine', label: "Ingichka ichak" },
@@ -33,10 +32,9 @@ const SYSTEM_ORGANS_MAP = {
   sensory: {
     title: 'Sezgi a\'zolari',
     organs: [
-      { id: 'eye_layers', label: "Ko'z qatlamlari" },
+      { id: 'eye_layers', label: "Ko'z olmasi ichki qatlamlari" },
       { id: 'ear', label: "Quloq" },
-      { id: 'skin_layers', label: "Teri" },
-      { id: 'eye', label: "Ko'z olmasi" }
+      { id: 'skin_layers', label: "Teri" }
     ]
   },
   nervous: {
@@ -69,12 +67,6 @@ const SYSTEM_ORGANS_MAP = {
       { id: 'ureters', label: "Siydik naylari" },
       { id: 'bladder_urethra', label: "Qovuq" },
       { id: 'urinary_system', label: "Siydik tizimi" }
-    ]
-  },
-  lymphatic: {
-    title: 'Limfa va immun',
-    organs: [
-      { id: 'lymphatic_system', label: "Limfa sistemasi" }
     ]
   },
   microbiology: {

@@ -316,17 +316,18 @@ export function createEyeInternalLayersModel() {
     group.add(capTube);
   }
 
-  // 2. CORNEA (Anterior Transparent Window)
+  // 2. CORNEA (Anterior Transparent Window - Crystal-Clear Optical Glass Clarity)
   const corneaGeo = new THREE.SphereGeometry(0.85, 36, 24, 0, Math.PI * 2, 0, Math.PI * 0.45);
   corneaGeo.scale(1.0, 1.0, 0.65);
   const corneaMat = new THREE.MeshPhysicalMaterial({
     color: 0xe0f2fe,
-    transmission: 0.96,
-    roughness: 0.03,
+    transmission: 0.98,
+    roughness: 0.02,
     ior: 1.376,
     transparent: true,
-    opacity: 0.42,
-    side: THREE.DoubleSide
+    opacity: 0.25,
+    depthWrite: false,
+    side: THREE.FrontSide
   });
   const corneaMesh = new THREE.Mesh(corneaGeo, corneaMat);
   corneaMesh.name = "cornea";
@@ -436,30 +437,32 @@ export function createEyeInternalLayersModel() {
   pupilMesh.position.set(0, 0, 0.956);
   group.add(pupilMesh);
 
-  // 7. CRYSTALLINE BICONVEX LENS (Billur gavhar)
+  // 7. CRYSTALLINE BICONVEX LENS (Billur gavhar - Crystal Optical Refraction)
   const lensGeo = new THREE.SphereGeometry(0.52, 32, 24);
   lensGeo.scale(1.0, 1.0, 0.48);
   const lensMat = new THREE.MeshPhysicalMaterial({
     color: 0xf0f9ff,
-    transmission: 0.96,
-    roughness: 0.04,
+    transmission: 0.98,
+    roughness: 0.02,
     ior: 1.413,
     transparent: true,
-    opacity: 0.85
+    opacity: 0.90,
+    clearcoat: 1.0,
+    clearcoatRoughness: 0.02
   });
   const lensMesh = new THREE.Mesh(lensGeo, lensMat);
   lensMesh.name = "lens";
   lensMesh.position.set(0, 0, 0.72);
   group.add(lensMesh);
 
-  // 8. VITREOUS BODY (Shishasimon tana - Soft Tinted Vitreous Humor)
+  // 8. VITREOUS BODY (Shishasimon tana - Ultra-Pure Crystal Vitreous Humor)
   const vitreousGeo = new THREE.SphereGeometry(1.28, 36, 24, 0, cutAngle);
   const vitreousMat = new THREE.MeshPhysicalMaterial({
     color: 0xe0f2fe,
-    transmission: 0.88,
-    roughness: 0.08,
+    transmission: 0.95,
+    roughness: 0.03,
     transparent: true,
-    opacity: 0.22,
+    opacity: 0.12,
     depthWrite: false
   });
   const vitreousMesh = new THREE.Mesh(vitreousGeo, vitreousMat);
@@ -503,6 +506,32 @@ export function createEyeInternalLayersModel() {
     tMesh.position.set(r.pos[0] * 0.9, r.pos[1] * 0.9, r.pos[2] + 0.62);
     group.add(tMesh);
   });
+
+  // 11. OBLIQUE MUSCLES (Superior Oblique with Trochlea pulley & Inferior Oblique)
+  const soPts = [
+    new THREE.Vector3(0.18, 0.35, -2.1),
+    new THREE.Vector3(0.72, 1.25, -0.1),
+    new THREE.Vector3(0.55, 1.35, 0.3),
+    new THREE.Vector3(0, 1.25, 0.2)
+  ];
+  const soMesh = makeTube(soPts, 0.11, 24, 8, muscleShader);
+  soMesh.name = "oblique_superior";
+  group.add(soMesh);
+
+  const trochleaGeo = new THREE.TorusGeometry(0.14, 0.04, 8, 16);
+  const trochleaMesh = new THREE.Mesh(trochleaGeo, new THREE.MeshStandardMaterial({ color: 0x93c5fd, roughness: 0.3 }));
+  trochleaMesh.name = "trochlea";
+  trochleaMesh.position.set(0.68, 1.35, 0.25);
+  group.add(trochleaMesh);
+
+  const ioPts = [
+    new THREE.Vector3(0.75, -1.1, 0.3),
+    new THREE.Vector3(0.2, -1.3, 0.1),
+    new THREE.Vector3(-0.85, -1.0, -0.3)
+  ];
+  const ioMesh = makeTube(ioPts, 0.12, 20, 8, muscleShader);
+  ioMesh.name = "oblique_inferior";
+  group.add(ioMesh);
 
   return group;
 }
