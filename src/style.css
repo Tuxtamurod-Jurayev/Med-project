@@ -1136,15 +1136,18 @@ html, body {
   width: 100%;
   max-width: 520px;
   background: #2b2b2b;
-  border-top-left-radius: var(--radius-lg);
-  border-top-right-radius: var(--radius-lg);
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
   border: 1px solid rgba(255, 255, 255, 0.15);
   border-bottom: none;
-  padding: 16px 16px 20px;
-  max-height: 84vh;
+  padding: 16px 16px calc(env(safe-area-inset-bottom, 0px) + 16px);
+  height: 85vh;
+  height: 85dvh;
+  max-height: 85vh;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.85);
+  box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.9);
+  overflow: hidden;
 }
 
 .modal-header {
@@ -1152,8 +1155,9 @@ html, body {
   align-items: center;
   justify-content: space-between;
   margin-bottom: 12px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid var(--border-subtle);
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  flex-shrink: 0;
 }
 
 .modal-title-row {
@@ -1169,17 +1173,17 @@ html, body {
 }
 
 .modal-title-row h3 {
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 700;
   color: #fff;
 }
 
 .btn-close-modal {
-  background: rgba(255, 255, 255, 0.08);
-  border: none;
-  color: var(--text-muted);
-  width: 32px;
-  height: 32px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #fff;
+  width: 34px;
+  height: 34px;
   border-radius: var(--radius-full);
   display: flex;
   align-items: center;
@@ -1189,8 +1193,7 @@ html, body {
 }
 
 .btn-close-modal:hover {
-  background: rgba(255, 255, 255, 0.16);
-  color: #fff;
+  background: rgba(255, 255, 255, 0.2);
 }
 
 .btn-close-modal .react-icon {
@@ -1202,17 +1205,23 @@ html, body {
 .mobile-systems-accordion {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  flex: 1;
+  min-height: 0;
   padding-right: 4px;
+  padding-bottom: 12px;
 }
 
 .m-accordion-card {
+  flex-shrink: 0;
+  width: 100%;
   background: #363636;
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: var(--radius-md);
   overflow: hidden;
-  transition: all 0.2s ease;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .m-accordion-card.active-system {
@@ -1224,7 +1233,9 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 14px;
+  padding: 13px 16px;
+  min-height: 48px;
+  flex-shrink: 0;
   cursor: pointer;
   user-select: none;
   background: #363636;
@@ -1238,17 +1249,17 @@ html, body {
 .m-acc-text {
   display: flex;
   align-items: baseline;
-  gap: 8px;
+  gap: 10px;
 }
 
 .m-acc-sys {
-  font-size: 14px;
+  font-size: 14.5px;
   font-weight: 700;
   color: #fff;
 }
 
 .m-acc-count {
-  font-size: 11px;
+  font-size: 11.5px;
   color: var(--text-dim);
   font-family: var(--font-mono);
 }
@@ -1258,6 +1269,7 @@ html, body {
   height: 18px;
   color: var(--text-muted);
   transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  flex-shrink: 0;
 }
 
 .m-accordion-card.expanded .m-chevron {
@@ -1267,9 +1279,9 @@ html, body {
 
 .m-accordion-body {
   display: none;
-  padding: 8px 10px 10px;
+  padding: 10px 12px 12px;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
   background: #2b2b2b;
 }
@@ -1281,15 +1293,17 @@ html, body {
 .m-acc-organ-btn {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   width: 100%;
   text-align: left;
-  padding: 10px 12px;
+  padding: 12px 14px;
+  min-height: 44px;
+  flex-shrink: 0;
   border-radius: var(--radius-sm);
   border: 1px solid rgba(255, 255, 255, 0.08);
   background: #333333;
   color: #e2e8f0;
-  font-size: 13px;
+  font-size: 13.5px;
   font-weight: 500;
   cursor: pointer;
   font-family: inherit;
@@ -1310,12 +1324,17 @@ html, body {
 }
 
 .dot-indicator {
-  width: 7px;
-  height: 7px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
   background: var(--text-dim);
   flex-shrink: 0;
   transition: all 0.2s ease;
+}
+
+.m-acc-organ-btn.selected .dot-indicator {
+  background: var(--accent-cyan-light);
+  box-shadow: 0 0 8px var(--accent-cyan-light);
 }
 
 .m-acc-organ-btn.selected .dot-indicator {
@@ -1370,24 +1389,28 @@ html, body {
     padding-bottom: 60px; /* Space for fixed bottom nav */
   }
 
-  /* Info sidebar becomes bottom sheet drawer sitting above the bottom nav */
+  /* FULL-SCREEN INFORMATION MODAL ON MOBILE (TUZILISHI & KASALLIKLAR) */
   .info-sidebar {
     position: fixed;
+    top: 0;
     bottom: 60px;
     left: 0;
     right: 0;
     width: 100%;
-    height: calc(75vh - 60px);
-    max-height: 580px;
+    height: calc(100vh - 60px);
+    height: calc(100dvh - 60px);
+    max-height: none;
     border-left: none;
-    background: #2b2b2b;
-    border-top: 1px solid rgba(56, 189, 248, 0.35);
-    border-top-left-radius: 20px;
-    border-top-right-radius: 20px;
-    box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.75);
-    transform: translateY(120%);
-    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    background: #242424;
+    border-top: none;
+    border-radius: 0;
+    box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.85);
+    transform: translateY(105%);
+    transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);
     z-index: 55;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
   }
 
   .info-sidebar.open-drawer {
@@ -1395,11 +1418,88 @@ html, body {
   }
 
   .drawer-handle {
-    display: flex;
+    display: none !important;
+  }
+
+  .sidebar-header {
+    padding: 16px 16px 14px;
+    background: #2b2b2b;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    flex-shrink: 0;
+  }
+
+  .sidebar-title-wrap {
+    margin-bottom: 0;
+  }
+
+  .organ-heading {
+    font-size: 22px;
+    font-weight: 800;
+  }
+
+  .sidebar-tabs-nav.two-tabs {
+    flex-shrink: 0;
+    background: #202020;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .sidebar-tabs-nav.two-tabs .nav-s-tab {
+    padding: 14px 10px;
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  .sidebar-scroll-body {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 16px 16px 24px;
+  }
+
+  .description-card {
+    padding: 14px;
+    font-size: 13.5px;
+    line-height: 1.6;
+    margin-bottom: 16px;
+  }
+
+  .part-card {
+    padding: 12px 14px;
+  }
+
+  .part-name-uz {
+    font-size: 13.5px;
+  }
+
+  .part-desc {
+    font-size: 12.5px;
+    line-height: 1.55;
+  }
+
+  .clinical-card {
+    padding: 14px;
+  }
+
+  .clinical-title {
+    font-size: 14px;
+  }
+
+  .clinical-text {
+    font-size: 12.5px;
+    line-height: 1.6;
   }
 
   .btn-close-drawer {
-    display: block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-full);
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: #fff;
+    cursor: pointer;
   }
 
   /* MOBILE FOOTER NAVIGATION BAR (3 TABS) */

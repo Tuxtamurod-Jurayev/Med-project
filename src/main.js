@@ -264,7 +264,8 @@ function renderMobileAccordionMenu() {
 
   Object.entries(SYSTEM_ORGANS_MAP).forEach(([sysKey, sysData]) => {
     const card = document.createElement('div');
-    card.className = `m-accordion-card ${sysKey === activeSystemKey ? 'active-system' : ''}`;
+    const isCurrentSystem = sysKey === activeSystemKey;
+    card.className = `m-accordion-card ${isCurrentSystem ? 'active-system expanded' : ''}`;
 
     const titleRow = document.createElement('div');
     titleRow.className = 'm-accordion-title';
@@ -298,13 +299,21 @@ function renderMobileAccordionMenu() {
     });
 
     titleRow.addEventListener('click', () => {
-      card.classList.toggle('expanded');
-    });
+      const isExpanded = card.classList.contains('expanded');
+      
+      // Close all other cards to prevent multi-expansion squishing on mobile
+      const allCards = mobileSystemsAccordion.querySelectorAll('.m-accordion-card');
+      allCards.forEach(c => {
+        if (c !== card) c.classList.remove('expanded');
+      });
 
-    // Auto-expand active system
-    if (sysKey === activeSystemKey) {
-      card.classList.add('expanded');
-    }
+      card.classList.toggle('expanded', !isExpanded);
+      if (!isExpanded) {
+        setTimeout(() => {
+          card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 80);
+      }
+    });
 
     card.appendChild(titleRow);
     card.appendChild(body);
@@ -315,6 +324,12 @@ function renderMobileAccordionMenu() {
 function openMobileMenu() {
   renderMobileAccordionMenu();
   mobileMenuDrawer.classList.remove('hidden');
+  setTimeout(() => {
+    const activeCard = mobileSystemsAccordion.querySelector('.active-system');
+    if (activeCard) {
+      activeCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  }, 100);
 }
 
 function closeMobileMenu() {
@@ -538,7 +553,10 @@ function toggleInfoSidebar() {
 function closeInfoSidebar() {
   if (!infoSidebar) return;
   infoSidebar.classList.remove('open-drawer');
-  infoSidebar.classList.add('hidden-sidebar');
+  const isMobile = window.innerWidth <= 900;
+  if (!isMobile) {
+    infoSidebar.classList.add('hidden-sidebar');
+  }
   setMobileNavActive('3d');
   setTimeout(() => sceneManager.onResize(), 150);
 }
