@@ -7,7 +7,16 @@ import {
   createSmallIntestineModel,
   createLargeIntestineAppendixModel,
   createLarynxVocalCordsModel,
-  createTracheaBronchialTreeModel
+  createTracheaBronchialTreeModel,
+  createKidneyNephronModel,
+  createUretersModel,
+  createBladderUrethraModel,
+  createEarModel,
+  createSkinLayersModel,
+  createLymphaticImmuneModel,
+  createCellStructureModel,
+  createDnaHelixModel,
+  createBloodCellsModel
 } from './detailedOrgans.js';
 
 export {
@@ -18,7 +27,16 @@ export {
   createSmallIntestineModel,
   createLargeIntestineAppendixModel,
   createLarynxVocalCordsModel,
-  createTracheaBronchialTreeModel
+  createTracheaBronchialTreeModel,
+  createKidneyNephronModel,
+  createUretersModel,
+  createBladderUrethraModel,
+  createEarModel,
+  createSkinLayersModel,
+  createLymphaticImmuneModel,
+  createCellStructureModel,
+  createDnaHelixModel,
+  createBloodCellsModel
 };
 
 // -------------------------------------------------------------
@@ -2833,5 +2851,19 @@ export const PROCEDURAL_MODEL_BUILDERS = {
   small_intestine: createSmallIntestineModel,
   large_intestine: createLargeIntestineAppendixModel,
   larynx_vocal_cords: createLarynxVocalCordsModel,
-  trachea_bronchi: createTracheaBronchialTreeModel
+  trachea_bronchi: createTracheaBronchialTreeModel,
+  // Urinary detailed models:
+  kidney: createKidneyNephronModel,
+  kidney_nephron: createKidneyNephronModel,
+  ureters: createUretersModel,
+  bladder_urethra: createBladderUrethraModel,
+  // Sensory detailed models:
+  ear: createEarModel,
+  skin_layers: createSkinLayersModel,
+  // Lymphatic & Immune:
+  lymphatic_system: createLymphaticImmuneModel,
+  // Cell & Microbiology:
+  cell_structure: createCellStructureModel,
+  dna_helix: createDnaHelixModel,
+  blood_cells: createBloodCellsModel
 };

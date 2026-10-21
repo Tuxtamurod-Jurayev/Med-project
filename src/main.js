@@ -34,6 +34,8 @@ const SYSTEM_ORGANS_MAP = {
     title: 'Sezgi a\'zolari',
     organs: [
       { id: 'eye_layers', label: "Ko'z olmasi ichki qatlamlari" },
+      { id: 'ear', label: "Quloq (tashqi, o'rta, ichki)" },
+      { id: 'skin_layers', label: "Teri qatlamlari va soch" },
       { id: 'eye', label: "Ko'z olmasi (Tashqi tuzilishi)" }
     ]
   },
@@ -63,8 +65,24 @@ const SYSTEM_ORGANS_MAP = {
   urinary: {
     title: 'Siydik chiqarish',
     organs: [
-      { id: 'kidney', label: "Buyraklar" },
-      { id: 'urinary_system', label: "Siydik chiqarish sistemasi" }
+      { id: 'kidney', label: "Buyraklar (kesimi va nefron)" },
+      { id: 'ureters', label: "Siydik naylari (ureterlar)" },
+      { id: 'bladder_urethra', label: "Qovuq va uretra" },
+      { id: 'urinary_system', label: "Yaxlit siydik tizimi" }
+    ]
+  },
+  lymphatic: {
+    title: 'Limfa va immun',
+    organs: [
+      { id: 'lymphatic_system', label: "Taloq va limfa tarmog'i" }
+    ]
+  },
+  microbiology: {
+    title: 'Hujayra va mikro',
+    organs: [
+      { id: 'cell_structure', label: "Hujayra tuzilishi (organellalar)" },
+      { id: 'dna_helix', label: "DNK qo'sh spirali" },
+      { id: 'blood_cells', label: "Qon hujayralari (eritrotsit, leykotsit)" }
     ]
   },
   endocrine: {

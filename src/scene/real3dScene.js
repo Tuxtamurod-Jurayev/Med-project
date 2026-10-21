@@ -65,11 +65,6 @@ export class Real3DSceneManager {
         targetScale: 2.2,
         yOffset: 0.0
       },
-      kidney: {
-        path: '/models/kidney.glb',
-        targetScale: 2.2,
-        yOffset: 0.0
-      },
       spine: {
         path: '/models/spine.glb',
         targetScale: 2.5,

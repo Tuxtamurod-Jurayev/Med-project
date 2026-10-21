@@ -928,41 +928,229 @@ export const ANATOMY_DATA = {
     ]
   },
 
-  // 19. BUYRAK (YAKKA MODEL)
+  // 19. BUYRAKLAR (KESIMI VA NEFRON MIKROTUZILISHI)
   kidney: {
     id: "kidney",
-    nameUz: "Buyrak",
-    nameLat: "Ren",
-    nameEn: "Human Kidney 3D",
+    nameUz: "Buyraklar (kesimi va nefron mikrotuzilishi)",
+    nameLat: "Ren (Sectio & Nephron)",
+    nameEn: "Kidney Section & Nephron 3D",
     systemKey: "urinary",
     system: "Siydik ayirish tizimi (Systema urinarium)",
-    category: "Ekskretor a'zo",
-    bonesCount: "0 ta suyak",
+    category: "Ekskretor va qon filtrlovchi a'zo",
+    bonesCount: "1-1.2 million nefron",
     weight: "~130 - 160 g",
-    keywords: ["buyrak", "kidney", "ren", "siydik", "nefron", "siydik ayirish", "filtr", "glomerula"],
-    description: "Inson buyragining 3D modeli: po'stloq modda, mag'iz piramidalari, buyrak jomi, nefronlar va siydik yo'li (ureter).",
+    keywords: ["buyrak", "kidney", "ren", "siydik", "nefron", "siydik ayirish", "filtr", "glomerula", "bowman", "genle", "jom"],
+    description: "Inson buyragining frontal kesimi va kattalashtirilgan nefron mikrotuzilishi 3D modeli: po'stloq qavati (cortex), Malpigi piramidalari (medulla), kichik va katta jomlar (calyces), buyrak jomi (pelvis renalis) hamda mikroskopik Nefron (Boumen kapsulasi, kapillyar koptokcha, Genle qovuzlog'i va yig'uvchi naycha).",
     parts: [
-      { id: "cortex_renal", nameUz: "Buyrak po'stloq qavati", nameLat: "Cortex renalis", desc: "Birlamchi siydik filtratsiyasi amalga oshuvchi qon tomirli soha." },
-      { id: "pelvis_renal", nameUz: "Buyrak jomi va siydik nayi", nameLat: "Pelvis renalis et Ureter", desc: "Filtrlangan ikkilamchi siydikni qovuqqa yo'naltiruvchi naycha." }
+      { id: "cortex_renal", nameUz: "Buyrak po'stloq qavati", nameLat: "Cortex renalis", desc: "Birlamchi siydik filtratsiyasi kechuvchi nefron kapsulalari va buralma naychalar zonasi." },
+      { id: "medulla_pyramids", nameUz: "Mag'iz piramidalari", nameLat: "Pyramides renales", desc: "Genle qovuzloqlari va siydik yig'uvchi to'g'ri naychalar joylashgan 7-8 ta piramida." },
+      { id: "pelvis_calyces", nameUz: "Buyrak jomi va kosachalari", nameLat: "Pelvis et calyces renales", desc: "Ikkilamchi siydikni to'plab, siydik nayiga (ureterga) uzatuvchi voronkasimon tuzilma." },
+      { id: "nephron_unit", nameUz: "Nefron mikrotuzilishi", nameLat: "Nephronum", desc: "Boumen-Shumlyanskiy kapsulasi, kapillyar glomerula, proksimal nay, Genle qovuzlog'i va distal naycha." }
     ],
     functions: [
-      "Qonni doimiy filtrlab zararli qoldiqlarni siydik bilan chiqarish",
-      "Suv-tuz va elektrolit muvozanatini saqlash",
-      "Qon bosimini regulyatsiya qiluvchi renin gormonini sintezlash"
+      "Qonni filtrlab, sutkasiga 150-180 litr birlamchi va 1.5 litr ikkilamchi siydik hosil qilish",
+      "Suv, elektrolitlar va kislota-ishqor muvozanatini saqlash",
+      "Eritropoez (qon hosil bo'lishi) va qon bosimini boshqaruvchi gormonlar ajratish"
     ],
     clinical: [
-      "Piyelonefrit - buyrak jomi va to'qimalarining yallig'lanishi.",
-      "Buyrak tosh kasalligi (Urolitiaz) - tuzlar kristallarining toshga aylanishi."
+      "Glomerulonefrit - nefron kapillyar koptokchalarining autoimmun yallig'lanishi.",
+      "Surunkali buyrak yetishmovchiligi - nefronlar sonining kamayishi va uremik intoksikatsiya."
     ],
-    quiz: [
-      {
-        question: "Buyrakning struktur-funktsional birligi nima deb ataladi?",
-        options: ["Neyron", "Nefron (Nephron)", "Alveola", "Osteon"],
-        correct: 1,
-        answerIndex: 1,
-        explanation: "Nefron (Nephron) buyrakning qon filtrlovchi asosiy mikroskopik birligidir."
-      }
-    ]
+    quiz: []
+  },
+
+  // 21. SIYDIK NAYLARI (URETERLAR)
+  ureters: {
+    id: "ureters",
+    nameUz: "Siydik naylari (ureterlar)",
+    nameLat: "Ureter dexter et sinister",
+    nameEn: "Ureters 3D",
+    systemKey: "urinary",
+    system: "Siydik ayirish tizimi (Systema urinarium)",
+    category: "Siydik o'tkazuvchi magistral",
+    bonesCount: "Mushakli naylar",
+    weight: "~25 - 30 sm uzunlik",
+    keywords: ["ureter", "siydik nayi", "ureterlar", "buyrak nayi", "psoas", "qovuq", "siydik yo'li"],
+    description: "Ikkala tomonlama siydik naylarining (Ureter dexter va sinister) to'liq 3D modeli: buyrak jomidan chiqish (PUJ), bel qismi, yonbosh tomirlarini kesib o'tish (chanoqqa kirish) va qovuq orqa devoriga qiyshiq kirish burchagi (UVJ).",
+    parts: [
+      { id: "puj_junction", nameUz: "Jom-siydik nayi tutashuvi (PUJ)", nameLat: "Junctura pyeloureterica", desc: "Buyrak jomining torayib siydik nayiga o'tuvchi birinchi fiziologik torligi." },
+      { id: "abdominal_part", nameUz: "Qorin bo'limi", nameLat: "Pars abdominalis", desc: "Katta bel mushagi (Psoas major) old yuzasi bo'ylab tushuvchi vertikal yo'l." },
+      { id: "pelvic_part", nameUz: "Chanoq bo'limi", nameLat: "Pars pelvina", desc: "Umumiy yonbosh tomirlarini kesib o'tib, kichik chanoq bo'ylab qovuqqa yo'naluvchi qism." },
+      { id: "uvj_junction", nameUz: "Qovuq ichi tutashuvi (UVJ)", nameLat: "Junctura ureterovesicalis", desc: "Siydikning orqaga (buyrakka) qaytishiga yo'l qo'ymaydigan klapansimon soha." }
+    ],
+    functions: ["Buyrakda hosil bo'lgan ikkilamchi siydikni peristaltik qisqarishlar orqali qovuqqa o'tkazish"],
+    clinical: ["Ureterolitiaz - siydik nayi torliklarida tosh tiqilib qolishi va o'tkir buyrak sanchig'i (kolika)."],
+    quiz: []
+  },
+
+  // 22. QOVUQ VA URETRA
+  bladder_urethra: {
+    id: "bladder_urethra",
+    nameUz: "Qovuq (siydik pufagi) va uretra",
+    nameLat: "Vesica urinaria et Urethra",
+    nameEn: "Urinary Bladder & Urethra 3D",
+    systemKey: "urinary",
+    system: "Siydik ayirish tizimi (Systema urinarium)",
+    category: "Siydik rezervuari va chiqaruv yo'li",
+    bonesCount: "Detruzor mushagi va sfinkterlar",
+    weight: "~350 - 500 ml sig'im",
+    keywords: ["qovuq", "siydik pufagi", "uretra", "vesica urinaria", "detruzor", "trigonum", "sfinkter", "prostatik uretra"],
+    description: "Qovuq (Vesica urinaria) ichki kesimi va uretra 3D modeli: kuchli detruzor mushagi, qovuq tubidagi silliq Lyoto uchburchagi (Trigonum vesicae), siydik naylari teshiklari hamda ichki va tashqi sfinkterli uretra yo'li.",
+    parts: [
+      { id: "detrusor_muscle", nameUz: "Detruzor mushagi", nameLat: "Musculus detrusor vesicae", desc: "Siydikni siqib chiqarish uchun uch qatlamli kuchli silliq mushak devori." },
+      { id: "trigonum_vesicae", nameUz: "Qovuq uchburchagi (Lyoto)", nameLat: "Trigonum vesicae", desc: "Ikki siydik nayi va uretra ichki teshigi hosil qiluvchi burmasiz silliq soha." },
+      { id: "urethra_tube", nameUz: "Siydik chiqarish kanali (Uretra)", nameLat: "Urethra", desc: "Qovuq bo'ynidan boshlanib, tashqi teshikka qadar davom etuvchi chiqaruv nayi." },
+      { id: "sphincters", nameUz: "Ichki va tashqi sfinkterlar", nameLat: "Sphincter urethrae", desc: "Ixtiyoriy va g'ayriixtiyoriy siydik tutish klapanlari." }
+    ],
+    functions: ["Siydikni vaqtincha to'plash, ushlab turish va vaqti-vaqti bilan tashqariga bo'shatish"],
+    clinical: ["Sistit - qovuq shilliq qavatining o'tkir bakterial yallig'lanishi.", "Siydik tutolmaslik (Inkratentsiya)."],
+    quiz: []
+  },
+
+  // 23. QULOQ (TASHQI, O'RTA, ICHKI)
+  ear: {
+    id: "ear",
+    nameUz: "Quloq (tashqi, o‘rta va ichki quloq — chig‘anoq hamda yarimaylana kanallar)",
+    nameLat: "Auris (externa, media, interna & Cochlea)",
+    nameEn: "Ear Anatomy, Ossicles & Cochlea 3D",
+    systemKey: "sensory",
+    system: "Sezgi a'zolari (Organa sensuum)",
+    category: "Eshitish va muvozanat a'zosi",
+    bonesCount: "3 ta eshitish suyakchasi (Bolg'acha, Sandoncha, Uzangicha)",
+    weight: "~35 g",
+    keywords: ["quloq", "ear", "auris", "nog'ora parda", "chig'anoq", "cochlea", "yarimaylana kanallar", "bolgacha", "sandoncha", "uzangicha", "eshitish"],
+    description: "Eshitish va muvozanat a'zosining to'liq 3D modeli: Tashqi quloq suprasi va eshitish yo'li; O'rta quloqdagi Nog'ora parda, 3 ta suyakcha (Bolg'acha, Sandoncha, Uzangicha) va Yevstaxiy nayi; Ichki quloqdagi Chig'anoq (Cochlea - 2.5 buralmali spiral), 3 ta Yarimaylana kanallar va Eshituv-muvozanat nervi (VIII juft).",
+    parts: [
+      { id: "auricula_meatus", nameUz: "Tashqi quloq suprasi va yo'li", nameLat: "Auricula et Meatus acusticus externus", desc: "Tovush to'lqinlarini tutib oluvchi elastik tog'ayli supra va yo'l." },
+      { id: "tympanic_membrane", nameUz: "Nog'ora parda", nameLat: "Membrana tympanica", desc: "Havodagi tovush tebranishlarini mexanik tebranishlarga aylantiruvchi yupqa parda." },
+      { id: "ossicles_chain", nameUz: "Eshituv suyakchalari zanjiri", nameLat: "Malleus, Incus et Stapes", desc: "Tovush kuchini 20 martagacha kuchaytirib ichki quloqqa uzatuvchi Bolg'acha, Sandoncha va Uzangicha." },
+      { id: "cochlea_snail", nameUz: "Eshitish chig'anog'i", nameLat: "Cochlea", desc: "Korti a'zosi fotoretseptorlari yordamida mexanik to'lqinni nerv impulsiga aylantiruvchi 2.5 buralmali chig'anoq." },
+      { id: "semicircular_canals", nameUz: "Uchta yarimaylana kanallar", nameLat: "Canales semicirculares", desc: "Boshning fazodagi burchakli harakatlari va muvozanatini sezuvchi 3 perpendikulyar kanal." }
+    ],
+    functions: ["Tovush to'lqinlarini qabul qilish, kuchaytirish va nerv impulsi sifatida miyaga uzatish; tana muvozanatini ta'minlash"],
+    clinical: ["Otitis media - o'rta quloqning yiringli yallig'lanishi.", "Mener kasalligi - ichki quloq endolimfasi bosimi oshishi va bosh aylanishi."],
+    quiz: []
+  },
+
+  // 24. TERI QATLAMLARI
+  skin_layers: {
+    id: "skin_layers",
+    nameUz: "Teri qatlamlari (epidermis, derma, yog‘ to‘qimasi, retseptorlar va soch ildizi)",
+    nameLat: "Cutis: Epidermis, Dermis & Subcutis",
+    nameEn: "Human Skin Layers & Hair Follicle 3D",
+    systemKey: "sensory",
+    system: "Sezgi a'zolari va Qoplovchi sistema (Integumentum commune)",
+    category: "Eng katta sezgi va himoya organi",
+    bonesCount: "Retseptorlar va soch apparati",
+    weight: "~4 - 5 kg (tana yuzasi 1.8 m²)",
+    keywords: ["teri", "skin", "epidermis", "derma", "soch", "soch ildizi", "ter bezi", "yog bezi", "retseptor", "meissner", "pacinian"],
+    description: "Inson terisining mikroskopik 3D blok kesimi: 5 qavatli Epidermis (muguz, yaltiroq, donador, tikanakli, bazal), tomirlar va tolalar boy Derma, Teri osti yog' qatlami (Gipoderma), Soch follikulasi va piyozchasi, Sochni tiklovchi silliq mushak, Yog' va ter bezlari hamda Meyssner va Pachini sezgi retseptorlari.",
+    parts: [
+      { id: "epidermis_layer", nameUz: "Epidermis (Ustki qatlam)", nameLat: "Epidermis", desc: "Muguzlanuvchi ko'p qavatli yassi epiteliy; tashqi mikroblar va nurlanishdan himoya qiladi." },
+      { id: "dermis_layer", nameUz: "Xususiy teri (Derma)", nameLat: "Dermis / Corium", desc: "Kollagen va elastik tolalar to'ri, kapillyar to'rlar, elastiklik va mustahkamlik asosi." },
+      { id: "hypodermis_fat", nameUz: "Teri osti yog' to'qimasi", nameLat: "Subcutis / Hypodermis", desc: "Yog' lobulalari to'plami; issiqlik izolyatsiyasi va mexanik amortizator." },
+      { id: "hair_unit", nameUz: "Soch apparati (Follikula va mushak)", nameLat: "Folliculus pili & Musculus arrector pili", desc: "Soch ildizi, yog' bezi va sochni tiklovchi silliq mushak tutami." },
+      { id: "skin_receptors", nameUz: "Taktil va bosim retseptorlari", nameLat: "Corpuscula tactus (Meissner & Pacini)", desc: "Mayin teginish, bosim, tebranish, og'riq va haroratni sezuvchi nerv uchlari." }
+    ],
+    functions: ["Himoya, termoregulyatsiya (terlash orqali sovutish), sezish (taktil, harorat, og'riq), D vitamini sintezi"],
+    clinical: ["Kuyish (I, II, III daraja) - epidermis va derma qatlamlarining termik zararlanishi.", "Dermatit va psoriaz."],
+    quiz: []
+  },
+
+  // 25. LIMFA VA IMMUN SISTEMASI
+  lymphatic_system: {
+    id: "lymphatic_system",
+    nameUz: "Limfa va immun sistemasi (Taloq, limfa tugunlari va tomirlari)",
+    nameLat: "Systema lymphaticum et Splen",
+    nameEn: "Lymphatic System & Spleen 3D",
+    systemKey: "lymphatic",
+    system: "Limfa va immun sistemasi (Systema lymphoideum)",
+    category: "Organizm immuniteti va drenaj tizimi",
+    bonesCount: "400-600 ta limfa tuguni",
+    weight: "~150 - 200 g (taloq bilan)",
+    keywords: ["limfa", "immun", "taloq", "spleen", "limfa tuguni", "limfatik tomir", "torakal kanal", "limfotsit", "antitanacha"],
+    description: "Limfa va immun tizimining mukammal 3D modeli: Taloq (Lien - qizil va oq pulpa, taloq arteriyasi), Loviyasimon Limfa tugunlari (po'stloq, follikulalar, kirituvchi va chiqaruvchi tomirlar) hamda Ko'krak limfa yo'li (Ductus thoracicus) va limfa tomirlari tarmog'i.",
+    parts: [
+      { id: "spleen_organ", nameUz: "Taloq (Lien)", nameLat: "Splen / Lien", desc: "Qonni qari eritrotsitlardan tozalovchi va limfotsitlar ishlab chiqaruvchi eng yirik limfoid a'zo." },
+      { id: "lymph_node", nameUz: "Limfa tuguni (Kesimi)", nameLat: "Nodus lymphaticus", desc: "Limfa suyuqligini bakteriya va toksinlardan filtrlovchi, B va T-hujayralar markazi." },
+      { id: "thoracic_duct", nameUz: "Ko'krak limfa yo'li", nameLat: "Ductus thoracicus", desc: "Qorin va oyoqlardan limfani to'plab, chap venoz burchakka quyuvchi bosh limfa magistrali." },
+      { id: "lymph_vessels", nameUz: "Klapanli limfatik tomirlar", nameLat: "Vasa lymphatica", desc: "To'qima aro suyuqlikni bir tomonlama harakatlantiruvchi klapanli nozik tomirlar." }
+    ],
+    functions: ["To'qimalardan ortiqcha suyuqlikni qonga qaytarish (drenaj), begona antigenlarni zararsizlantirish, immunitet"],
+    clinical: ["Limfadenit - infektsiya tufayli limfa tugunlarining kattalashishi va og'rishi.", "Limfoma - limfoid to'qima o'smalari."],
+    quiz: []
+  },
+
+  // 26. HUJAYRA TUZILISHI (MITOXONDRIYA, YADRO, ORGANELLALAR)
+  cell_structure: {
+    id: "cell_structure",
+    nameUz: "Hujayra tuzilishi (mitoxondriya, yadro, organellalar)",
+    nameLat: "Structura cellulae eukarioticae",
+    nameEn: "Eukaryotic Cell Structure & Organelles 3D",
+    systemKey: "microbiology",
+    system: "Sitologiya va Mikrobiologiya",
+    category: "Hayotning elementar birligi",
+    bonesCount: "Subhujayraviy organellalar",
+    weight: "~10 - 100 mikrometr",
+    keywords: ["hujayra", "sitologiya", "yadro", "mitoxondriya", "golji", "er", "lizosoma", "dnk", "sitoplazma", "organella", "cell"],
+    description: "Evkariot hayvon hujayrasining 3D sitologik modeli: Plazmatik membrana, Yadro (yadrocha, xromatin, yadro g'ovalari), Mitoxondriyalar (ichki kristalar va matritsa bilan energiya stantsiyalari), Donador va Silliq Endoplazmatik To'r (ER), Golji kompleksi, Lizosomalar va Sentriolalar.",
+    parts: [
+      { id: "nucleus_cell", nameUz: "Hujayra yadrosi va Yadrocha", nameLat: "Nucleus et Nucleolus", desc: "Irsiy axborot (DNK) saqlovchi va transkripsiyani boshqaruvchi markaz." },
+      { id: "mitochondria_power", nameUz: "Mitoxondriyalar (Kristalar bilan)", nameLat: "Mitochondria", desc: "Oksidlanish-fosforillanish orqali universal energiya (ATF) sintezlovchi a'zocha." },
+      { id: "endoplasmic_reticulum", nameUz: "Endoplazmatik to'r (ER)", nameLat: "Reticulum endoplasmaticum", desc: "Oqsillar (donador ER) va lipidlar (silliq ER) sintezi hamda transporti." },
+      { id: "golgi_complex", nameUz: "Golji apparati", nameLat: "Complexus golgiensis", desc: "Sintezlangan oqsillarni saralovchi, modifikatsiyalovchi va pufakchalarga o'rovchi tizim." },
+      { id: "lysosomes_perox", nameUz: "Lizosomalar", nameLat: "Lysosomata", desc: "Hujayra ichi hazmini ta'minlovchi gidrolitik fermentlarga boy pufakchalar." }
+    ],
+    functions: ["Moddalar va energiya almashinuvi, oqsil biosintezi, irsiyatni saqlash va ko'payish"],
+    clinical: ["Mitoxondrial kasalliklar - energiya tanqisligi sindromlari.", "Lizosomal to'planish kasalliklari."],
+    quiz: []
+  },
+
+  // 27. DNK SPIRALI
+  dna_helix: {
+    id: "dna_helix",
+    nameUz: "DNK spirali (Qo'sh spiral genetik kodi)",
+    nameLat: "Helix duplex acidi desoxyribonucleici (B-DNA)",
+    nameEn: "DNA Double Helix Structure 3D",
+    systemKey: "microbiology",
+    system: "Molekulyar genetika va Sitologiya",
+    category: "Irsiyatning molekulyar asosi",
+    bonesCount: "Komplementar azot asoslari",
+    weight: "~2 nm diametr, 3.4 nm qadam",
+    keywords: ["dnk", "dna", "genetika", "spiral", "qo'sh spiral", "adenin", "timin", "guanin", "sitozin", "vodorod bog", "xromosoma"],
+    description: "Uotson va Krik B-DNK qo'sh spiralining 3D modeli: antiparallel qand-fosfat zanjirlari (5'-3' va 3'-5'), Katta va Kichik egatchalar hamda komplementar juftlashgan azot asoslari: Adenin (A, yashil) - Timin (T, sariq) ikkitalik vodorod bog'i bilan, Guanin (G, ko'k) - Sitozin (C, qizil) uchtalik vodorod bog'i bilan.",
+    parts: [
+      { id: "sugar_phosphate", nameUz: "Qand-fosfat tayanchi", nameLat: "Sceleton desoxyriboso-phosphoricum", desc: "Dezoksiriboza qandi va fosfat qoldiqlaridan tuzilgan tashqi mustahkam qo'sh spiral zanjir." },
+      { id: "base_at", nameUz: "Adenin - Timin (A-T) juftligi", nameLat: "Adeninum - Thyminum", desc: "Ikkita vodorod bog'i orqali birlashgan komplementar azot asoslari." },
+      { id: "base_gc", nameUz: "Guanin - Sitozin (G-C) juftligi", nameLat: "Guaninum - Cytosinum", desc: "Uchta mustahkam vodorod bog'i orqali birikkan komplementar juftlik." },
+      { id: "grooves_dna", nameUz: "Katta va kichik egatchalar", nameLat: "Sulcus major et minor", desc: "Oqsillar va fermentlar (polimeraza) DNK bilan birikadigan fazoviy chuqurchalar." }
+    ],
+    functions: ["Genetik axborotni kodlash, saqlash, replikatsiya (ko'payish) va transkripsiyada uzatish"],
+    clinical: ["Gen mutatsiyalari - nukleotidlar ketma-ketligining buzilishi va irsiy kasalliklar."],
+    quiz: []
+  },
+
+  // 28. QON HUJAYRALARI (ERITROTSIT, LEYKOTSIT, TROMBOTSIT)
+  blood_cells: {
+    id: "blood_cells",
+    nameUz: "Qon hujayralari (eritrotsit, leykotsit, trombotsit)",
+    nameLat: "Cellulae sanguinis: Erythrocyti, Leucocyti & Thrombocyti",
+    nameEn: "Blood Cells: RBC, WBC & Platelets 3D",
+    systemKey: "microbiology",
+    system: "Gematologiya va Qon aylanish",
+    category: "Qonning shaklli elementlari",
+    bonesCount: "Milliardlab erkin qon hujayralari",
+    weight: "~7-8 mikrometr (RBC)",
+    keywords: ["qon hujayralari", "qon", "eritrotsit", "leykotsit", "trombotsit", "gemoglobin", "neytrofil", "qon plastinkasi", "qon ivishi"],
+    description: "Inson qonining shaklli elementlari 3D mikroskopik modeli: Kislorod tashuvchi ikki tomoni botiq disk shaklidagi qizil qon tanachalari (Eritrotsitlar), Ko'p bo'lakli yadroli oq qon himoya hujayralari (Neytrofil leykotsitlar) va Qon ivishini ta'minlovchi o'siqli plastinkalar (Trombotsitlar).",
+    parts: [
+      { id: "erythrocyte_rbc", nameUz: "Eritrotsitlar (Qizil qon tanachalari)", nameLat: "Erythrocyti", desc: "Yadrosiz, ikki tomoni botiq disk shaklida bo'lib, gemoglobin oqsili yordamida O2 va CO2 tashiydi." },
+      { id: "leukocyte_wbc", nameUz: "Leykotsitlar (Neytrofil)", nameLat: "Leucocyti (Neutrophilus)", desc: "Segmentlangan ko'p bo'lakli yadroli va fagotsitoz xususiyatiga ega immun hujayra." },
+      { id: "thrombocyte_plt", nameUz: "Trombotsitlar (Qon plastinkalari)", nameLat: "Thrombocyti", desc: "Qon tomiri shikastlanganda ivish faktorlarini faollashtiruvchi o'siqli yassi plastinkalar." }
+    ],
+    functions: ["Kislorod va karbonat angidrid transporti, fagotsitoz orqali infektsiyalarga qarshi kurashish, gemostaz (qon to'xtatish)"],
+    clinical: ["Anemiya (Kamqonlik) - eritrotsitlar yoki gemoglobin miqdori kamayishi.", "Trombotsitopeniya - qon oqishi xavfi."],
+    quiz: []
   },
 
   // 20. UMURTQA POG'ONASI (YAKKA MODEL)
