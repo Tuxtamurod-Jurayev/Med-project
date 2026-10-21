@@ -137,7 +137,7 @@ export class Real3DSceneManager {
 
   initScene() {
     this.scene = new THREE.Scene();
-    this.scene.background = new THREE.Color(0x060a14);
+    this.scene.background = new THREE.Color(0x2f2f2f);
 
     const width = this.container.clientWidth || window.innerWidth;
     const height = this.container.clientHeight || window.innerHeight;
@@ -153,6 +153,7 @@ export class Real3DSceneManager {
     });
     this.renderer.setSize(width, height);
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    this.renderer.setClearColor(0x2f2f2f, 1);
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
     this.renderer.toneMappingExposure = 1.35;
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -165,8 +166,8 @@ export class Real3DSceneManager {
     this.ambientLight = new THREE.AmbientLight(0xffffff, 1.4);
     this.scene.add(this.ambientLight);
 
-    // Hemisphere light - subtle sky/ground natural tone
-    this.hemiLight = new THREE.HemisphereLight(0xffffff, 0x1e293b, 1.25);
+    // Hemisphere light - natural neutral ground tone matching #2f2f2f
+    this.hemiLight = new THREE.HemisphereLight(0xffffff, 0x383838, 1.25);
     this.hemiLight.position.set(0, 20, 0);
     this.scene.add(this.hemiLight);
 

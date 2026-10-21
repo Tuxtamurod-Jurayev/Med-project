@@ -93,8 +93,8 @@ export const ANATOMY_DATA = {
   // 3. SEZGI / KO'Z TO'QIMALARI
   eye: {
     id: "eye",
-    nameUz: "Ko'z to'qimalari va olmasi",
-    nameLat: "Bulbus oculi & Tunicae oculi",
+    nameUz: "Ko'z olmasi",
+    nameLat: "Bulbus oculi",
     nameEn: "Human Eye & Ocular Tissues 3D",
     systemKey: "sensory",
     system: "Sezgi a'zolari (Organa sensuum)",
@@ -227,8 +227,8 @@ export const ANATOMY_DATA = {
   // 5. OVQAT HAZM / O'T PUFAGI
   gallbladder: {
     id: "gallbladder",
-    nameUz: "O't pufagi va o't yo'llari",
-    nameLat: "Vesica biliaris & Ductus biliares",
+    nameUz: "O't pufagi",
+    nameLat: "Vesica biliaris",
     nameEn: "Gallbladder & Biliary System 3D",
     systemKey: "digestive",
     system: "Ovqat hazm qilish sistemasi (Systema digestorium)",
@@ -350,8 +350,8 @@ export const ANATOMY_DATA = {
   // 8. TAYANCH-HARAKAT / BARMOG'LAR VA QO'L TUZILISHI
   hand_fingers: {
     id: "hand_fingers",
-    nameUz: "Panja va barmoqlar",
-    nameLat: "Digiti manus & Skeleton manus",
+    nameUz: "Qo'l panjasi",
+    nameLat: "Manus",
     nameEn: "Hand & Finger Anatomy 3D",
     systemKey: "musculoskeletal",
     system: "Tayanch-harakat a'zolari (Systema skeletale)",
@@ -471,9 +471,9 @@ export const ANATOMY_DATA = {
   // 11. HIQILDOQ VA OVOZ BOYLAMLARI (LARYNX & PLICA VOCALIS)
   larynx_vocal_cords: {
     id: "larynx_vocal_cords",
-    nameUz: "Hiqildoq va ovoz boylamlari",
-    nameLat: "Larynx & Plica vocalis",
-    nameEn: "Larynx & Vocal Cords 3D",
+    nameUz: "Hiqildoq",
+    nameLat: "Larynx",
+    nameEn: "Larynx 3D",
     systemKey: "respiratory",
     system: "Nafas olish sistemasi (Systema respiratorium)",
     category: "Ovoz va nafas o'tkazuvchi a'zo",
@@ -503,9 +503,9 @@ export const ANATOMY_DATA = {
   // 12. TRAXEYA VA BRONXLAR DARAXTI
   trachea_bronchi: {
     id: "trachea_bronchi",
-    nameUz: "Traxeya va bronxlar daraxti",
-    nameLat: "Trachea & Arbor bronchialis",
-    nameEn: "Trachea & Bronchial Tree 3D",
+    nameUz: "Traxeya",
+    nameLat: "Trachea",
+    nameEn: "Trachea & Bronchi 3D",
     systemKey: "respiratory",
     system: "Nafas olish sistemasi (Systema respiratorium)",
     category: "Havo o'tkazuvchi nafas yo'llari",
@@ -533,9 +533,9 @@ export const ANATOMY_DATA = {
   // 13. QIZILO'NGACH VA HALQUM
   esophagus_pharynx: {
     id: "esophagus_pharynx",
-    nameUz: "Qizilo'ngach va halqum",
-    nameLat: "Esophagus & Pharynx",
-    nameEn: "Esophagus & Pharynx 3D",
+    nameUz: "Qizilo'ngach",
+    nameLat: "Esophagus",
+    nameEn: "Esophagus 3D",
     systemKey: "digestive",
     system: "Ovqat hazm qilish sistemasi (Systema digestorium)",
     category: "Hazm trakti o'tkazuvchi bo'limi",
@@ -605,9 +605,9 @@ export const ANATOMY_DATA = {
   // 16. YO'G'ON ICHAK VA APPENDIKS
   large_intestine: {
     id: "large_intestine",
-    nameUz: "Yo'g'on ichak va appendiks",
-    nameLat: "Intestinum crassum & Appendix",
-    nameEn: "Large Intestine & Appendix 3D",
+    nameUz: "Yo'g'on ichak",
+    nameLat: "Intestinum crassum",
+    nameEn: "Large Intestine 3D",
     systemKey: "digestive",
     system: "Ovqat hazm qilish sistemasi (Systema digestorium)",
     category: "Suv so'rish va najas shakllantirish",
@@ -986,9 +986,9 @@ export const ANATOMY_DATA = {
   // 22. QOVUQ VA URETRA
   bladder_urethra: {
     id: "bladder_urethra",
-    nameUz: "Qovuq va uretra",
-    nameLat: "Vesica urinaria et Urethra",
-    nameEn: "Urinary Bladder & Urethra 3D",
+    nameUz: "Qovuq",
+    nameLat: "Vesica urinaria",
+    nameEn: "Urinary Bladder 3D",
     systemKey: "urinary",
     system: "Siydik ayirish tizimi (Systema urinarium)",
     category: "Siydik rezervuari va chiqaruv yo'li",
@@ -1011,8 +1011,8 @@ export const ANATOMY_DATA = {
   ear: {
     id: "ear",
     nameUz: "Quloq",
-    nameLat: "Auris (externa, media, interna & Cochlea)",
-    nameEn: "Ear Anatomy, Ossicles & Cochlea 3D",
+    nameLat: "Auris",
+    nameEn: "Ear Anatomy 3D",
     systemKey: "sensory",
     system: "Sezgi a'zolari (Organa sensuum)",
     category: "Eshitish va muvozanat a'zosi",
@@ -1035,9 +1035,9 @@ export const ANATOMY_DATA = {
   // 24. TERI QATLAMLARI
   skin_layers: {
     id: "skin_layers",
-    nameUz: "Teri qatlamlari",
-    nameLat: "Cutis: Epidermis, Dermis & Subcutis",
-    nameEn: "Human Skin Layers & Hair Follicle 3D",
+    nameUz: "Teri",
+    nameLat: "Cutis",
+    nameEn: "Human Skin Anatomy 3D",
     systemKey: "sensory",
     system: "Sezgi a'zolari va Qoplovchi sistema (Integumentum commune)",
     category: "Eng katta sezgi va himoya organi",
@@ -1060,9 +1060,9 @@ export const ANATOMY_DATA = {
   // 25. LIMFA VA IMMUN SISTEMASI
   lymphatic_system: {
     id: "lymphatic_system",
-    nameUz: "Limfa va immun sistemasi",
-    nameLat: "Systema lymphaticum et Splen",
-    nameEn: "Lymphatic System & Spleen 3D",
+    nameUz: "Limfa sistemasi",
+    nameLat: "Systema lymphaticum",
+    nameEn: "Lymphatic System 3D",
     systemKey: "lymphatic",
     system: "Limfa va immun sistemasi (Systema lymphoideum)",
     category: "Organizm immuniteti va drenaj tizimi",

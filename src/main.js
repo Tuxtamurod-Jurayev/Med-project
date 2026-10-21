@@ -12,18 +12,18 @@ const SYSTEM_ORGANS_MAP = {
     title: 'Nafas olish',
     organs: [
       { id: 'lung', label: "O'pka" },
-      { id: 'larynx_vocal_cords', label: "Hiqildoq va ovoz boylamlari" },
-      { id: 'trachea_bronchi', label: "Traxeya va bronxlar" }
+      { id: 'larynx_vocal_cords', label: "Hiqildoq" },
+      { id: 'trachea_bronchi', label: "Traxeya" }
     ]
   },
   digestive: {
     title: 'Ovqat hazm',
     organs: [
-      { id: 'gallbladder', label: "O't pufagi va yo'llari" },
-      { id: 'esophagus_pharynx', label: "Qizilo'ngach va halqum" },
+      { id: 'gallbladder', label: "O't pufagi" },
+      { id: 'esophagus_pharynx', label: "Qizilo'ngach" },
       { id: 'salivary_glands', label: "So'lak bezlari" },
       { id: 'small_intestine', label: "Ingichka ichak" },
-      { id: 'large_intestine', label: "Yo'g'on ichak va appendiks" },
+      { id: 'large_intestine', label: "Yo'g'on ichak" },
       { id: 'stomach', label: "Oshqozon" },
       { id: 'liver', label: "Jigar" },
       { id: 'pancreas', label: "Oshqozon osti bezi" },
@@ -35,7 +35,7 @@ const SYSTEM_ORGANS_MAP = {
     organs: [
       { id: 'eye_layers', label: "Ko'z qatlamlari" },
       { id: 'ear', label: "Quloq" },
-      { id: 'skin_layers', label: "Teri qatlamlari" },
+      { id: 'skin_layers', label: "Teri" },
       { id: 'eye', label: "Ko'z olmasi" }
     ]
   },
@@ -51,15 +51,15 @@ const SYSTEM_ORGANS_MAP = {
     title: 'Qon aylanish',
     organs: [
       { id: 'heart', label: "Inson yuragi" },
-      { id: 'circulatory_system', label: "Qon aylanish tizimi" }
+      { id: 'circulatory_system', label: "Qon tomirlari" }
     ]
   },
   musculoskeletal: {
     title: 'Tayanch-harakat',
     organs: [
-      { id: 'musculoskeletal_system', label: "Inson skeleti" },
+      { id: 'musculoskeletal_system', label: "Skelet" },
       { id: 'skull', label: "Bosh suyagi" },
-      { id: 'hand_fingers', label: "Panja va barmoqlar" }
+      { id: 'hand_fingers', label: "Qo'l panjasi" }
     ]
   },
   urinary: {
@@ -67,14 +67,14 @@ const SYSTEM_ORGANS_MAP = {
     organs: [
       { id: 'kidney', label: "Buyraklar" },
       { id: 'ureters', label: "Siydik naylari" },
-      { id: 'bladder_urethra', label: "Qovuq va uretra" },
-      { id: 'urinary_system', label: "Siydik chiqarish sistemasi" }
+      { id: 'bladder_urethra', label: "Qovuq" },
+      { id: 'urinary_system', label: "Siydik tizimi" }
     ]
   },
   lymphatic: {
     title: 'Limfa va immun',
     organs: [
-      { id: 'lymphatic_system', label: "Limfa va immun sistemasi" }
+      { id: 'lymphatic_system', label: "Limfa sistemasi" }
     ]
   },
   microbiology: {
@@ -88,7 +88,7 @@ const SYSTEM_ORGANS_MAP = {
   endocrine: {
     title: 'Endokrin',
     organs: [
-      { id: 'endocrine_system', label: "Endokrin sistema" },
+      { id: 'endocrine_system', label: "Endokrin bezlar" },
       { id: 'pancreas', label: "Oshqozon osti bezi" }
     ]
   }
