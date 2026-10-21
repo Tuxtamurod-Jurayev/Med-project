@@ -105,6 +105,31 @@ export class Real3DSceneManager {
         targetScale: 2.4,
         yOffset: 0.0
       },
+      small_intestine: {
+        path: '/models/small_intestine.glb',
+        targetScale: 2.3,
+        yOffset: 0.0
+      },
+      large_intestine: {
+        path: '/models/large_intestine.glb',
+        targetScale: 2.3,
+        yOffset: 0.0
+      },
+      ear: {
+        path: '/models/ear.glb',
+        targetScale: 2.4,
+        yOffset: 0.0
+      },
+      skin_layers: {
+        path: '/models/skin_layers.glb',
+        targetScale: 2.35,
+        yOffset: 0.0
+      },
+      skin: {
+        path: '/models/skin_layers.glb',
+        targetScale: 2.35,
+        yOffset: 0.0
+      },
       larynx_vocal_cords: {
         path: '/models/larynx_vocal_cords.glb',
         targetScale: 2.35,
@@ -1045,6 +1070,226 @@ export class Real3DSceneManager {
           } else {
             child.material.roughness = 0.35;
             child.material.side = THREE.DoubleSide;
+          }
+        }
+      });
+    } else if (key === 'small_intestine') {
+      // Small Intestine: Highlight Jejunum and Ileum with vibrant PBR, subtle colon frame
+      group.traverse((child) => {
+        if (child.isMesh && child.material) {
+          child.castShadow = true;
+          child.receiveShadow = true;
+          child.material.side = THREE.DoubleSide;
+          const name = (child.name || '').toLowerCase();
+          const parentName = (child.parent?.name || '').toLowerCase();
+
+          if (name.includes('tunntarm') || parentName.includes('tunntarm') || name.includes('small')) {
+            // Small intestine: high detail mucosal folds with healthy enteric luster
+            if (child.material.map) {
+              child.material.roughness = 0.28;
+              child.material.metalness = 0.04;
+              child.material.transparent = false;
+              child.material.opacity = 1.0;
+              if (child.material.color) child.material.color.setHex(0xffffff);
+              child.material.needsUpdate = true;
+            } else {
+              child.material = new THREE.MeshPhysicalMaterial({
+                color: 0xf472b6,
+                roughness: 0.28,
+                metalness: 0.04,
+                clearcoat: 0.7,
+                side: THREE.DoubleSide
+              });
+            }
+          } else if (name.includes('tjocktarm') || parentName.includes('tjocktarm') || name.includes('large')) {
+            // Large intestine frame: semi-translucent anatomical context
+            if (child.material.map) {
+              child.material.transparent = true;
+              child.material.opacity = 0.25;
+              child.material.depthWrite = true;
+              child.material.roughness = 0.42;
+              child.material.needsUpdate = true;
+            } else {
+              child.material = new THREE.MeshStandardMaterial({
+                color: 0xd97706,
+                transparent: true,
+                opacity: 0.25,
+                depthWrite: true,
+                roughness: 0.42,
+                side: THREE.DoubleSide
+              });
+            }
+          }
+        }
+      });
+    } else if (key === 'large_intestine') {
+      // Large Intestine: Highlight Colon framing, haustra, and appendix, subtle small intestine loops
+      group.traverse((child) => {
+        if (child.isMesh && child.material) {
+          child.castShadow = true;
+          child.receiveShadow = true;
+          child.material.side = THREE.DoubleSide;
+          const name = (child.name || '').toLowerCase();
+          const parentName = (child.parent?.name || '').toLowerCase();
+
+          if (name.includes('tjocktarm') || parentName.includes('tjocktarm') || name.includes('large')) {
+            // Large intestine: full vibrant PBR textures with glossy haustra and appendix
+            if (child.material.map) {
+              child.material.roughness = 0.32;
+              child.material.metalness = 0.04;
+              child.material.transparent = false;
+              child.material.opacity = 1.0;
+              if (child.material.color) child.material.color.setHex(0xffffff);
+              child.material.needsUpdate = true;
+            } else {
+              child.material = new THREE.MeshPhysicalMaterial({
+                color: 0xd97706,
+                roughness: 0.32,
+                metalness: 0.04,
+                clearcoat: 0.65,
+                side: THREE.DoubleSide
+              });
+            }
+          } else if (name.includes('tunntarm') || parentName.includes('tunntarm') || name.includes('small')) {
+            // Inner small intestine loops: subtle semi-translucent inner mass
+            if (child.material.map) {
+              child.material.transparent = true;
+              child.material.opacity = 0.22;
+              child.material.depthWrite = true;
+              child.material.roughness = 0.45;
+              child.material.needsUpdate = true;
+            } else {
+              child.material = new THREE.MeshStandardMaterial({
+                color: 0xf472b6,
+                transparent: true,
+                opacity: 0.22,
+                depthWrite: true,
+                roughness: 0.45,
+                side: THREE.DoubleSide
+              });
+            }
+          }
+        }
+      });
+    } else if (key === 'ear') {
+      // Complete Ear: Pinna, Ear Canal, Tympanic membrane, Malleus/Incus/Stapes ossicles, Cochlea & Semicircular canals
+      group.traverse((child) => {
+        if (child.isMesh && child.material) {
+          child.castShadow = true;
+          child.receiveShadow = true;
+          child.material.side = THREE.DoubleSide;
+          const name = (child.name || '').toLowerCase();
+
+          if (name.includes('cochlea')) {
+            // Cochlea snail spiral: crystalline acoustic sky-blue
+            child.material = new THREE.MeshPhysicalMaterial({
+              color: 0x38bdf8,
+              emissive: 0x0284c7,
+              emissiveIntensity: 0.25,
+              roughness: 0.16,
+              metalness: 0.08,
+              clearcoat: 0.95,
+              side: THREE.DoubleSide
+            });
+          } else if (name.includes('vestibule') || name.includes('canal')) {
+            if (name.includes('external')) {
+              // External acoustic meatus: ear canal skin tissue
+              child.material = new THREE.MeshStandardMaterial({
+                color: 0xf5d0c5,
+                roughness: 0.35,
+                side: THREE.DoubleSide
+              });
+            } else {
+              // Vestibule and semicircular canals: crystalline balance aqua
+              child.material = new THREE.MeshPhysicalMaterial({
+                color: 0x0ea5e9,
+                emissive: 0x0369a1,
+                emissiveIntensity: 0.22,
+                roughness: 0.16,
+                metalness: 0.08,
+                clearcoat: 0.95,
+                side: THREE.DoubleSide
+              });
+            }
+          } else if (name.includes('tympanic')) {
+            // Tympanic membrane: translucent pearly eardrum
+            child.material = new THREE.MeshPhysicalMaterial({
+              color: 0xe2e8f0,
+              transparent: true,
+              opacity: 0.65,
+              roughness: 0.15,
+              metalness: 0.04,
+              clearcoat: 0.9,
+              side: THREE.DoubleSide
+            });
+          } else if (name.includes('malleus') || name.includes('incus') || name.includes('stapes') || name.includes('ossicle')) {
+            // Auditory ossicles: polished acoustic bone ivory
+            child.material = new THREE.MeshStandardMaterial({
+              color: 0xf8fafc,
+              roughness: 0.22,
+              metalness: 0.08,
+              side: THREE.DoubleSide
+            });
+          } else if (name.includes('nerve')) {
+            // Vestibulocochlear & auditory nerves: radiant golden fibers
+            child.material = new THREE.MeshStandardMaterial({
+              color: 0xfacc15,
+              emissive: 0xca8a04,
+              emissiveIntensity: 0.35,
+              roughness: 0.22,
+              metalness: 0.05,
+              side: THREE.DoubleSide
+            });
+          } else if (name.includes('pinna') || name.includes('auricle') || name.includes('helix') || name.includes('tragus')) {
+            // External ear pinna: natural cartilage and flesh
+            child.material = new THREE.MeshStandardMaterial({
+              color: 0xf5d0c5,
+              roughness: 0.38,
+              metalness: 0.02,
+              side: THREE.DoubleSide
+            });
+          } else {
+            child.material.roughness = 0.32;
+            child.material.side = THREE.DoubleSide;
+          }
+        }
+      });
+    } else if (key === 'skin_layers' || key === 'skin') {
+      // Human Skin Block Anatomy: Epidermis, Dermis, Hypodermis, Hair follicle, Glands & Capillary network
+      group.traverse((child) => {
+        if (child.isMesh && child.material) {
+          child.castShadow = true;
+          child.receiveShadow = true;
+          child.material.side = THREE.DoubleSide;
+
+          if (child.material.map) {
+            // High-resolution baked anatomical textures: preserve texture and optimize PBR
+            child.material.roughness = 0.35;
+            child.material.metalness = 0.04;
+            if (child.material.color) child.material.color.setHex(0xffffff);
+            child.material.needsUpdate = true;
+          } else {
+            const name = (child.name || '').toLowerCase();
+            const matName = (child.material.name || '').toLowerCase();
+            const all = name + ' ' + matName;
+
+            if (all.includes('hair') || all.includes('follicle')) {
+              child.material = new THREE.MeshStandardMaterial({ color: 0x18181b, roughness: 0.22, metalness: 0.15, side: THREE.DoubleSide });
+            } else if (all.includes('gland') || all.includes('sebaceous')) {
+              child.material = new THREE.MeshStandardMaterial({ color: 0xfbbf24, roughness: 0.38, side: THREE.DoubleSide });
+            } else if (all.includes('nerve') || all.includes('receptor')) {
+              child.material = new THREE.MeshStandardMaterial({ color: 0xfacc15, emissive: 0xca8a04, emissiveIntensity: 0.3, roughness: 0.25, side: THREE.DoubleSide });
+            } else if (all.includes('artery') || all.includes('art')) {
+              child.material = new THREE.MeshStandardMaterial({ color: 0xdc2626, roughness: 0.25, side: THREE.DoubleSide });
+            } else if (all.includes('vein')) {
+              child.material = new THREE.MeshStandardMaterial({ color: 0x2563eb, roughness: 0.25, side: THREE.DoubleSide });
+            } else if (all.includes('fat') || all.includes('hypoderm') || all.includes('adipose')) {
+              child.material = new THREE.MeshStandardMaterial({ color: 0xfef08a, roughness: 0.5, side: THREE.DoubleSide });
+            } else if (all.includes('dermis')) {
+              child.material = new THREE.MeshStandardMaterial({ color: 0xf43f5e, roughness: 0.36, side: THREE.DoubleSide });
+            } else {
+              child.material = new THREE.MeshStandardMaterial({ color: 0xf5d0c5, roughness: 0.38, side: THREE.DoubleSide });
+            }
           }
         }
       });
