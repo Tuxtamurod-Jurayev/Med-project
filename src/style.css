@@ -1630,13 +1630,14 @@ html, body {
 }
 
 /* ==========================================================================
-   APP STARTUP SPLASH SCREEN & WALKING SKELETON LOADER
+   APP STARTUP SPLASH SCREEN (Modern Medical #2f2f2f Theme)
    ========================================================================== */
 .app-splash-overlay {
   position: fixed;
   inset: 0;
   z-index: 999999;
-  background: radial-gradient(ellipse 90% 70% at 50% 35%, #182234 0%, #0c121d 60%, #06090e 100%);
+  background-color: #2f2f2f;
+  background-image: radial-gradient(circle at 50% 36%, #3a3a3a 0%, #2f2f2f 65%, #252525 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1644,12 +1645,12 @@ html, body {
   padding: 24px;
   user-select: none;
   opacity: 1;
-  transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1), transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .app-splash-overlay.splash-fade-out {
   opacity: 0;
-  transform: scale(1.04);
+  transform: scale(1.03);
   pointer-events: none;
 }
 
@@ -1659,116 +1660,78 @@ html, body {
   align-items: center;
   text-align: center;
   width: 100%;
-  max-width: 440px;
+  max-width: 420px;
+  padding: 20px 16px;
 }
 
 .splash-logo-badge {
-  width: 68px;
-  height: 68px;
+  width: 72px;
+  height: 72px;
   background: linear-gradient(135deg, #0284c7 0%, #06b6d4 100%);
   border-radius: 18px;
-  border: 1.5px solid rgba(255, 255, 255, 0.3);
+  border: 1.5px solid rgba(255, 255, 255, 0.32);
   display: flex;
   align-items: center;
   justify-content: center;
   color: #fff;
-  box-shadow: 0 0 32px rgba(6, 182, 212, 0.45), 0 8px 24px rgba(0, 0, 0, 0.4);
-  margin-bottom: 16px;
+  box-shadow: 0 10px 32px rgba(6, 182, 212, 0.38), 0 4px 14px rgba(0, 0, 0, 0.45);
+  margin-bottom: 20px;
   animation: splashBadgePulse 2.4s ease-in-out infinite;
 }
 
 @keyframes splashBadgePulse {
   0%, 100% {
     transform: scale(1);
-    box-shadow: 0 0 30px rgba(6, 182, 212, 0.45);
+    box-shadow: 0 10px 32px rgba(6, 182, 212, 0.38), 0 4px 14px rgba(0, 0, 0, 0.45);
   }
   50% {
     transform: scale(1.05);
-    box-shadow: 0 0 45px rgba(6, 182, 212, 0.7);
+    box-shadow: 0 12px 42px rgba(6, 182, 212, 0.62), 0 6px 18px rgba(0, 0, 0, 0.5);
   }
 }
 
 .splash-logo-icon {
-  width: 32px;
-  height: 42px;
+  width: 34px;
+  height: 44px;
   fill: #ffffff;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.35));
 }
 
 .splash-title {
-  font-size: 32px;
+  font-size: 34px;
   font-weight: 800;
   letter-spacing: -0.5px;
-  margin: 0 0 6px 0;
-  background: linear-gradient(180deg, #ffffff 40%, #cbd5e1 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  margin: 0 0 8px 0;
+  color: #ffffff;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+.splash-badge-wrap {
+  margin-bottom: 34px;
 }
 
 .splash-subtitle {
-  font-size: 13.5px;
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 14px;
+  background: rgba(6, 182, 212, 0.12);
+  border: 1px solid rgba(6, 182, 212, 0.28);
+  border-radius: 999px;
+  font-size: 12px;
   font-weight: 600;
-  letter-spacing: 1.2px;
+  letter-spacing: 1px;
   text-transform: uppercase;
   color: #38bdf8;
-  margin: 0 0 28px 0;
-  text-shadow: 0 0 12px rgba(56, 189, 248, 0.3);
+  text-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
 }
 
+/* OPTIMIZED HORIZONTAL PROGRESS BAR */
 .splash-progress-container {
   width: 100%;
-  position: relative;
+  max-width: 360px;
   display: flex;
   flex-direction: column;
-}
-
-.splash-skeleton-track-area {
-  position: relative;
-  width: 100%;
-  height: 74px;
-  margin-bottom: 4px;
-}
-
-.splash-skeleton-walker {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 54px;
-  height: 70px;
-  pointer-events: none;
-  will-change: transform;
-}
-
-.splash-progress-track {
-  width: 100%;
-  height: 10px;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  border-radius: 999px;
-  overflow: hidden;
-  position: relative;
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5);
-}
-
-.splash-progress-fill {
-  width: 0%;
-  height: 100%;
-  background: linear-gradient(90deg, #0284c7 0%, #06b6d4 70%, #10b981 100%);
-  border-radius: 999px;
-  position: relative;
-  box-shadow: 0 0 14px rgba(6, 182, 212, 0.75);
-}
-
-.splash-progress-light {
-  position: absolute;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #ffffff;
-  box-shadow: 0 0 8px 3px #ffffff, 0 0 16px 6px #06b6d4;
+  gap: 10px;
 }
 
 .splash-meta-row {
@@ -1776,13 +1739,39 @@ html, body {
   justify-content: space-between;
   align-items: center;
   width: 100%;
-  margin-top: 14px;
-  padding: 0 4px;
+  padding: 0 2px;
+}
+
+.splash-status-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.splash-pulse-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #06b6d4;
+  box-shadow: 0 0 8px #06b6d4;
+  animation: pulseDotAnim 1.4s ease-in-out infinite;
+}
+
+@keyframes pulseDotAnim {
+  0%, 100% {
+    transform: scale(0.9);
+    opacity: 0.6;
+  }
+  50% {
+    transform: scale(1.3);
+    opacity: 1;
+    box-shadow: 0 0 12px #38bdf8;
+  }
 }
 
 .splash-status-text {
   font-size: 13px;
-  color: #94a3b8;
+  color: #d1d5db;
   font-weight: 500;
   letter-spacing: -0.1px;
   transition: color 0.3s ease;
@@ -1796,112 +1785,54 @@ html, body {
   text-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
 }
 
+.splash-progress-track {
+  width: 100%;
+  height: 8px;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+.splash-progress-fill {
+  width: 0%;
+  height: 100%;
+  background: linear-gradient(90deg, #0284c7 0%, #06b6d4 70%, #10b981 100%);
+  border-radius: 999px;
+  position: relative;
+  box-shadow: 0 0 12px rgba(6, 182, 212, 0.7);
+  transition: width 0.05s linear;
+}
+
+.splash-progress-light {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 0 8px 2px #ffffff, 0 0 16px 5px #06b6d4;
+}
+
 .splash-skip-btn {
-  margin-top: 26px;
-  background: transparent;
-  border: none;
-  color: #64748b;
-  font-size: 12.5px;
+  margin-top: 28px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #94a3b8;
+  font-size: 12px;
   font-weight: 600;
   cursor: pointer;
-  padding: 6px 12px;
-  border-radius: 6px;
+  padding: 6px 16px;
+  border-radius: 999px;
   transition: all 0.2s ease;
 }
 
 .splash-skip-btn:hover {
-  color: #cbd5e1;
-  background: rgba(255, 255, 255, 0.05);
-}
-
-/* SKELETON WALKING GAIT KEYFRAMES */
-@keyframes skelBobTorso {
-  0%, 100% { transform: translateY(0px); }
-  50%      { transform: translateY(-4px); }
-}
-.skel-anim-torso {
-  animation: skelBobTorso 0.65s ease-in-out infinite;
-}
-
-@keyframes skelNodSkull {
-  0%, 100% { transform: rotate(0deg); }
-  50%      { transform: rotate(3deg); }
-}
-.skel-anim-skull {
-  transform-origin: 49px 38px;
-  animation: skelNodSkull 0.65s ease-in-out infinite;
-}
-
-@keyframes skelNearHip {
-  0%   { transform: rotate(-26deg); }
-  50%  { transform: rotate(26deg); }
-  100% { transform: rotate(-26deg); }
-}
-.skel-anim-near-hip {
-  animation: skelNearHip 0.65s ease-in-out infinite;
-}
-
-@keyframes skelNearKnee {
-  0%   { transform: rotate(4deg); }
-  30%  { transform: rotate(42deg); }
-  70%  { transform: rotate(0deg); }
-  100% { transform: rotate(4deg); }
-}
-.skel-anim-near-knee {
-  animation: skelNearKnee 0.65s ease-in-out infinite;
-}
-
-@keyframes skelFarHip {
-  0%   { transform: rotate(26deg); }
-  50%  { transform: rotate(-26deg); }
-  100% { transform: rotate(26deg); }
-}
-.skel-anim-far-hip {
-  animation: skelFarHip 0.65s ease-in-out infinite;
-}
-
-@keyframes skelFarKnee {
-  0%   { transform: rotate(0deg); }
-  30%  { transform: rotate(4deg); }
-  50%  { transform: rotate(42deg); }
-  100% { transform: rotate(0deg); }
-}
-.skel-anim-far-knee {
-  animation: skelFarKnee 0.65s ease-in-out infinite;
-}
-
-@keyframes skelNearArm {
-  0%   { transform: rotate(28deg); }
-  50%  { transform: rotate(-28deg); }
-  100% { transform: rotate(28deg); }
-}
-.skel-anim-near-shoulder {
-  animation: skelNearArm 0.65s ease-in-out infinite;
-}
-
-@keyframes skelNearElbow {
-  0%   { transform: rotate(-10deg); }
-  50%  { transform: rotate(25deg); }
-  100% { transform: rotate(-10deg); }
-}
-.skel-anim-near-elbow {
-  animation: skelNearElbow 0.65s ease-in-out infinite;
-}
-
-@keyframes skelFarArm {
-  0%   { transform: rotate(-28deg); }
-  50%  { transform: rotate(28deg); }
-  100% { transform: rotate(-28deg); }
-}
-.skel-anim-far-shoulder {
-  animation: skelFarArm 0.65s ease-in-out infinite;
-}
-
-@keyframes skelFarElbow {
-  0%   { transform: rotate(25deg); }
-  50%  { transform: rotate(-10deg); }
-  100% { transform: rotate(25deg); }
-}
-.skel-anim-far-elbow {
-  animation: skelFarElbow 0.65s ease-in-out infinite;
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.2);
 }

@@ -616,12 +616,10 @@ if (mobTabDiseases) {
   });
 }
 
-// STARTUP SPLASH SCREEN & WALKING SKELETON LOADER
+// STARTUP SPLASH SCREEN & PROGRESS LOADER (Optimized Modern Medical UI)
 function initStartupSplashScreen() {
   const splash = document.getElementById('appStartupSplash');
   const fill = document.getElementById('splashProgressFill');
-  const walker = document.getElementById('splashSkeletonWalker');
-  const trackArea = document.querySelector('.splash-skeleton-track-area');
   const percentText = document.getElementById('splashPercentText');
   const statusText = document.getElementById('splashStatusText');
   const skipBtn = document.getElementById('skipSplashBtn');
@@ -630,7 +628,7 @@ function initStartupSplashScreen() {
 
   let isDismissed = false;
   let startTime = null;
-  const DURATION_MS = 2700; // 2.7s total (matches 2-3s requirement)
+  const DURATION_MS = 2500; // 2.5s smooth duration (2-3s window)
 
   function dismissSplash() {
     if (isDismissed) return;
@@ -641,7 +639,7 @@ function initStartupSplashScreen() {
       if (splash.parentNode) {
         splash.parentNode.removeChild(splash);
       }
-    }, 500);
+    }, 450);
   }
 
   if (skipBtn) {
@@ -660,19 +658,13 @@ function initStartupSplashScreen() {
     if (isDismissed) return;
     if (!startTime) startTime = timestamp;
     const elapsed = timestamp - startTime;
-    const progress = Math.min(elapsed / DURATION_MS, 1.0);
-    const pct = Math.floor(progress * 100);
+    const rawProgress = Math.min(elapsed / DURATION_MS, 1.0);
+    // Smooth deceleration curve
+    const progress = 1 - Math.pow(1 - rawProgress, 2.2);
+    const pct = Math.min(100, Math.floor(progress * 100));
 
     if (fill) {
       fill.style.width = `${progress * 100}%`;
-    }
-
-    if (walker && trackArea) {
-      const areaWidth = trackArea.clientWidth || 360;
-      const walkerWidth = walker.clientWidth || 54;
-      const maxX = Math.max(0, areaWidth - walkerWidth);
-      const currentX = progress * maxX;
-      walker.style.transform = `translateX(${currentX}px)`;
     }
 
     if (percentText) {
@@ -680,24 +672,24 @@ function initStartupSplashScreen() {
     }
 
     if (statusText) {
-      if (pct < 28) {
-        statusText.textContent = "Anatomik modellar yuklanmoqda...";
-      } else if (pct < 62) {
-        statusText.textContent = "Skelet va to'qimalar tayyorlanmoqda...";
-      } else if (pct < 92) {
-        statusText.textContent = "3D interaktiv atlas ishga tushmoqda...";
+      if (pct < 25) {
+        statusText.textContent = "Tizim tayyorlanmoqda...";
+      } else if (pct < 55) {
+        statusText.textContent = "3D modellar yuklanmoqda...";
+      } else if (pct < 88) {
+        statusText.textContent = "Interaktiv atlas faollashtirilmoqda...";
       } else {
         statusText.textContent = "Tayyor! Xush kelibsiz!";
         statusText.style.color = "#10b981";
       }
     }
 
-    if (progress < 1.0) {
+    if (rawProgress < 1.0) {
       requestAnimationFrame(updateSplash);
     } else {
       setTimeout(() => {
         dismissSplash();
-      }, 250);
+      }, 200);
     }
   }
 
