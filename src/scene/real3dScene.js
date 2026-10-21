@@ -140,6 +140,31 @@ export class Real3DSceneManager {
         targetScale: 2.35,
         yOffset: 0.0
       },
+      kidney: {
+        path: '/models/kidney.glb',
+        targetScale: 2.35,
+        yOffset: 0.0
+      },
+      kidney_nephron: {
+        path: '/models/kidney.glb',
+        targetScale: 2.35,
+        yOffset: 0.0
+      },
+      ureters: {
+        path: '/models/ureters.glb',
+        targetScale: 2.35,
+        yOffset: 0.0
+      },
+      bladder_urethra: {
+        path: '/models/bladder_urethra.glb',
+        targetScale: 2.35,
+        yOffset: 0.0
+      },
+      bladder: {
+        path: '/models/bladder_urethra.glb',
+        targetScale: 2.35,
+        yOffset: 0.0
+      },
       urinary_system: {
         path: '/models/urinary_system.glb',
         targetScale: 2.6,
@@ -774,13 +799,16 @@ export class Real3DSceneManager {
         }
       });
     } else if (key === 'urinary_system') {
-      // Urinary System: Kidneys, Ureters, Bladder, Renal vessels & Skeleton
+      // Complete Urinary System: Bilateral Kidneys, Adrenals, Aorta & IVC, Renal/Iliac vessels, Ureters, Bladder
       group.traverse((child) => {
         if (child.isMesh && child.material) {
           const nodeName = (child.name || '').toLowerCase();
           const parentName = (child.parent?.name || '').toLowerCase();
+          child.castShadow = true;
+          child.receiveShadow = true;
+          child.material.side = THREE.DoubleSide;
 
-          if (nodeName.includes('skeleton') || parentName.includes('skeleton') || child.name === 'Object_8') {
+          if (nodeName.includes('skeleton') || parentName.includes('skeleton')) {
             // Skeletal cage reference frame: semi-translucent anatomical bone ivory
             child.material = new THREE.MeshStandardMaterial({
               color: 0xf1f5f9,
@@ -794,8 +822,117 @@ export class Real3DSceneManager {
             child.userData.isGlass = true;
             child.userData.defaultOpacity = 0.42;
             child.userData.defaultDepthWrite = true;
+          } else if (nodeName.includes('suprarenal')) {
+            // Adrenal glands (Glandulae suprarenales)
+            child.material = new THREE.MeshStandardMaterial({
+              color: 0xf59e0b,
+              roughness: 0.38,
+              metalness: 0.05,
+              side: THREE.DoubleSide
+            });
+          } else if (nodeName.includes('ureter') && !nodeName.includes('orifice') && !nodeName.includes('bladder')) {
+            // Bilateral Ureters
+            child.material = new THREE.MeshPhysicalMaterial({
+              color: 0xf43f5e,
+              roughness: 0.24,
+              metalness: 0.04,
+              clearcoat: 0.85,
+              clearcoatRoughness: 0.1,
+              side: THREE.DoubleSide
+            });
+          } else if (nodeName.includes('pelvis')) {
+            // Renal Pelvis
+            child.material = new THREE.MeshStandardMaterial({
+              color: 0xfde047,
+              roughness: 0.32,
+              metalness: 0.04,
+              side: THREE.DoubleSide
+            });
+          } else if (nodeName.includes('pyramid') || nodeName.includes('medulla')) {
+            // Renal Medullary Pyramids
+            child.material = new THREE.MeshStandardMaterial({
+              color: 0x991b1b,
+              roughness: 0.38,
+              metalness: 0.04,
+              side: THREE.DoubleSide
+            });
+          } else if (nodeName.includes('column')) {
+            // Renal Columns of Bertin
+            child.material = new THREE.MeshStandardMaterial({
+              color: 0xa21caf,
+              roughness: 0.36,
+              metalness: 0.05,
+              side: THREE.DoubleSide
+            });
+          } else if (nodeName.includes('papilla')) {
+            // Renal Papillae
+            child.material = new THREE.MeshStandardMaterial({
+              color: 0xfef08a,
+              roughness: 0.30,
+              side: THREE.DoubleSide
+            });
+          } else if (nodeName.includes('cortex') || (nodeName.includes('kidney') && !nodeName.includes('capsule'))) {
+            // Renal Cortex
+            child.material = new THREE.MeshPhysicalMaterial({
+              color: 0x881337,
+              roughness: 0.35,
+              metalness: 0.04,
+              clearcoat: 0.35,
+              side: THREE.DoubleSide
+            });
+          } else if (nodeName.includes('capsule')) {
+            // Fibrous Capsule
+            child.material = new THREE.MeshStandardMaterial({
+              color: 0x94a3b8,
+              roughness: 0.25,
+              transparent: true,
+              opacity: 0.40,
+              side: THREE.DoubleSide
+            });
+            child.userData.isGlass = true;
+            child.userData.defaultOpacity = 0.40;
+          } else if (nodeName.includes('trigone')) {
+            // Trigone plate
+            child.material = new THREE.MeshStandardMaterial({
+              color: 0xfed7aa,
+              roughness: 0.25,
+              side: THREE.DoubleSide
+            });
+          } else if (nodeName.includes('orifice')) {
+            // Ureteral orifices
+            child.material = new THREE.MeshStandardMaterial({
+              color: 0xfef08a,
+              emissive: 0xd97706,
+              emissiveIntensity: 0.35,
+              roughness: 0.20,
+              side: THREE.DoubleSide
+            });
+          } else if (nodeName.includes('bladder') || nodeName.includes('fundus') || nodeName.includes('neck')) {
+            // Bladder Detrusor
+            child.material = new THREE.MeshPhysicalMaterial({
+              color: 0xe11d48,
+              roughness: 0.28,
+              metalness: 0.04,
+              clearcoat: 0.75,
+              side: THREE.DoubleSide
+            });
+          } else if (nodeName.includes('artery') || nodeName.includes('aorta')) {
+            // Arteries: Aorta, Renal & Iliac Arteries
+            child.material = new THREE.MeshStandardMaterial({
+              color: 0xdc2626,
+              roughness: 0.26,
+              metalness: 0.08,
+              side: THREE.DoubleSide
+            });
+          } else if (nodeName.includes('vein') || nodeName.includes('cava')) {
+            // Veins: IVC, Renal & Iliac Veins
+            child.material = new THREE.MeshStandardMaterial({
+              color: 0x2563eb,
+              roughness: 0.26,
+              metalness: 0.08,
+              side: THREE.DoubleSide
+            });
           } else if (child.material.map) {
-            // Urinary organs (Kidneys, Ureters, Urinary Bladder, Renal Artery & Vein)
             child.material.roughness = 0.32;
             child.material.metalness = 0.05;
             child.material.side = THREE.DoubleSide;
@@ -807,8 +944,6 @@ export class Real3DSceneManager {
             child.material.roughness = 0.35;
             child.material.side = THREE.DoubleSide;
           }
-          child.castShadow = true;
-          child.receiveShadow = true;
         }
       });
     } else if (key === 'endocrine_system') {
@@ -1386,54 +1521,285 @@ export class Real3DSceneManager {
                   side: THREE.DoubleSide
                 });
               }
-            } else if (key === 'kidney') {
+            } else if (key === 'kidney' || key === 'kidney_nephron') {
               const meshName = (child.name || '');
-              if (meshName.includes('10')) {
-                // Renal Cortex & Fibrous Capsule
-                child.material = new THREE.MeshStandardMaterial({
+              if (meshName === 'Object_12') {
+                // 1. Renal Cortex & Outer Parenchyma (Cortex renalis) - 65,532 verts
+                child.material = new THREE.MeshPhysicalMaterial({
                   color: 0x881337,
                   roughness: 0.35,
-                  metalness: 0.05,
+                  metalness: 0.04,
+                  clearcoat: 0.35,
+                  clearcoatRoughness: 0.15,
                   side: THREE.DoubleSide
                 });
-              } else if (meshName.includes('11')) {
-                // Renal Medulla Pyramids
+              } else if (meshName === 'Object_13') {
+                // 2. Renal Medullary Pyramids (Pyramides renales) - 35,285 verts
+                child.material = new THREE.MeshPhysicalMaterial({
+                  color: 0x991b1b,
+                  roughness: 0.40,
+                  metalness: 0.04,
+                  clearcoat: 0.25,
+                  clearcoatRoughness: 0.2,
+                  side: THREE.DoubleSide
+                });
+              } else if (meshName === 'Object_11') {
+                // 3. Renal Columns of Bertin & Calyx Junctions - 5,623 verts
                 child.material = new THREE.MeshStandardMaterial({
-                  color: 0x7f1d1d,
-                  roughness: 0.4,
+                  color: 0xa21caf,
+                  roughness: 0.36,
                   metalness: 0.05,
                   side: THREE.DoubleSide
                 });
-              } else if (meshName.includes('2') || meshName.includes('8')) {
-                // Ureter & Renal Pelvis (Ivory / Pale Yellow)
+              } else if (meshName === 'Object_10') {
+                // 4. Renal Pelvis (Pelvis renalis) - 4,346 verts
+                child.material = new THREE.MeshPhysicalMaterial({
+                  color: 0xfde68a,
+                  roughness: 0.30,
+                  metalness: 0.04,
+                  clearcoat: 0.45,
+                  side: THREE.DoubleSide
+                });
+              } else if (meshName === 'Object_4') {
+                // 5. Proximal Ureter tube (Ureter) - 1,280 verts
+                child.material = new THREE.MeshPhysicalMaterial({
+                  color: 0xf472b6,
+                  roughness: 0.35,
+                  metalness: 0.04,
+                  clearcoat: 0.6,
+                  side: THREE.DoubleSide
+                });
+              } else if (meshName === 'Object_2' || meshName === 'Object_3') {
+                // 6. Calyces renales minores et majores (Minor and Major Calyces)
                 child.material = new THREE.MeshStandardMaterial({
                   color: 0xfef08a,
-                  roughness: 0.35,
-                  metalness: 0.05,
+                  roughness: 0.32,
+                  metalness: 0.04,
                   side: THREE.DoubleSide
                 });
-              } else if (meshName.includes('0') || meshName.includes('3') || meshName.includes('4')) {
-                // Renal Artery branches (Scarlet Red)
+              } else if (meshName === 'Object_5' || meshName === 'Object_7') {
+                // 7. Renal Artery branches (Scarlet Red)
                 child.material = new THREE.MeshStandardMaterial({
                   color: 0xdc2626,
-                  roughness: 0.28,
-                  metalness: 0.1,
+                  roughness: 0.25,
+                  metalness: 0.08,
                   side: THREE.DoubleSide
                 });
-              } else if (meshName.includes('1') || meshName.includes('5')) {
-                // Renal Vein branches (Royal Blue)
+              } else if (meshName === 'Object_6' || meshName === 'Object_8') {
+                // 8. Renal Vein branches (Royal Blue)
                 child.material = new THREE.MeshStandardMaterial({
                   color: 0x1d4ed8,
-                  roughness: 0.28,
-                  metalness: 0.1,
+                  roughness: 0.25,
+                  metalness: 0.08,
                   side: THREE.DoubleSide
                 });
+              } else if (meshName === 'Object_9') {
+                // 9. Fibrous Renal Capsule (Capsula fibrosa)
+                child.material = new THREE.MeshStandardMaterial({
+                  color: 0xe2e8f0,
+                  roughness: 0.22,
+                  metalness: 0.05,
+                  transparent: true,
+                  opacity: 0.62,
+                  side: THREE.DoubleSide
+                });
+                child.userData.isGlass = true;
+                child.userData.defaultOpacity = 0.62;
               } else {
-                // Minor and Major Calyces
                 child.material = new THREE.MeshStandardMaterial({
                   color: 0xfef3c7,
                   roughness: 0.35,
                   metalness: 0.05,
+                  side: THREE.DoubleSide
+                });
+              }
+            } else if (key === 'ureters') {
+              const nodeName = (child.name || '').toLowerCase();
+              if (nodeName.includes('ureter') && !nodeName.includes('orifice') && !nodeName.includes('bladder')) {
+                // Highlighted Star: Bilateral Ureters (25-30 cm muscular conduit with peristaltic luster)
+                child.material = new THREE.MeshPhysicalMaterial({
+                  color: 0xf43f5e,
+                  emissive: 0x881337,
+                  emissiveIntensity: 0.2,
+                  roughness: 0.22,
+                  metalness: 0.04,
+                  clearcoat: 0.88,
+                  clearcoatRoughness: 0.1,
+                  side: THREE.DoubleSide
+                });
+              } else if (nodeName.includes('pelvis')) {
+                // Renal Pelvis (PUJ pyeloureteric junction)
+                child.material = new THREE.MeshPhysicalMaterial({
+                  color: 0xfde047,
+                  roughness: 0.30,
+                  metalness: 0.04,
+                  clearcoat: 0.5,
+                  side: THREE.DoubleSide
+                });
+              } else if (nodeName.includes('orifice')) {
+                // Ureteral Orifices (UVJ vesicoureteral junction in bladder)
+                child.material = new THREE.MeshStandardMaterial({
+                  color: 0xfef08a,
+                  emissive: 0xf59e0b,
+                  emissiveIntensity: 0.4,
+                  roughness: 0.2,
+                  metalness: 0.1,
+                  side: THREE.DoubleSide
+                });
+              } else if (nodeName.includes('kidney') || nodeName.includes('cortex')) {
+                // Translucent Kidney Parenchyma context
+                child.material = new THREE.MeshStandardMaterial({
+                  color: 0x991b1b,
+                  roughness: 0.45,
+                  metalness: 0.05,
+                  transparent: true,
+                  opacity: 0.35,
+                  side: THREE.DoubleSide
+                });
+                child.userData.isGlass = true;
+                child.userData.defaultOpacity = 0.35;
+              } else if (nodeName.includes('capsule')) {
+                // Translucent Renal Capsule
+                child.material = new THREE.MeshStandardMaterial({
+                  color: 0x94a3b8,
+                  roughness: 0.3,
+                  transparent: true,
+                  opacity: 0.22,
+                  side: THREE.DoubleSide
+                });
+                child.userData.isGlass = true;
+                child.userData.defaultOpacity = 0.22;
+              } else if (nodeName.includes('bladder')) {
+                // Translucent Bladder context
+                child.material = new THREE.MeshStandardMaterial({
+                  color: 0xe11d48,
+                  roughness: 0.35,
+                  transparent: true,
+                  opacity: 0.32,
+                  side: THREE.DoubleSide
+                });
+                child.userData.isGlass = true;
+                child.userData.defaultOpacity = 0.32;
+              } else if (nodeName.includes('trigone')) {
+                // Trigone plate
+                child.material = new THREE.MeshStandardMaterial({
+                  color: 0xfed7aa,
+                  roughness: 0.3,
+                  side: THREE.DoubleSide
+                });
+              } else if (nodeName.includes('artery')) {
+                // Common / Internal / External Iliac & Renal Arteries
+                child.material = new THREE.MeshStandardMaterial({
+                  color: 0xdc2626,
+                  roughness: 0.28,
+                  metalness: 0.08,
+                  transparent: true,
+                  opacity: 0.75,
+                  side: THREE.DoubleSide
+                });
+                child.userData.isGlass = true;
+                child.userData.defaultOpacity = 0.75;
+              } else if (nodeName.includes('vein')) {
+                // Common / External Iliac & Renal Veins
+                child.material = new THREE.MeshStandardMaterial({
+                  color: 0x2563eb,
+                  roughness: 0.28,
+                  metalness: 0.08,
+                  transparent: true,
+                  opacity: 0.75,
+                  side: THREE.DoubleSide
+                });
+                child.userData.isGlass = true;
+                child.userData.defaultOpacity = 0.75;
+              } else {
+                child.material = new THREE.MeshStandardMaterial({
+                  color: 0xf472b6,
+                  roughness: 0.35,
+                  side: THREE.DoubleSide
+                });
+              }
+            } else if (key === 'bladder_urethra' || key === 'bladder') {
+              const nodeName = (child.name || '').toLowerCase();
+              if (nodeName.includes('trigone')) {
+                // Lieutaud's Trigone (Trigonum vesicae) - Smooth triangular mucosal floor
+                child.material = new THREE.MeshPhysicalMaterial({
+                  color: 0xfed7aa,
+                  roughness: 0.22,
+                  metalness: 0.04,
+                  clearcoat: 0.85,
+                  clearcoatRoughness: 0.12,
+                  side: THREE.DoubleSide
+                });
+              } else if (nodeName.includes('orifice')) {
+                // Bilateral Ureteral Orifices
+                child.material = new THREE.MeshStandardMaterial({
+                  color: 0xfef08a,
+                  emissive: 0xd97706,
+                  emissiveIntensity: 0.35,
+                  roughness: 0.20,
+                  metalness: 0.08,
+                  side: THREE.DoubleSide
+                });
+              } else if (nodeName.includes('neck') || nodeName.includes('smooth_muscle')) {
+                // Internal Urethral Sphincter (M. sphincter urethrae internus)
+                child.material = new THREE.MeshPhysicalMaterial({
+                  color: 0x9f1239,
+                  roughness: 0.30,
+                  metalness: 0.05,
+                  clearcoat: 0.65,
+                  side: THREE.DoubleSide
+                });
+              } else if (nodeName.includes('urethra') && !nodeName.includes('external_urethral_sphincter')) {
+                // Urethral canal
+                child.material = new THREE.MeshPhysicalMaterial({
+                  color: 0xfb7185,
+                  roughness: 0.28,
+                  metalness: 0.04,
+                  clearcoat: 0.75,
+                  side: THREE.DoubleSide
+                });
+              } else if (nodeName.includes('external_urethral_sphincter')) {
+                // External voluntary striated sphincter
+                child.material = new THREE.MeshStandardMaterial({
+                  color: 0xb91c1c,
+                  roughness: 0.35,
+                  metalness: 0.05,
+                  side: THREE.DoubleSide
+                });
+              } else if (nodeName.includes('ureter')) {
+                // Terminal ureter segments entering bladder
+                child.material = new THREE.MeshPhysicalMaterial({
+                  color: 0xf472b6,
+                  roughness: 0.30,
+                  metalness: 0.04,
+                  clearcoat: 0.75,
+                  side: THREE.DoubleSide
+                });
+              } else if (nodeName.includes('dome')) {
+                // Bladder Dome / Body (Detrusor muscle)
+                child.material = new THREE.MeshPhysicalMaterial({
+                  color: 0xbe123c,
+                  roughness: 0.32,
+                  metalness: 0.04,
+                  clearcoat: 0.72,
+                  clearcoatRoughness: 0.15,
+                  side: THREE.DoubleSide
+                });
+              } else if (nodeName.includes('base') || nodeName.includes('fundus')) {
+                // Bladder Fundus & Base (Thick detrusor muscle)
+                child.material = new THREE.MeshPhysicalMaterial({
+                  color: 0xe11d48,
+                  roughness: 0.28,
+                  metalness: 0.04,
+                  clearcoat: 0.78,
+                  clearcoatRoughness: 0.12,
+                  side: THREE.DoubleSide
+                });
+              } else {
+                child.material = new THREE.MeshStandardMaterial({
+                  color: 0xe11d48,
+                  roughness: 0.32,
+                  metalness: 0.04,
                   side: THREE.DoubleSide
                 });
               }
