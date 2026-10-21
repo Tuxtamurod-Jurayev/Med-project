@@ -338,27 +338,10 @@ export class Real3DSceneManager {
 
     // Normalize Bounding Box and Center at (0, 0, 0)
     modelRoot.updateMatrixWorld(true);
-    let center = new THREE.Vector3();
-    let maxDim = 1.0;
-
-    if (key === 'gallbladder') {
-      const gbBox = new THREE.Box3();
-      modelRoot.traverse((c) => {
-        if (c.isMesh && (c.name.toLowerCase().includes('gallbladder') || c.name.toLowerCase().includes('artery') || c.name.toLowerCase().includes('vein'))) {
-          gbBox.expandByObject(c);
-        }
-      });
-      const fullBox = new THREE.Box3().setFromObject(modelRoot);
-      const fullSize = fullBox.getSize(new THREE.Vector3());
-      maxDim = Math.max(fullSize.x, fullSize.y, fullSize.z) || 1.0;
-      center = gbBox.isEmpty() ? fullBox.getCenter(new THREE.Vector3()) : gbBox.getCenter(new THREE.Vector3());
-      modelRoot.rotation.x = -0.28;
-    } else {
-      const bbox = new THREE.Box3().setFromObject(modelRoot);
-      const size = bbox.getSize(new THREE.Vector3());
-      center = bbox.getCenter(new THREE.Vector3());
-      maxDim = Math.max(size.x, size.y, size.z) || 1.0;
-    }
+    const bbox = new THREE.Box3().setFromObject(modelRoot);
+    const size = bbox.getSize(new THREE.Vector3());
+    const center = bbox.getCenter(new THREE.Vector3());
+    const maxDim = Math.max(size.x, size.y, size.z) || 1.0;
     const scale = (cfg.targetScale || 2.2) / maxDim;
     modelRoot.scale.set(scale, scale, scale);
 
@@ -600,43 +583,171 @@ export class Real3DSceneManager {
         }
       });
     } else if (key === 'eye') {
-      // Correct ocular shaders: crystal clear glass cornea with depthWrite=false so textured eye shines through!
+      // Ocular Internal Layers: Cornea, Sclera, Choroid, Retina, Macula, Lens, Ciliary body, Iris, Pupil, Optic nerve, Extraocular muscles
       group.traverse((child) => {
         if (child.isMesh && child.material) {
-          const matName = child.material.name || '';
-          if (matName.toLowerCase().includes('glass') || child.name.toLowerCase().includes('glass')) {
+          child.castShadow = true;
+          child.receiveShadow = true;
+          child.material.side = THREE.DoubleSide;
+          const name = (child.name || '').toLowerCase();
+          const matName = (child.material.name || '').toLowerCase();
+          const all = name + ' ' + matName;
+
+          if (all.includes('cornea') || all.includes('glass')) {
+            // Cornea: Crystal-clear refractive window
             child.material = new THREE.MeshPhysicalMaterial({
-              color: 0xffffff,
+              color: 0xe0f2fe,
               transparent: true,
-              opacity: 0.14,
-              roughness: 0.02,
+              opacity: 0.35,
+              roughness: 0.03,
               metalness: 0.0,
-              transmission: 0.98,
+              transmission: 0.96,
               ior: 1.376,
-              depthWrite: false, // Essential: never occlude inner eye!
+              depthWrite: false,
               side: THREE.FrontSide
             });
-          } else {
-            // Inner eyeball (with high-res baked iris, pupil and sclera texture from Sketchfab)
-            if (child.material.map) {
-              child.material.roughness = 0.22;
-              child.material.metalness = 0.0;
-              child.material.depthWrite = true;
-              child.material.side = THREE.DoubleSide;
-              if (child.material.normalMap && child.material.normalScale) {
-                child.material.normalScale.set(1.2, 1.2);
-              }
-              child.material.needsUpdate = true;
-            } else {
+          } else if (all.includes('vitreous')) {
+            // Vitreous Body: Soft translucent optical jelly
+            child.material = new THREE.MeshPhysicalMaterial({
+              color: 0xe0f2fe,
+              transparent: true,
+              opacity: 0.22,
+              roughness: 0.08,
+              metalness: 0.0,
+              transmission: 0.88,
+              depthWrite: false,
+              side: THREE.DoubleSide
+            });
+          } else if (all.includes('lens')) {
+            // Crystalline Lens: High-refraction biconvex optical lens
+            child.material = new THREE.MeshPhysicalMaterial({
+              color: 0xf0f9ff,
+              transparent: true,
+              opacity: 0.85,
+              roughness: 0.04,
+              metalness: 0.02,
+              transmission: 0.96,
+              ior: 1.413,
+              side: THREE.DoubleSide
+            });
+          } else if (all.includes('retina')) {
+            // Retina: Sensory neural fotoreceptor layer (Warm amber-coral)
+            child.material = new THREE.MeshStandardMaterial({
+              color: 0xf97316,
+              roughness: 0.32,
+              metalness: 0.02,
+              side: THREE.DoubleSide
+            });
+          } else if (all.includes('macula')) {
+            // Macula Lutea & Fovea: High-acuity golden yellow center
+            child.material = new THREE.MeshBasicMaterial({
+              color: 0xfacc15,
+              side: THREE.DoubleSide
+            });
+          } else if (all.includes('disc')) {
+            // Optic Disc: Papilla nervi optici (Blind spot)
+            child.material = new THREE.MeshBasicMaterial({
+              color: 0xfde047,
+              side: THREE.DoubleSide
+            });
+          } else if (all.includes('choroid')) {
+            // Choroid: Vascular pigmented tunic (Deep chocolate-violet)
+            child.material = new THREE.MeshStandardMaterial({
+              color: 0x2a0845,
+              roughness: 0.42,
+              metalness: 0.05,
+              side: THREE.DoubleSide
+            });
+          } else if (all.includes('ciliary')) {
+            // Ciliary Body: Contractile ring (Rich crimson)
+            child.material = new THREE.MeshStandardMaterial({
+              color: 0x991b1b,
+              roughness: 0.38,
+              metalness: 0.04,
+              side: THREE.DoubleSide
+            });
+          } else if (all.includes('zonule')) {
+            // Zonular Fibers: Delicate sky-blue suspensory ligaments
+            child.material = new THREE.MeshBasicMaterial({
+              color: 0x7dd3fc,
+              transparent: true,
+              opacity: 0.70
+            });
+          } else if (all.includes('pupil')) {
+            // Pupil: Deep velvet black light absorber
+            child.material = new THREE.MeshBasicMaterial({
+              color: 0x020617,
+              side: THREE.DoubleSide
+            });
+          } else if (all.includes('iris') || all.includes('sphincter')) {
+            // Iris: Medical sapphire-cerulean blue stroma
+            child.material = new THREE.MeshStandardMaterial({
+              color: 0x0284c7,
+              roughness: 0.28,
+              metalness: 0.05,
+              side: THREE.DoubleSide
+            });
+          } else if (all.includes('artery') || all.includes('art') || all.includes('episcleral')) {
+            // Central Retinal & Episcleral Arteries: Scarlet red
+            child.material = new THREE.MeshStandardMaterial({
+              color: 0xdc2626,
+              roughness: 0.22,
+              metalness: 0.08,
+              side: THREE.DoubleSide
+            });
+          } else if (all.includes('vein')) {
+            // Central Retinal Veins: Royal blue
+            child.material = new THREE.MeshStandardMaterial({
+              color: 0x2563eb,
+              roughness: 0.22,
+              metalness: 0.08,
+              side: THREE.DoubleSide
+            });
+          } else if (all.includes('optic') || all.includes('nerve')) {
+            // Optic Nerve: Radiant cranial nerve II (Vibrant golden yellow)
+            child.material = new THREE.MeshStandardMaterial({
+              color: 0xfacc15,
+              emissive: 0xca8a04,
+              emissiveIntensity: 0.35,
+              roughness: 0.28,
+              metalness: 0.05,
+              side: THREE.DoubleSide
+            });
+          } else if (all.includes('rectus') || all.includes('muscle') || all.includes('oblique')) {
+            if (all.includes('tendon')) {
               child.material = new THREE.MeshStandardMaterial({
-                color: 0xf8fafc,
-                roughness: 0.22,
-                metalness: 0.0,
+                color: 0xfef3c7,
+                roughness: 0.30,
+                metalness: 0.02,
+                side: THREE.DoubleSide
+              });
+            } else {
+              // Extraocular Muscles: Contractile crimson-ruby
+              child.material = new THREE.MeshStandardMaterial({
+                color: 0xb91c1c,
+                roughness: 0.32,
+                metalness: 0.04,
                 side: THREE.DoubleSide
               });
             }
+          } else if (all.includes('sclera')) {
+            // Sclera: Soft porcelain warm ivory-buff (not stark white)
+            child.material = new THREE.MeshStandardMaterial({
+              color: 0xeee8dc,
+              roughness: 0.35,
+              metalness: 0.02,
+              side: THREE.DoubleSide
+            });
+          } else if (child.material.map) {
+            child.material.roughness = 0.25;
+            child.material.needsUpdate = true;
+          } else {
+            child.material = new THREE.MeshStandardMaterial({
+              color: 0xeee8dc,
+              roughness: 0.35,
+              side: THREE.DoubleSide
+            });
           }
-          child.castShadow = true;
         }
       });
     } else if (key === 'heart') {
@@ -999,7 +1110,7 @@ export class Real3DSceneManager {
         }
       });
     } else if (key === 'gallbladder') {
-      // Photorealistic Gallbladder & Biliary System: Fundus, Corpus, Collum, Cystic duct, Portal triad vessels
+      // Photorealistic Gallbladder & Biliary System: Pure Gallbladder (Fundus, Corpus, Collum, Hartmann's Pouch), Cystic Duct, Biliary Tree, Duodenum C-loop, Cystic Artery & Portal Vein (Liver removed!)
       group.traverse((child) => {
         if (child.isMesh && child.material) {
           child.castShadow = true;
@@ -1007,66 +1118,74 @@ export class Real3DSceneManager {
           child.material.side = THREE.DoubleSide;
           const nodeName = (child.name || '').toLowerCase();
 
-          if (nodeName.includes('gallbladder')) {
+          if (nodeName.includes('liver')) {
+            // Completely hide liver as requested by user
+            child.visible = false;
+          } else if (nodeName.includes('gallbladder') || nodeName.includes('hartmann') || nodeName.includes('fundus') || nodeName.includes('corpus') || nodeName.includes('collum')) {
             // Gallbladder: High-gloss emerald-olive bile luster with clearcoat sheen
-            if (child.material.map) {
-              child.material.roughness = 0.16;
-              child.material.metalness = 0.04;
-              child.material.needsUpdate = true;
-            } else {
-              child.material = new THREE.MeshPhysicalMaterial({
-                color: 0x166534,
-                emissive: 0x052e16,
-                emissiveIntensity: 0.15,
-                roughness: 0.18,
-                metalness: 0.04,
-                clearcoat: 0.92,
-                clearcoatRoughness: 0.08,
-                side: THREE.DoubleSide
-              });
-            }
+            child.material = new THREE.MeshPhysicalMaterial({
+              color: 0x166534,
+              emissive: 0x052e16,
+              emissiveIntensity: 0.18,
+              roughness: 0.18,
+              metalness: 0.04,
+              clearcoat: 0.95,
+              clearcoatRoughness: 0.08,
+              transmission: 0.12,
+              ior: 1.38,
+              side: THREE.DoubleSide
+            });
+          } else if (nodeName.includes('duct') || nodeName.includes('heister') || nodeName.includes('valve') || nodeName.includes('choledoch')) {
+            // Biliary Ducts (Cystic duct, Hepatic ducts, Common bile duct): Healthy green biliary ducts
+            child.material = new THREE.MeshPhysicalMaterial({
+              color: 0x15803d,
+              roughness: 0.22,
+              metalness: 0.03,
+              clearcoat: 0.88,
+              clearcoatRoughness: 0.1,
+              side: THREE.DoubleSide
+            });
           } else if (nodeName.includes('artery')) {
-            // Hepatic / Cystic Arteries: Oxygenated arterial crimson
+            // Cystic & Hepatic Arteries: Oxygenated arterial crimson
             child.material = new THREE.MeshStandardMaterial({
               color: 0xdc2626,
-              roughness: 0.28,
+              roughness: 0.22,
               metalness: 0.08,
               side: THREE.DoubleSide
             });
           } else if (nodeName.includes('portal') || nodeName.includes('vein')) {
-            // Portal Vein / Venous branches: Rich sapphire blue
+            // Portal Vein: Deep royal blue
             child.material = new THREE.MeshStandardMaterial({
-              color: 0x2563eb,
-              roughness: 0.28,
+              color: 0x1d4ed8,
+              roughness: 0.22,
               metalness: 0.08,
               side: THREE.DoubleSide
             });
-          } else if (nodeName.includes('inferior_vena_cava')) {
-            // IVC: Deep venous navy
-            child.material = new THREE.MeshStandardMaterial({
-              color: 0x1d4ed8,
-              roughness: 0.3,
-              metalness: 0.06,
+          } else if (nodeName.includes('duodenum') || nodeName.includes('plicae')) {
+            // Duodenum C-loop: Warm mucosal enteric pink
+            child.material = new THREE.MeshPhysicalMaterial({
+              color: 0xf472b6,
+              roughness: 0.35,
+              metalness: 0.02,
+              clearcoat: 0.65,
               side: THREE.DoubleSide
             });
-          } else if (nodeName.includes('liver')) {
-            // Visceral Liver bed: Translucent anatomical context so the gallbladder & biliary vessels shine forward
-            if (child.material.map) {
-              child.material.transparent = true;
-              child.material.opacity = 0.36;
-              child.material.depthWrite = true;
-              child.material.roughness = 0.42;
-              child.material.needsUpdate = true;
-            } else {
-              child.material = new THREE.MeshStandardMaterial({
-                color: 0x7f1d1d,
-                transparent: true,
-                opacity: 0.36,
-                depthWrite: true,
-                roughness: 0.42,
-                side: THREE.DoubleSide
-              });
-            }
+          } else if (nodeName.includes('pancreas') || nodeName.includes('wirsung')) {
+            // Pancreas head: Warm glandular golden-amber
+            child.material = new THREE.MeshStandardMaterial({
+              color: 0xfde047,
+              roughness: 0.45,
+              metalness: 0.02,
+              side: THREE.DoubleSide
+            });
+          } else if (nodeName.includes('oddi') || nodeName.includes('ampulla')) {
+            // Sphincter of Oddi & Ampulla of Vater: Deep mucosal ruby
+            child.material = new THREE.MeshPhysicalMaterial({
+              color: 0xbe123c,
+              roughness: 0.25,
+              clearcoat: 0.85,
+              side: THREE.DoubleSide
+            });
           } else {
             child.material.roughness = 0.28;
             child.material.side = THREE.DoubleSide;
@@ -1307,7 +1426,7 @@ export class Real3DSceneManager {
         }
       });
     } else if (key === 'ear') {
-      // Complete Ear: Pinna, Ear Canal, Tympanic membrane, Malleus/Incus/Stapes ossicles, Cochlea & Semicircular canals
+      // Complete Ear: Pinna, Ear Canal, Tympanic membrane, Malleus/Incus/Stapes ossicles, Cochlea & Semicircular canals (No plain white!)
       group.traverse((child) => {
         if (child.isMesh && child.material) {
           child.castShadow = true;
@@ -1316,115 +1435,205 @@ export class Real3DSceneManager {
           const name = (child.name || '').toLowerCase();
 
           if (name.includes('cochlea')) {
-            // Cochlea snail spiral: crystalline acoustic sky-blue
+            // Cochlea snail spiral: crystalline acoustic sapphire-blue
             child.material = new THREE.MeshPhysicalMaterial({
-              color: 0x38bdf8,
-              emissive: 0x0284c7,
-              emissiveIntensity: 0.25,
+              color: 0x0284c7,
+              emissive: 0x0369a1,
+              emissiveIntensity: 0.32,
               roughness: 0.16,
               metalness: 0.08,
               clearcoat: 0.95,
+              clearcoatRoughness: 0.08,
               side: THREE.DoubleSide
             });
           } else if (name.includes('vestibule') || name.includes('canal')) {
             if (name.includes('external')) {
-              // External acoustic meatus: ear canal skin tissue
+              // External acoustic meatus: warm mucosal auditory canal
               child.material = new THREE.MeshStandardMaterial({
-                color: 0xf5d0c5,
-                roughness: 0.35,
+                color: 0xc2410c,
+                roughness: 0.38,
+                metalness: 0.02,
                 side: THREE.DoubleSide
               });
             } else {
-              // Vestibule and semicircular canals: crystalline balance aqua
+              // Vestibule and semicircular canals: crystalline balance emerald-teal
               child.material = new THREE.MeshPhysicalMaterial({
-                color: 0x0ea5e9,
-                emissive: 0x0369a1,
-                emissiveIntensity: 0.22,
+                color: 0x0d9488,
+                emissive: 0x0f766e,
+                emissiveIntensity: 0.28,
                 roughness: 0.16,
                 metalness: 0.08,
                 clearcoat: 0.95,
+                clearcoatRoughness: 0.08,
                 side: THREE.DoubleSide
               });
             }
-          } else if (name.includes('tympanic')) {
-            // Tympanic membrane: translucent pearly eardrum
+          } else if (name.includes('tympanic') && !name.includes('chorda')) {
+            // Tympanic membrane: glowing translucent amber-gold eardrum (Not plain white!)
             child.material = new THREE.MeshPhysicalMaterial({
-              color: 0xe2e8f0,
+              color: 0xf59e0b,
+              emissive: 0xd97706,
+              emissiveIntensity: 0.2,
               transparent: true,
-              opacity: 0.65,
-              roughness: 0.15,
+              opacity: 0.68,
+              roughness: 0.16,
               metalness: 0.04,
-              clearcoat: 0.9,
+              clearcoat: 0.92,
               side: THREE.DoubleSide
             });
           } else if (name.includes('malleus') || name.includes('incus') || name.includes('stapes') || name.includes('ossicle')) {
-            // Auditory ossicles: polished acoustic bone ivory
+            // Auditory ossicles (Hammer, Anvil, Stirrup): Polished acoustic bone in warm amber-brass (Not plain white!)
             child.material = new THREE.MeshStandardMaterial({
-              color: 0xf8fafc,
+              color: 0xd97706,
               roughness: 0.22,
-              metalness: 0.08,
+              metalness: 0.22,
+              side: THREE.DoubleSide
+            });
+          } else if (name.includes('chorda')) {
+            // Chorda tympani nerve: Rose-magenta nerve branch
+            child.material = new THREE.MeshStandardMaterial({
+              color: 0xec4899,
+              emissive: 0xbe185d,
+              emissiveIntensity: 0.35,
+              roughness: 0.22,
               side: THREE.DoubleSide
             });
           } else if (name.includes('nerve')) {
-            // Vestibulocochlear & auditory nerves: radiant golden fibers
+            // Vestibulocochlear & auditory nerves: Radiant golden-yellow fibers
             child.material = new THREE.MeshStandardMaterial({
               color: 0xfacc15,
               emissive: 0xca8a04,
-              emissiveIntensity: 0.35,
+              emissiveIntensity: 0.45,
               roughness: 0.22,
               metalness: 0.05,
               side: THREE.DoubleSide
             });
           } else if (name.includes('pinna') || name.includes('auricle') || name.includes('helix') || name.includes('tragus')) {
-            // External ear pinna: natural cartilage and flesh
-            child.material = new THREE.MeshStandardMaterial({
-              color: 0xf5d0c5,
-              roughness: 0.38,
+            // External ear pinna: Rich natural cartilage and skin tone (terracotta-peach)
+            child.material = new THREE.MeshPhysicalMaterial({
+              color: 0xd97757,
+              roughness: 0.36,
               metalness: 0.02,
+              clearcoat: 0.35,
               side: THREE.DoubleSide
             });
           } else {
-            child.material.roughness = 0.32;
-            child.material.side = THREE.DoubleSide;
+            child.material = new THREE.MeshStandardMaterial({
+              color: 0xd97757,
+              roughness: 0.34,
+              side: THREE.DoubleSide
+            });
           }
         }
       });
     } else if (key === 'skin_layers' || key === 'skin') {
-      // Human Skin Block Anatomy: Epidermis, Dermis, Hypodermis, Hair follicle, Glands & Capillary network
+      // Human Skin Block Anatomy: Epidermis, Dermis, Hypodermis, Hair follicle, Glands & Capillary network (Zero plain white!)
       group.traverse((child) => {
         if (child.isMesh && child.material) {
           child.castShadow = true;
           child.receiveShadow = true;
           child.material.side = THREE.DoubleSide;
 
-          if (child.material.map) {
-            // High-resolution baked anatomical textures: preserve texture and optimize PBR
-            child.material.roughness = 0.35;
-            child.material.metalness = 0.04;
-            if (child.material.color) child.material.color.setHex(0xffffff);
-            child.material.needsUpdate = true;
-          } else {
-            const name = (child.name || '').toLowerCase();
-            const matName = (child.material.name || '').toLowerCase();
-            const all = name + ' ' + matName;
+          const matName = (child.material.name || '');
+          const nodeName = (child.name || '').toLowerCase();
+          const all = nodeName + ' ' + matName.toLowerCase();
 
-            if (all.includes('hair') || all.includes('follicle')) {
-              child.material = new THREE.MeshStandardMaterial({ color: 0x18181b, roughness: 0.22, metalness: 0.15, side: THREE.DoubleSide });
-            } else if (all.includes('gland') || all.includes('sebaceous')) {
-              child.material = new THREE.MeshStandardMaterial({ color: 0xfbbf24, roughness: 0.38, side: THREE.DoubleSide });
-            } else if (all.includes('nerve') || all.includes('receptor')) {
-              child.material = new THREE.MeshStandardMaterial({ color: 0xfacc15, emissive: 0xca8a04, emissiveIntensity: 0.3, roughness: 0.25, side: THREE.DoubleSide });
-            } else if (all.includes('artery') || all.includes('art')) {
-              child.material = new THREE.MeshStandardMaterial({ color: 0xdc2626, roughness: 0.25, side: THREE.DoubleSide });
-            } else if (all.includes('vein')) {
-              child.material = new THREE.MeshStandardMaterial({ color: 0x2563eb, roughness: 0.25, side: THREE.DoubleSide });
-            } else if (all.includes('fat') || all.includes('hypoderm') || all.includes('adipose')) {
-              child.material = new THREE.MeshStandardMaterial({ color: 0xfef08a, roughness: 0.5, side: THREE.DoubleSide });
-            } else if (all.includes('dermis')) {
-              child.material = new THREE.MeshStandardMaterial({ color: 0xf43f5e, roughness: 0.36, side: THREE.DoubleSide });
-            } else {
-              child.material = new THREE.MeshStandardMaterial({ color: 0xf5d0c5, roughness: 0.38, side: THREE.DoubleSide });
-            }
+          // Match by material index in skin_layers.glb as well as semantic names
+          if (matName === 'Material.004' || all.includes('epidermis') || all.includes('stratum')) {
+            // 1. Epidermis (Stratum corneum & germinativum) - Rich realistic skin tone
+            child.material = new THREE.MeshPhysicalMaterial({
+              color: 0xc87d55,
+              roughness: 0.42,
+              metalness: 0.02,
+              clearcoat: 0.25,
+              side: THREE.DoubleSide
+            });
+          } else if (matName === 'Material.003' || matName === 'Material.002' || all.includes('dermis')) {
+            // 2. Dermis (Dense connective tissue with collagen & elastin) - Rich rose-crimson
+            child.material = new THREE.MeshPhysicalMaterial({
+              color: 0xe11d48,
+              roughness: 0.36,
+              metalness: 0.02,
+              clearcoat: 0.35,
+              side: THREE.DoubleSide
+            });
+          } else if (matName === 'Material.011' || all.includes('adipose') || all.includes('fat') || all.includes('hypoderm')) {
+            // 3. Hypodermis (Subcutaneous adipose lipid lobules - 76 meshes) - Bright warm sunflower yellow
+            child.material = new THREE.MeshPhysicalMaterial({
+              color: 0xfacc15,
+              roughness: 0.45,
+              metalness: 0.02,
+              clearcoat: 0.25,
+              side: THREE.DoubleSide
+            });
+          } else if (matName === 'Material.005' || all.includes('gland') || all.includes('sebaceous') || all.includes('sweat')) {
+            // 4. Sebaceous & Coiled Sweat Glands (76 meshes) - Vibrant warm amber-tangerine
+            child.material = new THREE.MeshPhysicalMaterial({
+              color: 0xf97316,
+              roughness: 0.30,
+              metalness: 0.04,
+              clearcoat: 0.65,
+              side: THREE.DoubleSide
+            });
+          } else if (matName === 'Material' || all.includes('hair') || all.includes('shaft')) {
+            // 5. Hair Shaft - Glossy dark melanin keratin
+            child.material = new THREE.MeshStandardMaterial({
+              color: 0x18181b,
+              roughness: 0.22,
+              metalness: 0.15,
+              side: THREE.DoubleSide
+            });
+          } else if (matName === 'Material.001' || all.includes('follicle') || all.includes('bulb')) {
+            // 6. Hair Follicle Root Sheath & Bulb - Warm golden-tan sheath
+            child.material = new THREE.MeshStandardMaterial({
+              color: 0xd97706,
+              roughness: 0.35,
+              metalness: 0.04,
+              side: THREE.DoubleSide
+            });
+          } else if (matName === 'Material.006' || all.includes('vein')) {
+            // 7. Venous Capillary Plexus - Deep royal blue
+            child.material = new THREE.MeshPhysicalMaterial({
+              color: 0x2563eb,
+              roughness: 0.22,
+              metalness: 0.08,
+              clearcoat: 0.85,
+              side: THREE.DoubleSide
+            });
+          } else if (matName === 'Material.007' || matName === 'Material.008' || matName === 'Material.009' || all.includes('artery') || all.includes('art')) {
+            // 8. Arterial Capillary Plexus - Vibrant scarlet red
+            child.material = new THREE.MeshPhysicalMaterial({
+              color: 0xdc2626,
+              roughness: 0.22,
+              metalness: 0.08,
+              clearcoat: 0.85,
+              side: THREE.DoubleSide
+            });
+          } else if (matName === 'Material.010' || all.includes('pili') || all.includes('muscle')) {
+            // 9. Arrector Pili Muscle - Contractile muscle crimson
+            child.material = new THREE.MeshStandardMaterial({
+              color: 0xb91c1c,
+              roughness: 0.35,
+              metalness: 0.04,
+              side: THREE.DoubleSide
+            });
+          } else if (all.includes('nerve') || all.includes('receptor') || all.includes('meissner') || all.includes('pacinian')) {
+            // 10. Cutaneous Sensory Nerves - Radiant electric yellow
+            child.material = new THREE.MeshStandardMaterial({
+              color: 0xfbbf24,
+              emissive: 0xca8a04,
+              emissiveIntensity: 0.35,
+              roughness: 0.25,
+              metalness: 0.05,
+              side: THREE.DoubleSide
+            });
+          } else {
+            // Fallback: warm golden tan (never plain white!)
+            child.material = new THREE.MeshStandardMaterial({
+              color: 0xba714a,
+              roughness: 0.38,
+              side: THREE.DoubleSide
+            });
           }
         }
       });

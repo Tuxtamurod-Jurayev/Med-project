@@ -83,20 +83,12 @@ export function createGallbladderBiliaryModel() {
     clearcoat: 0.85
   });
 
-  // A. VISCERAL LIVER BED (Fossa vesicae biliaris)
-  const liverGeo = new THREE.SphereGeometry(1.65, 36, 24, 0, Math.PI, 0, Math.PI * 0.75);
-  liverGeo.scale(1.2, 0.75, 0.65);
-  const liverMesh = new THREE.Mesh(liverGeo, liverBedShader);
-  liverMesh.rotation.x = Math.PI * 0.25;
-  liverMesh.rotation.y = -Math.PI * 0.45;
-  liverMesh.position.set(0.75, 1.35, -0.28);
-  group.add(liverMesh);
-
-  // B. GALLBLADDER RESERVOIR (Fundus, Corpus, Infundibulum / Hartmann's pouch, Collum)
-  // 1. Fundus vesicae biliaris (Smooth pear-shaped apex extending below liver margin)
+  // A. GALLBLADDER RESERVOIR (Fundus, Corpus, Infundibulum / Hartmann's pouch, Collum)
+  // 1. Fundus vesicae biliaris (Smooth pear-shaped apex with rich emerald-olive bile gloss)
   const fundusGeo = new THREE.SphereGeometry(0.58, 36, 28);
   fundusGeo.scale(0.85, 1.28, 0.92);
   const fundusMesh = new THREE.Mesh(fundusGeo, gbShader);
+  fundusMesh.name = "gallbladder_fundus";
   fundusMesh.position.set(0.68, 0.42, 0.22);
   fundusMesh.rotation.z = -0.36;
   group.add(fundusMesh);
@@ -105,6 +97,7 @@ export function createGallbladderBiliaryModel() {
   const bodyGeo = new THREE.CylinderGeometry(0.42, 0.56, 1.05, 36);
   bodyGeo.scale(0.88, 1, 0.86);
   const bodyMesh = new THREE.Mesh(bodyGeo, gbShader);
+  bodyMesh.name = "gallbladder_corpus";
   bodyMesh.position.set(0.5, 1.05, 0.14);
   bodyMesh.rotation.z = -0.32;
   group.add(bodyMesh);
@@ -113,6 +106,7 @@ export function createGallbladderBiliaryModel() {
   const neckGeo = new THREE.SphereGeometry(0.35, 28, 22);
   neckGeo.scale(0.85, 1.15, 0.85);
   const neckMesh = new THREE.Mesh(neckGeo, gbShader);
+  neckMesh.name = "gallbladder_collum";
   neckMesh.position.set(0.32, 1.58, 0.06);
   neckMesh.rotation.z = -0.25;
   group.add(neckMesh);
@@ -120,6 +114,7 @@ export function createGallbladderBiliaryModel() {
   // Hartmann's pouch bulbous dilation
   const pouchGeo = new THREE.SphereGeometry(0.24, 22, 18);
   const pouchMesh = new THREE.Mesh(pouchGeo, gbShader);
+  pouchMesh.name = "hartmann_pouch";
   pouchMesh.position.set(0.46, 1.48, 0.16);
   group.add(pouchMesh);
 
@@ -130,10 +125,12 @@ export function createGallbladderBiliaryModel() {
       new THREE.Vector3(0.52 + b * 0.05, 1.15 - b * 0.3, 0.25),
       new THREE.Vector3(0.65, 0.55 - b * 0.1, 0.28)
     ];
-    group.add(makeTube(artBranchPts, 0.018, 14, 6, arteryShader));
+    const artBranch = makeTube(artBranchPts, 0.018, 14, 6, arteryShader);
+    artBranch.name = "cystic_artery_branch_" + b;
+    group.add(artBranch);
   }
 
-  // C. BILIARY DUCT TREE (Systema biliare)
+  // B. BILIARY DUCT TREE (Systema biliare)
   // 1. Cystic Duct with Heister's Spiral Valves (Valvula spiralis)
   const cysticPts = [
     new THREE.Vector3(0.28, 1.65, 0.04),
@@ -141,7 +138,9 @@ export function createGallbladderBiliaryModel() {
     new THREE.Vector3(0.04, 1.58, -0.05),
     new THREE.Vector3(-0.08, 1.38, -0.06)
   ];
-  group.add(makeTube(cysticPts, 0.068, 28, 12, ductShader));
+  const cysticDuct = makeTube(cysticPts, 0.068, 28, 12, ductShader);
+  cysticDuct.name = "cystic_duct";
+  group.add(cysticDuct);
 
   // 6 Spiral Valve Ridges along cystic duct
   for (let h = 0; h < 6; h++) {
@@ -149,6 +148,7 @@ export function createGallbladderBiliaryModel() {
     const pt = new THREE.CatmullRomCurve3(cysticPts).getPoint(t);
     const ringGeo = new THREE.TorusGeometry(0.078, 0.019, 8, 18);
     const ringMesh = new THREE.Mesh(ringGeo, ductShader);
+    ringMesh.name = "heister_valve_" + h;
     ringMesh.position.copy(pt);
     ringMesh.rotation.x = Math.PI * 0.38 + h * 0.45;
     group.add(ringMesh);
@@ -160,21 +160,27 @@ export function createGallbladderBiliaryModel() {
     new THREE.Vector3(0.15, 1.88, -0.08),
     new THREE.Vector3(-0.06, 1.65, -0.07)
   ];
-  group.add(makeTube(rHepaticPts, 0.065, 18, 10, ductShader));
+  const rHepaticDuct = makeTube(rHepaticPts, 0.065, 18, 10, ductShader);
+  rHepaticDuct.name = "right_hepatic_duct";
+  group.add(rHepaticDuct);
 
   const lHepaticPts = [
     new THREE.Vector3(-0.52, 2.15, -0.14),
     new THREE.Vector3(-0.25, 1.82, -0.09),
     new THREE.Vector3(-0.06, 1.65, -0.07)
   ];
-  group.add(makeTube(lHepaticPts, 0.06, 18, 10, ductShader));
+  const lHepaticDuct = makeTube(lHepaticPts, 0.06, 18, 10, ductShader);
+  lHepaticDuct.name = "left_hepatic_duct";
+  group.add(lHepaticDuct);
 
   // 3. Common Hepatic Duct (Ductus hepaticus communis)
   const comHepaticPts = [
     new THREE.Vector3(-0.06, 1.65, -0.07),
     new THREE.Vector3(-0.08, 1.38, -0.06)
   ];
-  group.add(makeTube(comHepaticPts, 0.08, 12, 10, ductShader));
+  const comHepaticDuct = makeTube(comHepaticPts, 0.08, 12, 10, ductShader);
+  comHepaticDuct.name = "common_hepatic_duct";
+  group.add(comHepaticDuct);
 
   // 4. Common Bile Duct (Ductus choledochus - supraduodenal to intraduodenal)
   const choledochusPts = [
@@ -184,9 +190,11 @@ export function createGallbladderBiliaryModel() {
     new THREE.Vector3(-0.14, -0.22, -0.02),
     new THREE.Vector3(-0.16, -0.72, 0.02)
   ];
-  group.add(makeTube(choledochusPts, 0.09, 32, 14, ductShader));
+  const choledochus = makeTube(choledochusPts, 0.09, 32, 14, ductShader);
+  choledochus.name = "common_bile_duct";
+  group.add(choledochus);
 
-  // D. CALOT'S TRIANGLE VASCULAR LANDMARKS (Cystic Artery & Portal Vein)
+  // C. CALOT'S TRIANGLE VASCULAR LANDMARKS (Cystic Artery & Portal Vein)
   // Cystic Artery arising from Right Hepatic Artery
   const cystArtPts = [
     new THREE.Vector3(-0.28, 1.48, -0.12),
@@ -194,7 +202,9 @@ export function createGallbladderBiliaryModel() {
     new THREE.Vector3(0.28, 1.52, 0.05),
     new THREE.Vector3(0.42, 1.35, 0.16)
   ];
-  group.add(makeTube(cystArtPts, 0.042, 20, 8, arteryShader));
+  const cystArt = makeTube(cystArtPts, 0.042, 20, 8, arteryShader);
+  cystArt.name = "cystic_artery";
+  group.add(cystArt);
 
   // Portal Vein (Vena portae hepatis - running posterior in hepatoduodenal ligament)
   const pvPts = [
@@ -202,13 +212,16 @@ export function createGallbladderBiliaryModel() {
     new THREE.Vector3(-0.2, 1.05, -0.17),
     new THREE.Vector3(-0.12, 1.88, -0.19)
   ];
-  group.add(makeTube(pvPts, 0.12, 18, 10, veinShader));
+  const pv = makeTube(pvPts, 0.12, 18, 10, veinShader);
+  pv.name = "portal_vein";
+  group.add(pv);
 
-  // E. PANCREAS HEAD & MAIN PANCREATIC DUCT (Wirsung)
+  // D. PANCREAS HEAD & MAIN PANCREATIC DUCT (Wirsung)
   // Pancreas Head nestled in duodenal C-loop
   const pancGeo = new THREE.SphereGeometry(0.55, 24, 20);
   pancGeo.scale(1.2, 0.95, 0.65);
   const pancMesh = new THREE.Mesh(pancGeo, pancreasHeadShader);
+  pancMesh.name = "pancreas_head";
   pancMesh.position.set(-0.48, -0.68, 0.0);
   group.add(pancMesh);
 
@@ -219,24 +232,28 @@ export function createGallbladderBiliaryModel() {
     new THREE.Vector3(-0.38, -0.68, -0.02),
     new THREE.Vector3(-0.16, -0.72, 0.02)
   ];
-  group.add(makeTube(pancDuctPts, 0.06, 24, 10, pancreaticDuctShader));
+  const pancDuct = makeTube(pancDuctPts, 0.06, 24, 10, pancreaticDuctShader);
+  pancDuct.name = "pancreatic_duct";
+  group.add(pancDuct);
 
-  // F. AMPULLA OF VATER, SPHINCTER OF ODDI & MAJOR DUODENAL PAPILLA
+  // E. AMPULLA OF VATER, SPHINCTER OF ODDI & MAJOR DUODENAL PAPILLA
   // Hepatopancreatic Ampulla
   const ampullaGeo = new THREE.SphereGeometry(0.13, 18, 16);
   const ampullaMat = new THREE.MeshPhysicalMaterial({ color: 0xbe123c, roughness: 0.25, clearcoat: 0.8 });
   const ampullaMesh = new THREE.Mesh(ampullaGeo, ampullaMat);
+  ampullaMesh.name = "ampulla_of_vater";
   ampullaMesh.position.set(-0.16, -0.72, 0.02);
   group.add(ampullaMesh);
 
   // Sphincter of Oddi muscular ring
   const sphincterGeo = new THREE.TorusGeometry(0.095, 0.038, 10, 20);
   const sphincterMesh = new THREE.Mesh(sphincterGeo, ampullaMat);
+  sphincterMesh.name = "sphincter_of_oddi";
   sphincterMesh.position.set(-0.16, -0.72, 0.02);
   sphincterMesh.rotation.y = Math.PI * 0.35;
   group.add(sphincterMesh);
 
-  // G. DUODENUM C-LOOP (Pars superior, descendens, horizontalis)
+  // F. DUODENUM C-LOOP (Pars superior, descendens, horizontalis)
   const duodCurve = new THREE.CatmullRomCurve3([
     new THREE.Vector3(0.42, -0.12, 0.16),  // Bulbus duodeni
     new THREE.Vector3(0.15, -0.32, 0.14),
@@ -245,7 +262,9 @@ export function createGallbladderBiliaryModel() {
     new THREE.Vector3(-0.58, -1.38, 0.02),
     new THREE.Vector3(-1.05, -1.18, -0.02)
   ]);
-  group.add(makeTube(duodCurve.points, 0.29, 42, 16, duodenumShader));
+  const duodMesh = makeTube(duodCurve.points, 0.29, 42, 16, duodenumShader);
+  duodMesh.name = "duodenum_c_loop";
+  group.add(duodMesh);
 
   // Circular mucosal folds (Plicae circulares) inside duodenum
   for (let f = 0; f < 8; f++) {
@@ -253,6 +272,7 @@ export function createGallbladderBiliaryModel() {
     const pt = duodCurve.getPoint(t);
     const ringGeo = new THREE.TorusGeometry(0.3, 0.028, 8, 20);
     const ringMesh = new THREE.Mesh(ringGeo, duodenumShader);
+    ringMesh.name = "plicae_circulares_" + f;
     ringMesh.position.copy(pt);
     group.add(ringMesh);
   }
@@ -270,85 +290,108 @@ export function createEyeInternalLayersModel() {
   // Cutaway angle (0 to 1.55 * PI) allowing direct view of inner layers
   const cutAngle = Math.PI * 1.55;
 
-  // 1. SCLERA (Outer Fibrous Tunic)
+  // 1. SCLERA (Outer Fibrous Tunic - Soft Warm Porcelain Ivory with Microvascular Plexus)
   const scleraGeo = new THREE.SphereGeometry(1.4, 48, 36, 0, cutAngle);
   const scleraMat = new THREE.MeshStandardMaterial({
-    color: 0xf8fafc,
-    roughness: 0.28,
+    color: 0xeee8dc, // Warm porcelain ivory-buff (not stark white)
+    roughness: 0.35,
     metalness: 0.02,
     side: THREE.DoubleSide
   });
   const scleraMesh = new THREE.Mesh(scleraGeo, scleraMat);
+  scleraMesh.name = "sclera";
   group.add(scleraMesh);
+
+  // Episcleral fine red capillary vessels over outer sclera
+  const capShader = new THREE.MeshStandardMaterial({ color: 0xdc2626, roughness: 0.28 });
+  for (let i = 0; i < 8; i++) {
+    const angle = (i / 8) * Math.PI * 1.5;
+    const pts = [
+      new THREE.Vector3(Math.cos(angle) * 1.15, Math.sin(angle) * 1.15, 0.78),
+      new THREE.Vector3(Math.cos(angle + 0.12) * 1.36, Math.sin(angle + 0.12) * 1.36, 0.35),
+      new THREE.Vector3(Math.cos(angle - 0.08) * 1.39, Math.sin(angle - 0.08) * 1.39, -0.3)
+    ];
+    const capTube = makeTube(pts, 0.016, 10, 6, capShader);
+    capTube.name = "episcleral_vessel_" + i;
+    group.add(capTube);
+  }
 
   // 2. CORNEA (Anterior Transparent Window)
   const corneaGeo = new THREE.SphereGeometry(0.85, 36, 24, 0, Math.PI * 2, 0, Math.PI * 0.45);
   corneaGeo.scale(1.0, 1.0, 0.65);
   const corneaMat = new THREE.MeshPhysicalMaterial({
     color: 0xe0f2fe,
-    transmission: 0.95,
-    roughness: 0.04,
+    transmission: 0.96,
+    roughness: 0.03,
     ior: 1.376,
     transparent: true,
-    opacity: 0.45,
+    opacity: 0.42,
     side: THREE.DoubleSide
   });
   const corneaMesh = new THREE.Mesh(corneaGeo, corneaMat);
+  corneaMesh.name = "cornea";
   corneaMesh.position.set(0, 0, 1.15);
   group.add(corneaMesh);
 
-  // 3. CHOROID (Middle Vascular Layer)
+  // 3. CHOROID (Middle Vascular Layer - Deep Rich Violet-Brown)
   const choroidGeo = new THREE.SphereGeometry(1.36, 48, 36, 0, cutAngle);
   const choroidMat = new THREE.MeshStandardMaterial({
-    color: 0x31102b, // Dark brown-violet vascular pigment
+    color: 0x2a0845, // Deep violet-brown vascular pigment
     roughness: 0.42,
     metalness: 0.05,
     side: THREE.DoubleSide
   });
   const choroidMesh = new THREE.Mesh(choroidGeo, choroidMat);
+  choroidMesh.name = "choroid";
   group.add(choroidMesh);
 
-  // 4. RETINA (Inner Neural Layer with Ora Serrata)
+  // 4. RETINA (Inner Sensory Neural Layer - Vibrant Amber-Coral)
   const retinaGeo = new THREE.SphereGeometry(1.32, 48, 36, 0, cutAngle, 0, Math.PI * 0.72);
   const retinaMat = new THREE.MeshStandardMaterial({
-    color: 0xfb923c, // Sensory retinal amber/coral
-    roughness: 0.35,
+    color: 0xf97316, // Sensory retinal amber-coral
+    roughness: 0.32,
     metalness: 0.02,
     side: THREE.DoubleSide
   });
   const retinaMesh = new THREE.Mesh(retinaGeo, retinaMat);
+  retinaMesh.name = "retina";
   group.add(retinaMesh);
 
-  // Macula Lutea & Fovea Centralis on Retina
-  const maculaGeo = new THREE.CircleGeometry(0.12, 16);
+  // Macula Lutea & Fovea Centralis on Retina (Radiant Yellow)
+  const maculaGeo = new THREE.CircleGeometry(0.14, 20);
   const maculaMat = new THREE.MeshBasicMaterial({ color: 0xfacc15, side: THREE.DoubleSide });
   const maculaMesh = new THREE.Mesh(maculaGeo, maculaMat);
+  maculaMesh.name = "macula_lutea";
   maculaMesh.position.set(0.35, 0, -1.31);
   group.add(maculaMesh);
 
-  // Optic Disc (Blind Spot / Papilla)
-  const discGeo = new THREE.CircleGeometry(0.14, 16);
-  const discMat = new THREE.MeshBasicMaterial({ color: 0xfef08a, side: THREE.DoubleSide });
+  // Optic Disc (Blind Spot / Papilla - Warm Golden Cream)
+  const discGeo = new THREE.CircleGeometry(0.16, 20);
+  const discMat = new THREE.MeshBasicMaterial({ color: 0xfde047, side: THREE.DoubleSide });
   const discMesh = new THREE.Mesh(discGeo, discMat);
+  discMesh.name = "optic_disc";
   discMesh.position.set(-0.25, 0, -1.31);
   group.add(discMesh);
 
   // Retinal Blood Vessels (Central retinal artery and vein branching)
-  const artShader = new THREE.MeshStandardMaterial({ color: 0xdc2626, roughness: 0.25 });
-  const veinShader = new THREE.MeshStandardMaterial({ color: 0x2563eb, roughness: 0.25 });
+  const artShader = new THREE.MeshStandardMaterial({ color: 0xdc2626, roughness: 0.22 });
+  const veinShader = new THREE.MeshStandardMaterial({ color: 0x2563eb, roughness: 0.22 });
   [
     [new THREE.Vector3(-0.25, 0, -1.31), new THREE.Vector3(-0.35, 0.45, -1.15), new THREE.Vector3(-0.25, 0.85, -0.85)],
     [new THREE.Vector3(-0.25, 0, -1.31), new THREE.Vector3(-0.38, -0.42, -1.15), new THREE.Vector3(-0.3, -0.82, -0.85)],
     [new THREE.Vector3(-0.25, 0, -1.31), new THREE.Vector3(0.15, 0.35, -1.22), new THREE.Vector3(0.55, 0.65, -0.95)],
     [new THREE.Vector3(-0.25, 0, -1.31), new THREE.Vector3(0.18, -0.32, -1.22), new THREE.Vector3(0.58, -0.62, -0.95)]
   ].forEach((pts, idx) => {
-    group.add(makeTube(pts, 0.022, 12, 6, idx % 2 === 0 ? artShader : veinShader));
+    const vTube = makeTube(pts, 0.022, 12, 6, idx % 2 === 0 ? artShader : veinShader);
+    vTube.name = idx % 2 === 0 ? "retinal_artery_" + idx : "retinal_vein_" + idx;
+    group.add(vTube);
   });
 
   // 5. CILIARY BODY & ZONULAR FIBERS
   const ciliaryGeo = new THREE.TorusGeometry(0.88, 0.12, 16, 40);
-  const ciliaryMat = new THREE.MeshStandardMaterial({ color: 0x991b1b, roughness: 0.4 });
+  const ciliaryMat = new THREE.MeshStandardMaterial({ color: 0x991b1b, roughness: 0.38 });
   const ciliaryMesh = new THREE.Mesh(ciliaryGeo, ciliaryMat);
+  ciliaryMesh.name = "ciliary_body";
   ciliaryMesh.position.set(0, 0, 0.72);
   group.add(ciliaryMesh);
 
@@ -359,58 +402,107 @@ export function createEyeInternalLayersModel() {
       new THREE.Vector3(Math.cos(angle) * 0.85, Math.sin(angle) * 0.85, 0.72),
       new THREE.Vector3(Math.cos(angle) * 0.52, Math.sin(angle) * 0.52, 0.72)
     ];
-    const fiberLine = makeTube(fiberPts, 0.008, 4, 4, new THREE.MeshBasicMaterial({ color: 0xe2e8f0, transparent: true, opacity: 0.6 }));
+    const fiberLine = makeTube(fiberPts, 0.009, 4, 4, new THREE.MeshBasicMaterial({ color: 0x7dd3fc, transparent: true, opacity: 0.7 }));
+    fiberLine.name = "zonule_fiber_" + z;
     group.add(fiberLine);
   }
 
-  // 6. IRIS & PUPIL
+  // 6. IRIS & PUPIL (Vibrant Sapphire Blue Iris with Inner Sphincter)
   const irisGeo = new THREE.RingGeometry(0.24, 0.78, 36);
   const irisMat = new THREE.MeshStandardMaterial({
     color: 0x0284c7, // Brilliant medical blue iris
-    roughness: 0.3,
+    roughness: 0.28,
     metalness: 0.05,
     side: THREE.DoubleSide
   });
   const irisMesh = new THREE.Mesh(irisGeo, irisMat);
+  irisMesh.name = "iris";
   irisMesh.position.set(0, 0, 0.95);
   group.add(irisMesh);
+
+  // Inner Pupillary Ring
+  const innerRingGeo = new THREE.RingGeometry(0.24, 0.42, 36);
+  const innerRingMat = new THREE.MeshStandardMaterial({ color: 0x0369a1, roughness: 0.32, side: THREE.DoubleSide });
+  const innerRingMesh = new THREE.Mesh(innerRingGeo, innerRingMat);
+  innerRingMesh.name = "pupillary_sphincter";
+  innerRingMesh.position.set(0, 0, 0.955);
+  group.add(innerRingMesh);
+
+  // Pupil (Deep velvet black light absorber)
+  const pupilGeo = new THREE.CircleGeometry(0.24, 32);
+  const pupilMat = new THREE.MeshBasicMaterial({ color: 0x020617 });
+  const pupilMesh = new THREE.Mesh(pupilGeo, pupilMat);
+  pupilMesh.name = "pupil";
+  pupilMesh.position.set(0, 0, 0.956);
+  group.add(pupilMesh);
 
   // 7. CRYSTALLINE BICONVEX LENS (Billur gavhar)
   const lensGeo = new THREE.SphereGeometry(0.52, 32, 24);
   lensGeo.scale(1.0, 1.0, 0.48);
   const lensMat = new THREE.MeshPhysicalMaterial({
-    color: 0xffffff,
+    color: 0xf0f9ff,
     transmission: 0.96,
-    roughness: 0.05,
+    roughness: 0.04,
     ior: 1.413,
     transparent: true,
     opacity: 0.85
   });
   const lensMesh = new THREE.Mesh(lensGeo, lensMat);
+  lensMesh.name = "lens";
   lensMesh.position.set(0, 0, 0.72);
   group.add(lensMesh);
 
-  // 8. VITREOUS BODY (Shishasimon tana)
+  // 8. VITREOUS BODY (Shishasimon tana - Soft Tinted Vitreous Humor)
   const vitreousGeo = new THREE.SphereGeometry(1.28, 36, 24, 0, cutAngle);
   const vitreousMat = new THREE.MeshPhysicalMaterial({
-    color: 0xdbeafe,
+    color: 0xe0f2fe,
     transmission: 0.88,
-    roughness: 0.1,
+    roughness: 0.08,
     transparent: true,
     opacity: 0.22,
     depthWrite: false
   });
   const vitreousMesh = new THREE.Mesh(vitreousGeo, vitreousMat);
+  vitreousMesh.name = "vitreous_body";
   group.add(vitreousMesh);
 
-  // 9. OPTIC NERVE CABLE (Nervus opticus)
+  // 9. OPTIC NERVE CABLE (Nervus opticus - Golden Yellow Cranial Nerve II)
   const opticPts = [
     new THREE.Vector3(-0.25, 0, -1.35),
     new THREE.Vector3(-0.35, -0.05, -1.85),
     new THREE.Vector3(-0.45, -0.1, -2.45)
   ];
-  const opticMat = new THREE.MeshStandardMaterial({ color: 0xfef08a, roughness: 0.35 });
-  group.add(makeTube(opticPts, 0.22, 16, 12, opticMat));
+  const opticMat = new THREE.MeshStandardMaterial({ color: 0xfacc15, emissive: 0xca8a04, emissiveIntensity: 0.35, roughness: 0.28 });
+  const opticMesh = makeTube(opticPts, 0.22, 16, 12, opticMat);
+  opticMesh.name = "optic_nerve";
+  group.add(opticMesh);
+
+  // 10. EXTRAOCULAR RECTUS MUSCLES (4 Rectus muscles in rich contractile crimson)
+  const muscleShader = new THREE.MeshStandardMaterial({ color: 0xb91c1c, roughness: 0.32, metalness: 0.04 });
+  const tendonShader = new THREE.MeshStandardMaterial({ color: 0xfef3c7, roughness: 0.30 });
+  const rectusList = [
+    { name: "rectus_superior", rotX: 0.65, rotY: 0, pos: [0, 1.25, -0.25] },
+    { name: "rectus_inferior", rotX: -0.65, rotY: 0, pos: [0, -1.25, -0.25] },
+    { name: "rectus_medialis", rotX: 0, rotY: 0.65, pos: [1.25, 0, -0.25] },
+    { name: "rectus_lateralis", rotX: 0, rotY: -0.65, pos: [-1.25, 0, -0.25] }
+  ];
+  rectusList.forEach(r => {
+    const mGeo = new THREE.CylinderGeometry(0.15, 0.22, 1.6, 14);
+    const mMesh = new THREE.Mesh(mGeo, muscleShader);
+    mMesh.name = r.name;
+    mMesh.rotation.x = r.rotX || (Math.PI / 2);
+    mMesh.rotation.y = r.rotY || 0;
+    mMesh.position.set(r.pos[0], r.pos[1], r.pos[2]);
+    group.add(mMesh);
+
+    const tGeo = new THREE.CylinderGeometry(0.12, 0.15, 0.32, 12);
+    const tMesh = new THREE.Mesh(tGeo, tendonShader);
+    tMesh.name = r.name + "_tendon";
+    tMesh.rotation.x = r.rotX || (Math.PI / 2);
+    tMesh.rotation.y = r.rotY || 0;
+    tMesh.position.set(r.pos[0] * 0.9, r.pos[1] * 0.9, r.pos[2] + 0.62);
+    group.add(tMesh);
+  });
 
   return group;
 }

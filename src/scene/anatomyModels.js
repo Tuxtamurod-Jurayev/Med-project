@@ -2830,7 +2830,7 @@ export function createSpineModel() {
 export const PROCEDURAL_MODEL_BUILDERS = {
   skull: createSkullModel,
   heart: createHeartModel,
-  eye: createEyeTissuesModel,
+  eye: createEyeInternalLayersModel,
   eye_tissues: createEyeInternalLayersModel,
   eye_layers: createEyeInternalLayersModel,
   gallbladder: createGallbladderBiliaryModel,
