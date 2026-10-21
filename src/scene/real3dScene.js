@@ -92,7 +92,17 @@ export class Real3DSceneManager {
       },
       gallbladder: {
         path: '/models/gallbladder.glb',
-        targetScale: 2.5,
+        targetScale: 2.45,
+        yOffset: 0.05
+      },
+      esophagus_pharynx: {
+        path: '/models/esophagus_pharynx.glb',
+        targetScale: 2.3,
+        yOffset: 0.0
+      },
+      salivary_glands: {
+        path: '/models/salivary_glands.glb',
+        targetScale: 2.4,
         yOffset: 0.0
       },
       larynx_vocal_cords: {
@@ -278,11 +288,27 @@ export class Real3DSceneManager {
 
     // Normalize Bounding Box and Center at (0, 0, 0)
     modelRoot.updateMatrixWorld(true);
-    const bbox = new THREE.Box3().setFromObject(modelRoot);
-    const size = bbox.getSize(new THREE.Vector3());
-    const center = bbox.getCenter(new THREE.Vector3());
+    let center = new THREE.Vector3();
+    let maxDim = 1.0;
 
-    const maxDim = Math.max(size.x, size.y, size.z) || 1.0;
+    if (key === 'gallbladder') {
+      const gbBox = new THREE.Box3();
+      modelRoot.traverse((c) => {
+        if (c.isMesh && (c.name.toLowerCase().includes('gallbladder') || c.name.toLowerCase().includes('artery') || c.name.toLowerCase().includes('vein'))) {
+          gbBox.expandByObject(c);
+        }
+      });
+      const fullBox = new THREE.Box3().setFromObject(modelRoot);
+      const fullSize = fullBox.getSize(new THREE.Vector3());
+      maxDim = Math.max(fullSize.x, fullSize.y, fullSize.z) || 1.0;
+      center = gbBox.isEmpty() ? fullBox.getCenter(new THREE.Vector3()) : gbBox.getCenter(new THREE.Vector3());
+      modelRoot.rotation.x = -0.28;
+    } else {
+      const bbox = new THREE.Box3().setFromObject(modelRoot);
+      const size = bbox.getSize(new THREE.Vector3());
+      center = bbox.getCenter(new THREE.Vector3());
+      maxDim = Math.max(size.x, size.y, size.z) || 1.0;
+    }
     const scale = (cfg.targetScale || 2.2) / maxDim;
     modelRoot.scale.set(scale, scale, scale);
 
@@ -813,15 +839,213 @@ export class Real3DSceneManager {
         }
       });
     } else if (key === 'gallbladder') {
-      // Gallbladder & Biliary Tree: Fundus, Corpus, Collum, Heister valve, Duodenum C-loop, Calot's triangle vessels
+      // Photorealistic Gallbladder & Biliary System: Fundus, Corpus, Collum, Cystic duct, Portal triad vessels
       group.traverse((child) => {
         if (child.isMesh && child.material) {
           child.castShadow = true;
           child.receiveShadow = true;
           child.material.side = THREE.DoubleSide;
-          child.material.roughness = 0.22;
-          child.material.metalness = 0.05;
-          child.material.needsUpdate = true;
+          const nodeName = (child.name || '').toLowerCase();
+
+          if (nodeName.includes('gallbladder')) {
+            // Gallbladder: High-gloss emerald-olive bile luster with clearcoat sheen
+            if (child.material.map) {
+              child.material.roughness = 0.16;
+              child.material.metalness = 0.04;
+              child.material.needsUpdate = true;
+            } else {
+              child.material = new THREE.MeshPhysicalMaterial({
+                color: 0x166534,
+                emissive: 0x052e16,
+                emissiveIntensity: 0.15,
+                roughness: 0.18,
+                metalness: 0.04,
+                clearcoat: 0.92,
+                clearcoatRoughness: 0.08,
+                side: THREE.DoubleSide
+              });
+            }
+          } else if (nodeName.includes('artery')) {
+            // Hepatic / Cystic Arteries: Oxygenated arterial crimson
+            child.material = new THREE.MeshStandardMaterial({
+              color: 0xdc2626,
+              roughness: 0.28,
+              metalness: 0.08,
+              side: THREE.DoubleSide
+            });
+          } else if (nodeName.includes('portal') || nodeName.includes('vein')) {
+            // Portal Vein / Venous branches: Rich sapphire blue
+            child.material = new THREE.MeshStandardMaterial({
+              color: 0x2563eb,
+              roughness: 0.28,
+              metalness: 0.08,
+              side: THREE.DoubleSide
+            });
+          } else if (nodeName.includes('inferior_vena_cava')) {
+            // IVC: Deep venous navy
+            child.material = new THREE.MeshStandardMaterial({
+              color: 0x1d4ed8,
+              roughness: 0.3,
+              metalness: 0.06,
+              side: THREE.DoubleSide
+            });
+          } else if (nodeName.includes('liver')) {
+            // Visceral Liver bed: Translucent anatomical context so the gallbladder & biliary vessels shine forward
+            if (child.material.map) {
+              child.material.transparent = true;
+              child.material.opacity = 0.36;
+              child.material.depthWrite = true;
+              child.material.roughness = 0.42;
+              child.material.needsUpdate = true;
+            } else {
+              child.material = new THREE.MeshStandardMaterial({
+                color: 0x7f1d1d,
+                transparent: true,
+                opacity: 0.36,
+                depthWrite: true,
+                roughness: 0.42,
+                side: THREE.DoubleSide
+              });
+            }
+          } else {
+            child.material.roughness = 0.28;
+            child.material.side = THREE.DoubleSide;
+          }
+        }
+      });
+    } else if (key === 'esophagus_pharynx' || key === 'esophagus') {
+      // Pharynx & Esophagus: Pharyngeal constrictor muscles, Esophageal muscularis, Stomach cardia & Hyoid bone
+      group.traverse((child) => {
+        if (child.isMesh && child.material) {
+          child.castShadow = true;
+          child.receiveShadow = true;
+          child.material.side = THREE.DoubleSide;
+          const nodeName = (child.name || '').toLowerCase();
+
+          if (nodeName.includes('esophagus') || nodeName.includes('oesophagus')) {
+            // Esophagus muscular tube: glistening muscular pinkish-crimson with smooth peristaltic mucosa
+            child.material = new THREE.MeshStandardMaterial({
+              color: 0xb91c1c, // Rich esophageal muscularis crimson
+              roughness: 0.28,
+              metalness: 0.06,
+              side: THREE.DoubleSide
+            });
+          } else if (nodeName.includes('pharyngeal') || nodeName.includes('palato') || nodeName.includes('stylo')) {
+            // Pharyngeal constrictor muscles: striated deep red muscle fibers
+            child.material = new THREE.MeshStandardMaterial({
+              color: 0x881337, // Striated muscular ruby
+              roughness: 0.36,
+              metalness: 0.04,
+              side: THREE.DoubleSide
+            });
+          } else if (nodeName.includes('stomach') || nodeName.includes('cardia')) {
+            // Stomach cardia & fundus: gastroesophageal junction
+            child.material = new THREE.MeshStandardMaterial({
+              color: 0xf472b6, // Mucosal gastric pink
+              roughness: 0.34,
+              metalness: 0.02,
+              side: THREE.DoubleSide
+            });
+          } else if (nodeName.includes('hyoid')) {
+            // Hyoid bone anatomical landmark: pearly bone ivory
+            child.material = new THREE.MeshStandardMaterial({
+              color: 0xf6efe2,
+              roughness: 0.38,
+              metalness: 0.05,
+              side: THREE.DoubleSide
+            });
+          } else {
+            child.material.roughness = 0.34;
+            child.material.side = THREE.DoubleSide;
+          }
+        }
+      });
+    } else if (key === 'salivary_glands') {
+      // Salivary Glands: Parotid + Stensen's duct, Submandibular + Wharton's duct, Sublingual, Mandible & Mylohyoid
+      group.traverse((child) => {
+        if (child.isMesh && child.material) {
+          child.castShadow = true;
+          child.receiveShadow = true;
+          child.material.side = THREE.DoubleSide;
+          const nodeName = (child.name || '').toLowerCase();
+
+          if (nodeName.includes('parotid_gland') || nodeName.includes('accessory_parotid')) {
+            // Parotid gland: Lobulated glandular amber-gold
+            child.material = new THREE.MeshStandardMaterial({
+              color: 0xf59e0b,
+              roughness: 0.36,
+              metalness: 0.04,
+              side: THREE.DoubleSide
+            });
+          } else if (nodeName.includes('parotid_duct')) {
+            // Stensen's duct: Translucent glistening salivary duct aqua-pearl
+            child.material = new THREE.MeshStandardMaterial({
+              color: 0x38bdf8,
+              emissive: 0x0284c7,
+              emissiveIntensity: 0.28,
+              roughness: 0.18,
+              metalness: 0.05,
+              side: THREE.DoubleSide
+            });
+          } else if (nodeName.includes('submandibular_gland')) {
+            // Submandibular gland: Warm glandular salmon-orange
+            child.material = new THREE.MeshStandardMaterial({
+              color: 0xf97316,
+              roughness: 0.36,
+              metalness: 0.04,
+              side: THREE.DoubleSide
+            });
+          } else if (nodeName.includes('submandibular_duct')) {
+            // Wharton's duct: Translucent salivary duct cyan
+            child.material = new THREE.MeshStandardMaterial({
+              color: 0x22d3ee,
+              emissive: 0x0891b2,
+              emissiveIntensity: 0.28,
+              roughness: 0.18,
+              metalness: 0.05,
+              side: THREE.DoubleSide
+            });
+          } else if (nodeName.includes('sublingual_gland')) {
+            // Sublingual gland: Soft glandular coral-pink
+            child.material = new THREE.MeshStandardMaterial({
+              color: 0xf43f5e,
+              roughness: 0.35,
+              metalness: 0.04,
+              side: THREE.DoubleSide
+            });
+          } else if (nodeName.includes('mandible')) {
+            // Lower jaw mandible reference frame: semi-translucent surgical bone ivory
+            child.material = new THREE.MeshStandardMaterial({
+              color: 0xf1f5f9,
+              transparent: true,
+              opacity: 0.38,
+              roughness: 0.44,
+              metalness: 0.05,
+              depthWrite: true,
+              side: THREE.DoubleSide
+            });
+          } else if (nodeName.includes('hyoid')) {
+            // Hyoid bone
+            child.material = new THREE.MeshStandardMaterial({
+              color: 0xf1f5f9,
+              transparent: true,
+              opacity: 0.45,
+              roughness: 0.42,
+              side: THREE.DoubleSide
+            });
+          } else if (nodeName.includes('mylohyoid')) {
+            // Mylohyoid muscle (oral floor diaphragm)
+            child.material = new THREE.MeshStandardMaterial({
+              color: 0x991b1b,
+              transparent: true,
+              opacity: 0.42,
+              roughness: 0.38,
+              side: THREE.DoubleSide
+            });
+          } else {
+            child.material.roughness = 0.35;
+            child.material.side = THREE.DoubleSide;
+          }
         }
       });
     } else if (key === 'oral_cavity') {
