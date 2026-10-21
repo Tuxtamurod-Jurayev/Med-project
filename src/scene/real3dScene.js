@@ -90,6 +90,21 @@ export class Real3DSceneManager {
         targetScale: 2.3,
         yOffset: 0.0
       },
+      gallbladder: {
+        path: '/models/gallbladder.glb',
+        targetScale: 2.5,
+        yOffset: 0.0
+      },
+      larynx_vocal_cords: {
+        path: '/models/larynx_vocal_cords.glb',
+        targetScale: 2.35,
+        yOffset: 0.0
+      },
+      larynx: {
+        path: '/models/larynx_vocal_cords.glb',
+        targetScale: 2.35,
+        yOffset: 0.0
+      },
       urinary_system: {
         path: '/models/urinary_system.glb',
         targetScale: 2.6,
@@ -830,6 +845,40 @@ export class Real3DSceneManager {
           child.material.needsUpdate = true;
         }
       });
+    } else if (key === 'larynx_vocal_cords' || key === 'larynx') {
+      // Larynx & Vocal Cords: CT-based accurate cartilages, muscles, vocal folds and membranes
+      group.traverse((child) => {
+        if (child.isMesh && child.material) {
+          child.castShadow = true;
+          child.receiveShadow = true;
+          child.material.side = THREE.DoubleSide;
+
+          if (child.material.map) {
+            // High-resolution CT-data baked textures: optimize medical PBR
+            child.material.roughness = 0.32;
+            child.material.metalness = 0.04;
+            if (child.material.color) {
+              child.material.color.setHex(0xffffff);
+            }
+            child.material.needsUpdate = true;
+          } else {
+            const nodeName = (child.name || '').toLowerCase();
+            const parentName = (child.parent?.name || '').toLowerCase();
+            if (nodeName.includes('corniculate') || parentName.includes('corniculate')) {
+              child.material = new THREE.MeshStandardMaterial({
+                color: 0xfef08a, // Corniculate elastic cartilage yellowish tone
+                roughness: 0.28,
+                metalness: 0.04,
+                side: THREE.DoubleSide
+              });
+            } else {
+              child.material.roughness = 0.32;
+              child.material.metalness = 0.04;
+              child.material.side = THREE.DoubleSide;
+            }
+          }
+        }
+      });
     } else {
       // For all models with textures (lung, liver, stomach): PRESERVE TEXTURES & optimize PBR!
       group.traverse((child) => {
@@ -936,7 +985,7 @@ export class Real3DSceneManager {
     this.currentModelGroup = pivotGroup;
     this.scene.add(this.currentModelGroup);
 
-    this.isPulsing = (key === 'heart' || key === 'circulatory_system' || key === 'lung' || key === 'respiratory_system');
+    this.isPulsing = (key === 'heart' || key === 'circulatory_system' || key === 'lung' || key === 'respiratory_system' || key === 'larynx_vocal_cords' || key === 'larynx');
     this.applyXRayState();
     this.applyWireframeState();
     this.resetCamera();
@@ -1035,6 +1084,10 @@ export class Real3DSceneManager {
         // Natural thoracic respiration
         const breath = 1.0 + Math.sin(elapsedTime * 1.8) * 0.045;
         this.currentModelGroup.scale.set(breath, breath, breath);
+      } else if (this.currentModelKey === 'larynx_vocal_cords' || this.currentModelKey === 'larynx') {
+        // Phonetic resonance & subtle vocal cord / larynx respiration oscillation
+        const phonPulse = 1.0 + Math.sin(elapsedTime * 2.2) * 0.012;
+        this.currentModelGroup.scale.set(phonPulse, phonPulse, phonPulse);
       } else if (this.currentModelKey === 'eye') {
         // Natural micro-saccades and subtle physiological gaze
         const saccadeX = Math.sin(elapsedTime * 0.8) * 0.035;
