@@ -647,12 +647,21 @@ html, body {
 }
 
 .btn-close-drawer {
-  background: transparent;
-  border: none;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
   color: var(--text-muted);
   cursor: pointer;
-  padding: 4px;
-  display: none;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.btn-close-drawer:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
 }
 
 .stats-row {
@@ -724,6 +733,22 @@ html, body {
   color: var(--accent-cyan-light);
   border-bottom-color: var(--accent-cyan-light);
   background: rgba(56, 189, 248, 0.05);
+}
+
+.sidebar-tabs-nav.two-tabs {
+  grid-template-columns: 1fr 1fr;
+}
+
+.sidebar-tabs-nav.two-tabs .nav-s-tab {
+  flex-direction: row;
+  padding: 12px 10px;
+  font-size: 13px;
+  gap: 8px;
+}
+
+.sidebar-tabs-nav.two-tabs .nav-s-tab .tab-mini-icon {
+  width: 17px;
+  height: 17px;
 }
 
 /* SIDEBAR SCROLL BODY */
@@ -843,6 +868,60 @@ html, body {
 .warning-list .detail-item::before {
   content: '!';
   color: var(--accent-amber);
+}
+
+/* CLINICAL CARDS */
+.clinical-cards-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.clinical-card {
+  background: rgba(245, 158, 11, 0.05);
+  border: 1px solid rgba(245, 158, 11, 0.22);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.clinical-card:hover {
+  background: rgba(245, 158, 11, 0.1);
+  border-color: rgba(245, 158, 11, 0.45);
+  transform: translateY(-1px);
+}
+
+.clinical-card-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.clinical-badge {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #fbbf24;
+  background: rgba(245, 158, 11, 0.16);
+  padding: 2px 7px;
+  border-radius: 4px;
+  letter-spacing: 0.5px;
+}
+
+.clinical-title {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #fef08a;
+  line-height: 1.3;
+}
+
+.clinical-text {
+  font-size: 12px;
+  color: #cbd5e1;
+  line-height: 1.55;
 }
 
 /* QUIZ STYLES */

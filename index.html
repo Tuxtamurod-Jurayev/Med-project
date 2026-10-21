@@ -53,6 +53,15 @@
           </svg>
         </button>
 
+        <!-- Toggle Info & Diseases Sidebar -->
+        <button id="toggleSidebarBtn" class="icon-action-btn" title="Aniq ma'lumotlar va kasalliklar paneli" aria-label="Ma'lumotlar">
+          <svg class="react-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="16" x2="12" y2="12"/>
+            <line x1="12" y1="8" x2="12.01" y2="8"/>
+          </svg>
+        </button>
+
         <!-- Fullscreen Button -->
         <button id="fullscreenBtn" class="icon-action-btn desktop-only" title="To'liq ekran rejimi" aria-label="To'liq ekran">
           <svg class="react-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -142,6 +151,15 @@
             </svg>
             <span class="t-label">Surat</span>
           </button>
+
+          <button id="quickInfoBtn" class="tool-btn" title="A'zo tuzilishi va kasalliklari">
+            <svg class="react-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="12" y1="16" x2="12" y2="12"/>
+              <line x1="12" y1="8" x2="12.01" y2="8"/>
+            </svg>
+            <span class="t-label">Ma'lumot</span>
+          </button>
         </div>
 
         <!-- LOADING INDICATOR -->
@@ -158,6 +176,95 @@
           <span>360° aylantirish uchun bosing va suring • Kattalashtirish uchun ikki barmoq bilan cho'zing</span>
         </div>
       </section>
+
+      <!-- RIGHT INFO SIDEBAR (DESKTOP) / BOTTOM DRAWER (MOBILE) -->
+      <aside class="info-sidebar" id="infoSidebar">
+
+        <!-- Mobile Drawer Drag Handle -->
+        <div class="drawer-handle" id="drawerHandle">
+          <div class="handle-bar"></div>
+        </div>
+
+        <!-- Sidebar Header (Category, Name, Latin Name & Close) -->
+        <div class="sidebar-header">
+          <div class="sidebar-title-wrap">
+            <div>
+              <span id="organCategory" class="category-chip">Nafas olish sistemasi</span>
+              <h2 id="organNameUz" class="organ-heading">O'pka</h2>
+              <p id="organNameLat" class="organ-latin-sub">Pulmones • 3D Anatomiya</p>
+            </div>
+            <button id="closeSidebarBtn" class="btn-close-drawer" aria-label="Yopish" title="Yopish">
+              <svg class="react-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"/>
+                <line x1="6" y1="6" x2="18" y2="18"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- ONLY 2 TABS: TUZILISHI & KASALLIKLAR -->
+        <nav class="sidebar-tabs-nav two-tabs" id="sidebarTabsNav">
+          <button class="nav-s-tab active" data-tab="parts">
+            <svg class="react-icon tab-mini-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect width="7" height="7" x="3" y="3" rx="1"/>
+              <rect width="7" height="7" x="14" y="3" rx="1"/>
+              <rect width="7" height="7" x="14" y="14" rx="1"/>
+              <rect width="7" height="7" x="3" y="14" rx="1"/>
+            </svg>
+            <span>Tuzilishi</span>
+          </button>
+
+          <button class="nav-s-tab" data-tab="clinical">
+            <svg class="react-icon tab-mini-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+            </svg>
+            <span>Kasalliklar</span>
+          </button>
+        </nav>
+
+        <!-- Sidebar Content Body -->
+        <div class="sidebar-scroll-body custom-scrollbar">
+
+          <!-- TAB 1: TUZILISHI (ANIQ MA'LUMOTLAR) -->
+          <div id="tabParts" class="tab-panel active">
+            <div class="description-card">
+              <p id="organDescription">Yuklanmoqda...</p>
+            </div>
+
+            <div class="panel-section-title">
+              <span>Anatomik Qismlar</span>
+              <span class="sub-tip">Aniq tuzilishi</span>
+            </div>
+
+            <div id="partsList" class="parts-grid">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+
+          <!-- TAB 2: KASALLIKLAR (KLINIK PATOLOGIYA) -->
+          <div id="tabClinical" class="tab-panel hidden">
+            <div class="panel-section-title title-amber">
+              <span>Klinik Kasalliklar</span>
+              <span class="sub-tip">Asosiy patologiyalar</span>
+            </div>
+
+            <div id="clinicalList" class="clinical-cards-list">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Sidebar Footer -->
+        <div class="sidebar-footer">
+          <div class="footer-status">
+            <span class="status-dot" style="background:#10b981; box-shadow:0 0 8px #10b981;"></span>
+            <span style="color:#10b981; font-weight:700;">3D Anatomiya va Patologiya</span>
+          </div>
+          <span class="footer-ver">MedAnatomy</span>
+        </div>
+
+      </aside>
     </main>
 
     <!-- MOBILE FULL-FEATURED ACCORDION DRAWER MENU -->

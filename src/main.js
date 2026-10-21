@@ -102,6 +102,21 @@ const loadingText = document.getElementById('loadingText');
 // Floating badge elements
 const badgeModelName = document.getElementById('badgeModelName');
 const badgeModelLat = document.getElementById('badgeModelLat');
+const modelFloatingBadge = document.getElementById('modelFloatingBadge');
+
+// Sidebar Info Elements
+const infoSidebar = document.getElementById('infoSidebar');
+const organCategory = document.getElementById('organCategory');
+const organNameUz = document.getElementById('organNameUz');
+const organNameLat = document.getElementById('organNameLat');
+const organDescription = document.getElementById('organDescription');
+const partsList = document.getElementById('partsList');
+const clinicalList = document.getElementById('clinicalList');
+const toggleSidebarBtn = document.getElementById('toggleSidebarBtn');
+const quickInfoBtn = document.getElementById('quickInfoBtn');
+const closeSidebarBtn = document.getElementById('closeSidebarBtn');
+const drawerHandle = document.getElementById('drawerHandle');
+const navSTabs = document.querySelectorAll('.nav-s-tab');
 
 // Menu Bar Elements
 const systemsTabsList = document.getElementById('systemsTabsList');
@@ -154,6 +169,9 @@ function selectOrgan(modelKey) {
 
   // Update floating label on the 3D canvas
   updateFloatingBadge(data);
+
+  // Update accurate info and clinical diseases in sidebar
+  updateInfoSidebar(data);
 }
 
 /**
@@ -358,6 +376,159 @@ if (fullscreenBtn) {
     } else {
       document.exitFullscreen().catch(() => {});
     }
+  });
+}
+
+/**
+ * UPDATE INFO & CLINICAL DISEASES SIDEBAR
+ */
+function updateInfoSidebar(data) {
+  if (!data) return;
+  if (organCategory) organCategory.textContent = data.category || data.system || "Anatomiya";
+  if (organNameUz) organNameUz.textContent = data.nameUz;
+  if (organNameLat) organNameLat.textContent = `${data.nameLat} • 3D Anatomiya`;
+  if (organDescription) organDescription.textContent = data.description || "Ushbu a'zo haqida aniq tibbiy ma'lumot.";
+
+  renderParts(data.parts || []);
+  renderClinical(data.clinical || []);
+}
+
+/**
+ * RENDER ANATOMICAL PARTS (TUZILISHI)
+ */
+function renderParts(parts) {
+  if (!partsList) return;
+  partsList.innerHTML = '';
+
+  if (!parts || parts.length === 0) {
+    partsList.innerHTML = '<div class="part-card"><p class="part-desc">Ushbu a\'zo yaxlit anatomik tuzilishga ega.</p></div>';
+    return;
+  }
+
+  parts.forEach(part => {
+    const card = document.createElement('div');
+    card.className = 'part-card';
+    card.innerHTML = `
+      <div class="part-header">
+        <span class="part-name-uz">${part.nameUz}</span>
+        <span class="part-name-lat">${part.nameLat || ''}</span>
+      </div>
+      <p class="part-desc">${part.desc || ''}</p>
+    `;
+    partsList.appendChild(card);
+  });
+}
+
+/**
+ * RENDER CLINICAL DISEASES (KASALLIKLAR)
+ */
+function renderClinical(clinical) {
+  if (!clinicalList) return;
+  clinicalList.innerHTML = '';
+
+  if (!clinical || clinical.length === 0) {
+    clinicalList.innerHTML = `
+      <div class="clinical-card">
+        <div class="clinical-card-header">
+          <span class="clinical-badge">Patologiya</span>
+          <span class="clinical-title">Klinik ma'lumot</span>
+        </div>
+        <p class="clinical-text">Ushbu a'zoga oid asosiy profilaktik va klinik ma'lumotlar normada saqlanadi.</p>
+      </div>
+    `;
+    return;
+  }
+
+  clinical.forEach((item, idx) => {
+    let title = `Kasallik #${idx + 1}`;
+    let desc = item;
+
+    if (item.includes(' - ')) {
+      const parts = item.split(' - ');
+      title = parts[0];
+      desc = parts.slice(1).join(' - ');
+    } else if (item.includes(': ')) {
+      const parts = item.split(': ');
+      title = parts[0];
+      desc = parts.slice(1).join(': ');
+    }
+
+    const card = document.createElement('div');
+    card.className = 'clinical-card';
+    card.innerHTML = `
+      <div class="clinical-card-header">
+        <span class="clinical-badge">Kasallik</span>
+        <span class="clinical-title">${title}</span>
+      </div>
+      <p class="clinical-text">${desc}</p>
+    `;
+    clinicalList.appendChild(card);
+  });
+}
+
+/**
+ * TOGGLE SIDEBAR / DRAWER
+ */
+function toggleInfoSidebar() {
+  if (!infoSidebar) return;
+  const isMobile = window.innerWidth <= 900;
+  if (isMobile) {
+    infoSidebar.classList.toggle('open-drawer');
+  } else {
+    infoSidebar.classList.toggle('hidden-sidebar');
+    setTimeout(() => sceneManager.onResize(), 150);
+  }
+}
+
+function closeInfoSidebar() {
+  if (!infoSidebar) return;
+  infoSidebar.classList.remove('open-drawer');
+  infoSidebar.classList.add('hidden-sidebar');
+  setTimeout(() => sceneManager.onResize(), 150);
+}
+
+// Sidebar Event Listeners
+if (toggleSidebarBtn) {
+  toggleSidebarBtn.addEventListener('click', toggleInfoSidebar);
+}
+
+if (quickInfoBtn) {
+  quickInfoBtn.addEventListener('click', toggleInfoSidebar);
+}
+
+if (closeSidebarBtn) {
+  closeSidebarBtn.addEventListener('click', closeInfoSidebar);
+}
+
+if (drawerHandle) {
+  drawerHandle.addEventListener('click', closeInfoSidebar);
+}
+
+if (modelFloatingBadge) {
+  modelFloatingBadge.style.cursor = 'pointer';
+  modelFloatingBadge.setAttribute('title', "A'zo tuzilishi va kasalliklarini ochish");
+  modelFloatingBadge.addEventListener('click', toggleInfoSidebar);
+}
+
+// Sidebar Tab switching (Tuzilishi <-> Kasalliklar)
+if (navSTabs && navSTabs.length > 0) {
+  navSTabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      navSTabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+
+      const tabKey = tab.getAttribute('data-tab');
+      const tabParts = document.getElementById('tabParts');
+      const tabClinical = document.getElementById('tabClinical');
+
+      if (tabKey === 'parts') {
+        if (tabParts) tabParts.classList.remove('hidden');
+        if (tabClinical) tabClinical.classList.add('hidden');
+      } else {
+        if (tabParts) tabParts.classList.add('hidden');
+        if (tabClinical) tabClinical.classList.remove('hidden');
+      }
+    });
   });
 }
 
