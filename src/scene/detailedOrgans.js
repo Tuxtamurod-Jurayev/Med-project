@@ -10,186 +10,252 @@ function makeTube(points, radius = 0.08, segments = 24, radialSegments = 12, mat
 }
 
 // ===========================================================================
-// 1. O'T PUFAGI VA O'T YO'LLARI (Vesica biliaris & Ductus biliares)
+// 1. O'T PUFAGI VA O'T YO'LLARI (Vesica biliaris & Systema biliare)
 // ===========================================================================
 export function createGallbladderBiliaryModel() {
   const group = new THREE.Group();
   group.name = "gallbladder_biliary_tree";
 
+  // Ultra-realistic anatomical materials with clearcoat bile sheen
   const gbShader = new THREE.MeshPhysicalMaterial({
-    color: 0x15803d, // Emerald olive bile green
+    color: 0x166534, // Natural emerald-olive bile green
     emissive: 0x052e16,
-    emissiveIntensity: 0.12,
+    emissiveIntensity: 0.15,
     roughness: 0.22,
     metalness: 0.04,
-    clearcoat: 0.92,
-    clearcoatRoughness: 0.1,
-    transmission: 0.15,
-    ior: 1.36,
+    clearcoat: 0.95,
+    clearcoatRoughness: 0.08,
+    transmission: 0.14,
+    ior: 1.38,
+    side: THREE.DoubleSide
+  });
+
+  const liverBedShader = new THREE.MeshPhysicalMaterial({
+    color: 0x7f1d1d, // Hepatic parenchyma glistening brown-red
+    roughness: 0.38,
+    metalness: 0.04,
+    clearcoat: 0.55,
     side: THREE.DoubleSide
   });
 
   const ductShader = new THREE.MeshPhysicalMaterial({
-    color: 0x16a34a,
-    roughness: 0.28,
+    color: 0x15803d,
+    roughness: 0.24,
     metalness: 0.03,
+    clearcoat: 0.85,
+    clearcoatRoughness: 0.12,
+    side: THREE.DoubleSide
+  });
+
+  const duodenumShader = new THREE.MeshPhysicalMaterial({
+    color: 0xf472b6,
+    roughness: 0.35,
+    metalness: 0.02,
+    clearcoat: 0.65,
+    side: THREE.DoubleSide
+  });
+
+  const pancreaticDuctShader = new THREE.MeshPhysicalMaterial({
+    color: 0xfef08a,
+    roughness: 0.26,
+    metalness: 0.05,
     clearcoat: 0.75,
     side: THREE.DoubleSide
   });
 
-  const duodenumShader = new THREE.MeshStandardMaterial({
-    color: 0xf472b6,
-    roughness: 0.38,
-    metalness: 0.02,
-    side: THREE.DoubleSide
+  const pancreasHeadShader = new THREE.MeshStandardMaterial({
+    color: 0xfde047,
+    roughness: 0.58,
+    metalness: 0.02
   });
 
-  const pancreaticDuctShader = new THREE.MeshStandardMaterial({
-    color: 0xfef08a,
-    roughness: 0.3,
-    metalness: 0.05,
-    side: THREE.DoubleSide
+  const arteryShader = new THREE.MeshPhysicalMaterial({
+    color: 0xdc2626,
+    roughness: 0.22,
+    metalness: 0.08,
+    clearcoat: 0.85
   });
 
-  const arteryShader = new THREE.MeshStandardMaterial({
-    color: 0xef4444,
-    roughness: 0.25,
-    metalness: 0.1
+  const veinShader = new THREE.MeshPhysicalMaterial({
+    color: 0x1d4ed8,
+    roughness: 0.22,
+    metalness: 0.08,
+    clearcoat: 0.85
   });
 
-  const veinShader = new THREE.MeshStandardMaterial({
-    color: 0x2563eb,
-    roughness: 0.25,
-    metalness: 0.1
-  });
+  // A. VISCERAL LIVER BED (Fossa vesicae biliaris)
+  const liverGeo = new THREE.SphereGeometry(1.65, 36, 24, 0, Math.PI, 0, Math.PI * 0.75);
+  liverGeo.scale(1.2, 0.75, 0.65);
+  const liverMesh = new THREE.Mesh(liverGeo, liverBedShader);
+  liverMesh.rotation.x = Math.PI * 0.25;
+  liverMesh.rotation.y = -Math.PI * 0.45;
+  liverMesh.position.set(0.75, 1.35, -0.28);
+  group.add(liverMesh);
 
-  // A. GALLBLADDER RESERVOIR (Fundus, Corpus, Collum, Hartmann's pouch)
-  const fundusGeo = new THREE.SphereGeometry(0.55, 32, 28);
-  fundusGeo.scale(0.85, 1.25, 0.9);
+  // B. GALLBLADDER RESERVOIR (Fundus, Corpus, Infundibulum / Hartmann's pouch, Collum)
+  // 1. Fundus vesicae biliaris (Smooth pear-shaped apex extending below liver margin)
+  const fundusGeo = new THREE.SphereGeometry(0.58, 36, 28);
+  fundusGeo.scale(0.85, 1.28, 0.92);
   const fundusMesh = new THREE.Mesh(fundusGeo, gbShader);
-  fundusMesh.position.set(0.65, 0.45, 0.2);
-  fundusMesh.rotation.z = -0.35;
+  fundusMesh.position.set(0.68, 0.42, 0.22);
+  fundusMesh.rotation.z = -0.36;
   group.add(fundusMesh);
 
-  const bodyGeo = new THREE.CylinderGeometry(0.38, 0.52, 0.95, 32);
-  bodyGeo.scale(0.88, 1, 0.85);
+  // 2. Corpus vesicae biliaris (Middle body tapering towards neck)
+  const bodyGeo = new THREE.CylinderGeometry(0.42, 0.56, 1.05, 36);
+  bodyGeo.scale(0.88, 1, 0.86);
   const bodyMesh = new THREE.Mesh(bodyGeo, gbShader);
-  bodyMesh.position.set(0.48, 1.05, 0.12);
+  bodyMesh.position.set(0.5, 1.05, 0.14);
   bodyMesh.rotation.z = -0.32;
   group.add(bodyMesh);
 
-  const neckGeo = new THREE.SphereGeometry(0.32, 24, 20);
-  neckGeo.scale(0.85, 1.1, 0.85);
+  // 3. Collum & Hartmann's Pouch (Infundibulocervical dilatation where stones lodge)
+  const neckGeo = new THREE.SphereGeometry(0.35, 28, 22);
+  neckGeo.scale(0.85, 1.15, 0.85);
   const neckMesh = new THREE.Mesh(neckGeo, gbShader);
-  neckMesh.position.set(0.32, 1.55, 0.05);
+  neckMesh.position.set(0.32, 1.58, 0.06);
   neckMesh.rotation.z = -0.25;
   group.add(neckMesh);
 
-  const pouchGeo = new THREE.SphereGeometry(0.22, 20, 18);
+  // Hartmann's pouch bulbous dilation
+  const pouchGeo = new THREE.SphereGeometry(0.24, 22, 18);
   const pouchMesh = new THREE.Mesh(pouchGeo, gbShader);
-  pouchMesh.position.set(0.45, 1.48, 0.15);
+  pouchMesh.position.set(0.46, 1.48, 0.16);
   group.add(pouchMesh);
 
-  // B. BILIARY DUCT TREE
-  // Cystic duct with Heister's valve spiral folds
-  const cysticPts = [
-    new THREE.Vector3(0.28, 1.62, 0.04),
-    new THREE.Vector3(0.12, 1.72, -0.02),
-    new THREE.Vector3(0.04, 1.55, -0.05),
-    new THREE.Vector3(-0.08, 1.35, -0.06)
-  ];
-  group.add(makeTube(cysticPts, 0.065, 24, 12, ductShader));
+  // Cystic Artery branches network on gallbladder surface
+  for (let b = 0; b < 3; b++) {
+    const artBranchPts = [
+      new THREE.Vector3(0.35, 1.55 - b * 0.2, 0.1),
+      new THREE.Vector3(0.52 + b * 0.05, 1.15 - b * 0.3, 0.25),
+      new THREE.Vector3(0.65, 0.55 - b * 0.1, 0.28)
+    ];
+    group.add(makeTube(artBranchPts, 0.018, 14, 6, arteryShader));
+  }
 
-  for (let h = 0; h < 5; h++) {
-    const t = h / 4;
+  // C. BILIARY DUCT TREE (Systema biliare)
+  // 1. Cystic Duct with Heister's Spiral Valves (Valvula spiralis)
+  const cysticPts = [
+    new THREE.Vector3(0.28, 1.65, 0.04),
+    new THREE.Vector3(0.12, 1.76, -0.02),
+    new THREE.Vector3(0.04, 1.58, -0.05),
+    new THREE.Vector3(-0.08, 1.38, -0.06)
+  ];
+  group.add(makeTube(cysticPts, 0.068, 28, 12, ductShader));
+
+  // 6 Spiral Valve Ridges along cystic duct
+  for (let h = 0; h < 6; h++) {
+    const t = h / 5;
     const pt = new THREE.CatmullRomCurve3(cysticPts).getPoint(t);
-    const ringGeo = new THREE.TorusGeometry(0.075, 0.018, 8, 16);
+    const ringGeo = new THREE.TorusGeometry(0.078, 0.019, 8, 18);
     const ringMesh = new THREE.Mesh(ringGeo, ductShader);
     ringMesh.position.copy(pt);
-    ringMesh.rotation.x = Math.PI * 0.4 + h * 0.4;
+    ringMesh.rotation.x = Math.PI * 0.38 + h * 0.45;
     group.add(ringMesh);
   }
 
-  // Right & Left Hepatic Ducts
+  // 2. Intrahepatic & Extrahepatic Right and Left Hepatic Ducts
   const rHepaticPts = [
-    new THREE.Vector3(0.35, 2.15, -0.1),
-    new THREE.Vector3(0.12, 1.82, -0.08),
-    new THREE.Vector3(-0.06, 1.62, -0.07)
+    new THREE.Vector3(0.42, 2.25, -0.12),
+    new THREE.Vector3(0.15, 1.88, -0.08),
+    new THREE.Vector3(-0.06, 1.65, -0.07)
   ];
-  group.add(makeTube(rHepaticPts, 0.06, 16, 10, ductShader));
+  group.add(makeTube(rHepaticPts, 0.065, 18, 10, ductShader));
 
   const lHepaticPts = [
-    new THREE.Vector3(-0.45, 2.05, -0.12),
-    new THREE.Vector3(-0.22, 1.78, -0.09),
-    new THREE.Vector3(-0.06, 1.62, -0.07)
+    new THREE.Vector3(-0.52, 2.15, -0.14),
+    new THREE.Vector3(-0.25, 1.82, -0.09),
+    new THREE.Vector3(-0.06, 1.65, -0.07)
   ];
-  group.add(makeTube(lHepaticPts, 0.055, 16, 10, ductShader));
+  group.add(makeTube(lHepaticPts, 0.06, 18, 10, ductShader));
 
-  // Common Hepatic Duct
+  // 3. Common Hepatic Duct (Ductus hepaticus communis)
   const comHepaticPts = [
-    new THREE.Vector3(-0.06, 1.62, -0.07),
-    new THREE.Vector3(-0.08, 1.35, -0.06)
+    new THREE.Vector3(-0.06, 1.65, -0.07),
+    new THREE.Vector3(-0.08, 1.38, -0.06)
   ];
-  group.add(makeTube(comHepaticPts, 0.075, 12, 10, ductShader));
+  group.add(makeTube(comHepaticPts, 0.08, 12, 10, ductShader));
 
-  // Common Bile Duct (Ductus choledochus)
+  // 4. Common Bile Duct (Ductus choledochus - supraduodenal to intraduodenal)
   const choledochusPts = [
-    new THREE.Vector3(-0.08, 1.35, -0.06),
-    new THREE.Vector3(-0.1, 0.85, -0.05),
+    new THREE.Vector3(-0.08, 1.38, -0.06),
+    new THREE.Vector3(-0.1, 0.88, -0.05),
     new THREE.Vector3(-0.12, 0.35, -0.04),
-    new THREE.Vector3(-0.14, -0.25, -0.02),
+    new THREE.Vector3(-0.14, -0.22, -0.02),
     new THREE.Vector3(-0.16, -0.72, 0.02)
   ];
-  group.add(makeTube(choledochusPts, 0.085, 28, 12, ductShader));
+  group.add(makeTube(choledochusPts, 0.09, 32, 14, ductShader));
 
-  // Main Pancreatic Duct (Wirsung)
+  // D. CALOT'S TRIANGLE VASCULAR LANDMARKS (Cystic Artery & Portal Vein)
+  // Cystic Artery arising from Right Hepatic Artery
+  const cystArtPts = [
+    new THREE.Vector3(-0.28, 1.48, -0.12),
+    new THREE.Vector3(0.04, 1.56, -0.06),
+    new THREE.Vector3(0.28, 1.52, 0.05),
+    new THREE.Vector3(0.42, 1.35, 0.16)
+  ];
+  group.add(makeTube(cystArtPts, 0.042, 20, 8, arteryShader));
+
+  // Portal Vein (Vena portae hepatis - running posterior in hepatoduodenal ligament)
+  const pvPts = [
+    new THREE.Vector3(-0.25, 0.15, -0.16),
+    new THREE.Vector3(-0.2, 1.05, -0.17),
+    new THREE.Vector3(-0.12, 1.88, -0.19)
+  ];
+  group.add(makeTube(pvPts, 0.12, 18, 10, veinShader));
+
+  // E. PANCREAS HEAD & MAIN PANCREATIC DUCT (Wirsung)
+  // Pancreas Head nestled in duodenal C-loop
+  const pancGeo = new THREE.SphereGeometry(0.55, 24, 20);
+  pancGeo.scale(1.2, 0.95, 0.65);
+  const pancMesh = new THREE.Mesh(pancGeo, pancreasHeadShader);
+  pancMesh.position.set(-0.48, -0.68, 0.0);
+  group.add(pancMesh);
+
+  // Main Pancreatic Duct (Ductus pancreaticus)
   const pancDuctPts = [
-    new THREE.Vector3(-1.15, -0.55, -0.08),
-    new THREE.Vector3(-0.75, -0.62, -0.05),
-    new THREE.Vector3(-0.35, -0.68, -0.02),
+    new THREE.Vector3(-1.25, -0.52, -0.08),
+    new THREE.Vector3(-0.82, -0.6, -0.05),
+    new THREE.Vector3(-0.38, -0.68, -0.02),
     new THREE.Vector3(-0.16, -0.72, 0.02)
   ];
-  group.add(makeTube(pancDuctPts, 0.055, 20, 10, pancreaticDuctShader));
+  group.add(makeTube(pancDuctPts, 0.06, 24, 10, pancreaticDuctShader));
 
-  // Ampulla of Vater & Sphincter of Oddi
-  const ampullaGeo = new THREE.SphereGeometry(0.12, 16, 14);
-  const ampullaMat = new THREE.MeshStandardMaterial({ color: 0xb91c1c, roughness: 0.3 });
+  // F. AMPULLA OF VATER, SPHINCTER OF ODDI & MAJOR DUODENAL PAPILLA
+  // Hepatopancreatic Ampulla
+  const ampullaGeo = new THREE.SphereGeometry(0.13, 18, 16);
+  const ampullaMat = new THREE.MeshPhysicalMaterial({ color: 0xbe123c, roughness: 0.25, clearcoat: 0.8 });
   const ampullaMesh = new THREE.Mesh(ampullaGeo, ampullaMat);
   ampullaMesh.position.set(-0.16, -0.72, 0.02);
   group.add(ampullaMesh);
 
-  const sphincterGeo = new THREE.TorusGeometry(0.09, 0.035, 8, 16);
+  // Sphincter of Oddi muscular ring
+  const sphincterGeo = new THREE.TorusGeometry(0.095, 0.038, 10, 20);
   const sphincterMesh = new THREE.Mesh(sphincterGeo, ampullaMat);
   sphincterMesh.position.set(-0.16, -0.72, 0.02);
-  sphincterMesh.rotation.y = Math.PI * 0.3;
+  sphincterMesh.rotation.y = Math.PI * 0.35;
   group.add(sphincterMesh);
 
-  // Duodenum C-loop
+  // G. DUODENUM C-LOOP (Pars superior, descendens, horizontalis)
   const duodCurve = new THREE.CatmullRomCurve3([
-    new THREE.Vector3(0.35, -0.15, 0.15),
-    new THREE.Vector3(0.12, -0.35, 0.12),
-    new THREE.Vector3(-0.08, -0.72, 0.08),
-    new THREE.Vector3(-0.15, -1.15, 0.05),
-    new THREE.Vector3(-0.55, -1.35, 0.02),
-    new THREE.Vector3(-0.95, -1.15, -0.02)
+    new THREE.Vector3(0.42, -0.12, 0.16),  // Bulbus duodeni
+    new THREE.Vector3(0.15, -0.32, 0.14),
+    new THREE.Vector3(-0.06, -0.72, 0.09), // Major papilla on medial wall
+    new THREE.Vector3(-0.14, -1.18, 0.06),
+    new THREE.Vector3(-0.58, -1.38, 0.02),
+    new THREE.Vector3(-1.05, -1.18, -0.02)
   ]);
-  group.add(makeTube(duodCurve.points, 0.28, 36, 16, duodenumShader));
+  group.add(makeTube(duodCurve.points, 0.29, 42, 16, duodenumShader));
 
-  // Calot's triangle vessels
-  const cystArtPts = [
-    new THREE.Vector3(-0.25, 1.45, -0.12),
-    new THREE.Vector3(0.05, 1.52, -0.06),
-    new THREE.Vector3(0.28, 1.48, 0.05),
-    new THREE.Vector3(0.42, 1.25, 0.18)
-  ];
-  group.add(makeTube(cystArtPts, 0.038, 18, 8, arteryShader));
-
-  const pvPts = [
-    new THREE.Vector3(-0.22, 0.2, -0.15),
-    new THREE.Vector3(-0.18, 1.0, -0.16),
-    new THREE.Vector3(-0.12, 1.8, -0.18)
-  ];
-  group.add(makeTube(pvPts, 0.11, 16, 10, veinShader));
+  // Circular mucosal folds (Plicae circulares) inside duodenum
+  for (let f = 0; f < 8; f++) {
+    const t = 0.15 + (f / 7) * 0.7;
+    const pt = duodCurve.getPoint(t);
+    const ringGeo = new THREE.TorusGeometry(0.3, 0.028, 8, 20);
+    const ringMesh = new THREE.Mesh(ringGeo, duodenumShader);
+    ringMesh.position.copy(pt);
+    group.add(ringMesh);
+  }
 
   return group;
 }
@@ -356,119 +422,183 @@ export function createEsophagusPharynxModel() {
   const group = new THREE.Group();
   group.name = "esophagus_pharynx";
 
-  const pharynxMat = new THREE.MeshStandardMaterial({
+  const pharynxMat = new THREE.MeshPhysicalMaterial({
     color: 0x991b1b, // Pharyngeal constrictor muscle deep red
-    roughness: 0.38,
-    metalness: 0.05,
-    side: THREE.DoubleSide
-  });
-
-  const esophMat = new THREE.MeshStandardMaterial({
-    color: 0xbe123c, // Muscularis externa rose-crimson
-    roughness: 0.36,
+    roughness: 0.35,
     metalness: 0.04,
+    clearcoat: 0.55,
     side: THREE.DoubleSide
   });
 
-  const mucosaMat = new THREE.MeshStandardMaterial({
+  const esophMat = new THREE.MeshPhysicalMaterial({
+    color: 0xbe123c, // Muscularis externa rose-crimson
+    roughness: 0.32,
+    metalness: 0.04,
+    clearcoat: 0.65,
+    clearcoatRoughness: 0.15,
+    side: THREE.DoubleSide
+  });
+
+  const mucosaMat = new THREE.MeshPhysicalMaterial({
     color: 0xf472b6, // Inner stratified mucosa pink
-    roughness: 0.28,
+    roughness: 0.25,
+    metalness: 0.02,
+    clearcoat: 0.8,
     side: THREE.DoubleSide
   });
 
-  const cartilageMat = new THREE.MeshStandardMaterial({
-    color: 0x93c5fd, // Hyaline cartilage blue
-    roughness: 0.25,
+  const cartilageMat = new THREE.MeshPhysicalMaterial({
+    color: 0x93c5fd, // Hyaline cartilage translucent blue
+    roughness: 0.22,
+    metalness: 0.06,
+    clearcoat: 0.85,
     transparent: true,
-    opacity: 0.88
+    opacity: 0.85
   });
 
-  // A. PHARYNX (Halqum - Funnel from skull base to C6)
-  // Superior, Middle, Inferior Constrictors
+  const hyoidMat = new THREE.MeshStandardMaterial({
+    color: 0xf8fafc,
+    roughness: 0.35,
+    metalness: 0.08
+  });
+
+  // A. HYOID BONE & LARYNGEAL CARTILAGE SCAFFOLDING
+  // 1. Hyoid Bone (Os hyoideum - horseshoe shape at C3)
+  const hyoidPts = [
+    new THREE.Vector3(-0.45, 1.85, -0.22), // Left greater horn
+    new THREE.Vector3(-0.35, 1.82, 0.15),
+    new THREE.Vector3(0, 1.78, 0.32),      // Body of hyoid
+    new THREE.Vector3(0.35, 1.82, 0.15),
+    new THREE.Vector3(0.45, 1.85, -0.22)   // Right greater horn
+  ];
+  group.add(makeTube(hyoidPts, 0.045, 20, 8, hyoidMat));
+
+  // 2. Thyroid Cartilage (Cartilago thyroidea - Adam's apple)
+  const thyGeo = new THREE.CylinderGeometry(0.48, 0.42, 0.65, 24, 1, true, -Math.PI * 0.4, Math.PI * 0.8);
+  const thyMesh = new THREE.Mesh(thyGeo, cartilageMat);
+  thyMesh.position.set(0, 1.45, 0.12);
+  group.add(thyMesh);
+
+  // 3. Cricoid Cartilage (Cartilago cricoidea - signet ring foundation)
+  const cricGeo = new THREE.CylinderGeometry(0.38, 0.36, 0.32, 24);
+  const cricMesh = new THREE.Mesh(cricGeo, cartilageMat);
+  cricMesh.position.set(0, 1.12, 0.1);
+  group.add(cricMesh);
+
+  // 4. Epiglottis leaf guarding laryngeal inlet
+  const epiglottisGeo = new THREE.SphereGeometry(0.28, 20, 16, 0, Math.PI * 1.5);
+  epiglottisGeo.scale(0.85, 1.5, 0.35);
+  const epiglottisMesh = new THREE.Mesh(epiglottisGeo, cartilageMat);
+  epiglottisMesh.position.set(0, 1.95, 0.05);
+  epiglottisMesh.rotation.x = -0.35;
+  group.add(epiglottisMesh);
+
+  // B. PHARYNX (Halqum: Nasopharynx, Oropharynx, Laryngopharynx)
+  // Funnel muscular tube from base of skull to C6
   const pharynxCurve = new THREE.CatmullRomCurve3([
-    new THREE.Vector3(0, 2.2, -0.05), // Nasopharynx
-    new THREE.Vector3(0, 1.7, 0.0),   // Oropharynx
-    new THREE.Vector3(0, 1.25, 0.02)  // Laryngopharynx
+    new THREE.Vector3(0, 2.35, -0.06), // Nasopharynx
+    new THREE.Vector3(0, 1.82, 0.0),   // Oropharynx
+    new THREE.Vector3(0, 1.35, 0.02),  // Laryngopharynx (Hypopharynx)
+    new THREE.Vector3(0, 1.12, 0.0)    // Pharyngoesophageal junction
   ]);
-  const pharynxMesh = makeTube(pharynxCurve.points, 0.42, 24, 16, pharynxMat);
+  const pharynxMesh = makeTube(pharynxCurve.points, 0.45, 32, 18, pharynxMat);
   group.add(pharynxMesh);
 
-  // Posterior Pharyngeal Raphe (Fibrous midline seam)
+  // Posterior Pharyngeal Raphe (Midline fibrous seam)
   const raphePts = [
-    new THREE.Vector3(0, 2.2, -0.44),
-    new THREE.Vector3(0, 1.25, -0.42)
+    new THREE.Vector3(0, 2.35, -0.48),
+    new THREE.Vector3(0, 1.12, -0.45)
   ];
-  group.add(makeTube(raphePts, 0.035, 12, 6, new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.3 })));
+  group.add(makeTube(raphePts, 0.038, 16, 6, new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.35 })));
 
-  // Piriform Recesses (Noksimon chuqurchalar)
+  // Piriform Recesses (Fossae piriformes on bilateral sides of larynx)
   [-1, 1].forEach(side => {
-    const recessGeo = new THREE.SphereGeometry(0.14, 14, 12);
-    recessGeo.scale(0.6, 1.4, 0.7);
+    const recessGeo = new THREE.SphereGeometry(0.15, 16, 12);
+    recessGeo.scale(0.6, 1.5, 0.75);
     const recessMesh = new THREE.Mesh(recessGeo, mucosaMat);
-    recessMesh.position.set(side * 0.32, 1.35, -0.15);
+    recessMesh.position.set(side * 0.34, 1.35, -0.12);
     group.add(recessMesh);
   });
 
-  // Cricoid & Thyroid Cartilage Landmarks for Upper Sphincter
-  const cricGeo = new THREE.CylinderGeometry(0.38, 0.36, 0.35, 20);
-  const cricMesh = new THREE.Mesh(cricGeo, cartilageMat);
-  cricMesh.position.set(0, 1.15, 0.18);
-  group.add(cricMesh);
-
-  // B. UPPER ESOPHAGEAL SPHINCTER (Cricopharyngeus muscle ring)
-  const uesGeo = new THREE.TorusGeometry(0.28, 0.07, 12, 24);
-  const uesMat = new THREE.MeshStandardMaterial({ color: 0x881337, roughness: 0.4 });
+  // C. UPPER ESOPHAGEAL SPHINCTER (UES / Cricopharyngeus muscle ring)
+  const uesGeo = new THREE.TorusGeometry(0.29, 0.075, 12, 28);
+  const uesMat = new THREE.MeshPhysicalMaterial({ color: 0x881337, roughness: 0.35, clearcoat: 0.6 });
   const uesMesh = new THREE.Mesh(uesGeo, uesMat);
   uesMesh.rotation.x = Math.PI / 2;
-  uesMesh.position.set(0, 1.12, 0);
+  uesMesh.position.set(0, 1.1, 0);
   group.add(uesMesh);
 
-  // C. ESOPHAGUS TUBE (Qizilo'ngach - 25cm anatomical course with physiological curves)
+  // D. ESOPHAGUS TUBE (Qizilo'ngach - 25 cm anatomical course with physiological curves)
   const esophCurve = new THREE.CatmullRomCurve3([
-    new THREE.Vector3(0, 1.1, 0),         // Cervical start (C6)
-    new THREE.Vector3(-0.04, 0.65, -0.02), // Slight left deviation in neck
-    new THREE.Vector3(0, 0.15, -0.05),    // Thoracic inlet
-    new THREE.Vector3(0.03, -0.35, -0.06), // Aortic arch compression (T4)
-    new THREE.Vector3(0.01, -0.85, -0.04), // Left bronchus compression (T5)
-    new THREE.Vector3(-0.06, -1.35, 0.02), // Lower thoracic curving anterior-left
-    new THREE.Vector3(-0.14, -1.75, 0.12)  // Diaphragmatic hiatus & Cardia (T10-T11)
+    new THREE.Vector3(0, 1.1, 0),          // 1. Cervical constriction (C6, 15 cm from incisors)
+    new THREE.Vector3(-0.04, 0.65, -0.02),  // Slight neck left deviation
+    new THREE.Vector3(0, 0.15, -0.05),     // Superior thoracic inlet
+    new THREE.Vector3(0.04, -0.32, -0.06),  // 2. Aortic arch impression (T4, 22 cm)
+    new THREE.Vector3(0.02, -0.78, -0.04),  // Left main bronchus impression (T5, 27 cm)
+    new THREE.Vector3(-0.05, -1.25, 0.02),  // Lower thoracic curve anterior-left
+    new THREE.Vector3(-0.14, -1.68, 0.1),   // 3. Diaphragmatic constriction at hiatus (T10, 38 cm)
+    new THREE.Vector3(-0.22, -1.98, 0.16)   // Abdominal segment & Cardia (T11)
   ]);
-  const esophMesh = makeTube(esophCurve.points, 0.22, 40, 16, esophMat);
+  const esophMesh = makeTube(esophCurve.points, 0.23, 48, 18, esophMat);
   group.add(esophMesh);
 
-  // Longitudinal Muscular Striations (Outer layer)
-  for (let s = 0; s < 8; s++) {
-    const angle = (s / 8) * Math.PI * 2;
-    const striationPts = esophCurve.getPoints(20).map(p => {
+  // Outer Longitudinal Muscular Bundles (Taenia-like muscle fibers)
+  for (let s = 0; s < 10; s++) {
+    const angle = (s / 10) * Math.PI * 2;
+    const striationPts = esophCurve.getPoints(24).map(p => {
       return new THREE.Vector3(
-        p.x + Math.cos(angle) * 0.225,
+        p.x + Math.cos(angle) * 0.235,
         p.y,
-        p.z + Math.sin(angle) * 0.225
+        p.z + Math.sin(angle) * 0.235
       );
     });
-    group.add(makeTube(striationPts, 0.018, 20, 6, new THREE.MeshStandardMaterial({ color: 0x881337, roughness: 0.4 })));
+    group.add(makeTube(striationPts, 0.016, 24, 6, new THREE.MeshStandardMaterial({ color: 0x881337, roughness: 0.4 })));
   }
 
-  // D. LOWER ESOPHAGEAL SPHINCTER & CARDIAL JUNCTION (Z-line)
-  const lesGeo = new THREE.CylinderGeometry(0.24, 0.38, 0.35, 24);
+  // Aortic Arch & Left Main Bronchus Crossings (Landmark impression models)
+  // Aortic Arch crossing anterior-left to esophagus
+  const aortaPts = [
+    new THREE.Vector3(-0.35, -0.22, 0.18),
+    new THREE.Vector3(0.04, -0.28, 0.22),
+    new THREE.Vector3(0.28, -0.45, 0.12)
+  ];
+  group.add(makeTube(aortaPts, 0.12, 16, 8, new THREE.MeshPhysicalMaterial({ color: 0xdc2626, roughness: 0.22, clearcoat: 0.8 })));
+
+  // Left Main Bronchus crossing
+  const bronchPts = [
+    new THREE.Vector3(-0.25, -0.72, 0.15),
+    new THREE.Vector3(0.08, -0.82, 0.18)
+  ];
+  group.add(makeTube(bronchPts, 0.085, 12, 8, cartilageMat));
+
+  // E. DIAPHRAGM HIATUS, LOWER ESOPHAGEAL SPHINCTER (LES) & GASTRIC CARDIA
+  // Diaphragmatic Muscular Ring (Crura diaphragmatis)
+  const hiatRingGeo = new THREE.TorusGeometry(0.38, 0.075, 12, 28);
+  const hiatRingMesh = new THREE.Mesh(hiatRingGeo, new THREE.MeshStandardMaterial({ color: 0x78350f, roughness: 0.55 }));
+  hiatRingMesh.rotation.x = Math.PI * 0.45;
+  hiatRingMesh.position.set(-0.14, -1.68, 0.1);
+  group.add(hiatRingMesh);
+
+  // Lower Esophageal Sphincter high-pressure muscular cuff
+  const lesGeo = new THREE.CylinderGeometry(0.25, 0.42, 0.38, 28);
   const lesMesh = new THREE.Mesh(lesGeo, esophMat);
-  lesMesh.position.set(-0.16, -1.82, 0.15);
+  lesMesh.position.set(-0.2, -1.85, 0.14);
   group.add(lesMesh);
 
-  // Gastric Cardia Flare
-  const cardiaGeo = new THREE.ConeGeometry(0.65, 0.5, 24, 1, true);
-  const cardiaMat = new THREE.MeshStandardMaterial({ color: 0xe11d48, roughness: 0.35, side: THREE.DoubleSide });
+  // Gastric Cardia Flare & Z-line (Squamocolumnar mucosal junction)
+  const cardiaGeo = new THREE.ConeGeometry(0.72, 0.55, 28, 1, true);
+  const cardiaMat = new THREE.MeshPhysicalMaterial({ color: 0xe11d48, roughness: 0.32, clearcoat: 0.7, side: THREE.DoubleSide });
   const cardiaMesh = new THREE.Mesh(cardiaGeo, cardiaMat);
   cardiaMesh.rotation.x = Math.PI;
-  cardiaMesh.position.set(-0.2, -2.1, 0.18);
+  cardiaMesh.position.set(-0.26, -2.18, 0.2);
   group.add(cardiaMesh);
 
-  // Diaphragmatic Muscular Ring at Hiatus
-  const hiatRingGeo = new THREE.TorusGeometry(0.35, 0.065, 10, 24);
-  const hiatRingMesh = new THREE.Mesh(hiatRingGeo, new THREE.MeshStandardMaterial({ color: 0x713f12, roughness: 0.5 }));
-  hiatRingMesh.rotation.x = Math.PI * 0.45;
-  hiatRingMesh.position.set(-0.11, -1.62, 0.08);
-  group.add(hiatRingMesh);
+  // Z-line jagged mucosal transition ring
+  const zLineGeo = new THREE.TorusGeometry(0.36, 0.028, 8, 24);
+  const zLineMesh = new THREE.Mesh(zLineGeo, new THREE.MeshPhysicalMaterial({ color: 0xfbcfe8, roughness: 0.2, clearcoat: 0.9 }));
+  zLineMesh.position.set(-0.22, -1.95, 0.16);
+  zLineMesh.rotation.x = Math.PI / 2;
+  group.add(zLineMesh);
 
   return group;
 }
@@ -480,121 +610,220 @@ export function createSalivaryGlandsModel() {
   const group = new THREE.Group();
   group.name = "salivary_glands";
 
-  const glandMat = new THREE.MeshStandardMaterial({
+  const glandMat = new THREE.MeshPhysicalMaterial({
     color: 0xf59e0b, // Warm glandular lobular amber
-    roughness: 0.45,
-    metalness: 0.05
+    roughness: 0.38,
+    metalness: 0.04,
+    clearcoat: 0.65,
+    clearcoatRoughness: 0.15
   });
 
-  const ductMat = new THREE.MeshStandardMaterial({
+  const ductMat = new THREE.MeshPhysicalMaterial({
     color: 0xf8fafc, // Excretory ducts pearly ivory
+    roughness: 0.22,
+    metalness: 0.08,
+    clearcoat: 0.85
+  });
+
+  const nerveMat = new THREE.MeshPhysicalMaterial({
+    color: 0xfacc15, // Facial nerve branches vivid yellow
+    emissive: 0xca8a04,
+    emissiveIntensity: 0.35,
     roughness: 0.25,
-    metalness: 0.08
+    clearcoat: 0.7
+  });
+
+  const masseterMat = new THREE.MeshStandardMaterial({
+    color: 0x991b1b, // Masseter muscle deep red
+    roughness: 0.5,
+    side: THREE.DoubleSide,
+    transparent: true,
+    opacity: 0.65
   });
 
   const boneRefMat = new THREE.MeshStandardMaterial({
     color: 0xf1f5f9,
     roughness: 0.42,
     transparent: true,
-    opacity: 0.32
+    opacity: 0.38
   });
 
-  const tongueMat = new THREE.MeshStandardMaterial({
+  const tongueMat = new THREE.MeshPhysicalMaterial({
     color: 0xe11d48,
-    roughness: 0.45
+    roughness: 0.38,
+    clearcoat: 0.45
   });
 
-  // A. MANDIBLE BONE REFERENCE (Pastki jag' suyagi ko'rinishi)
+  // A. MANDIBLE BONE & TEETH REFERENCE (Pastki jag' suyagi va tishlar qatori)
   const jawCurve = new THREE.CatmullRomCurve3([
-    new THREE.Vector3(-1.15, 1.15, -0.65), // Left condyle
-    new THREE.Vector3(-1.25, 0.2, -0.45),  // Left angle
-    new THREE.Vector3(-0.75, -0.25, 0.35),
-    new THREE.Vector3(0, -0.35, 0.85),     // Chin / Symphysis menti
-    new THREE.Vector3(0.75, -0.25, 0.35),
-    new THREE.Vector3(1.25, 0.2, -0.45),   // Right angle
-    new THREE.Vector3(1.15, 1.15, -0.65)   // Right condyle
+    new THREE.Vector3(-1.18, 1.25, -0.65), // Left condyle
+    new THREE.Vector3(-1.28, 0.25, -0.45), // Left angle
+    new THREE.Vector3(-0.78, -0.25, 0.35),
+    new THREE.Vector3(0, -0.38, 0.88),     // Chin / Symphysis menti
+    new THREE.Vector3(0.78, -0.25, 0.35),
+    new THREE.Vector3(1.28, 0.25, -0.45),  // Right angle
+    new THREE.Vector3(1.18, 1.25, -0.65)   // Right condyle
   ]);
-  group.add(makeTube(jawCurve.points, 0.12, 32, 12, boneRefMat));
+  group.add(makeTube(jawCurve.points, 0.13, 36, 12, boneRefMat));
 
-  // Tongue Base
-  const tongueGeo = new THREE.SphereGeometry(0.65, 24, 20);
-  tongueGeo.scale(0.85, 0.55, 1.25);
+  // Mandibular dental arcade (Teeth row)
+  for (let t = -7; t <= 7; t++) {
+    const angle = (t / 7) * Math.PI * 0.45;
+    const toothGeo = new THREE.CylinderGeometry(0.045, 0.038, 0.12, 10);
+    const toothMesh = new THREE.Mesh(toothGeo, new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.2 }));
+    toothMesh.position.set(Math.sin(angle) * 0.68, -0.15, Math.cos(angle) * 0.65 + 0.15);
+    group.add(toothMesh);
+  }
+
+  // Tongue Muscular Body (Genioglossus)
+  const tongueGeo = new THREE.SphereGeometry(0.68, 28, 22);
+  tongueGeo.scale(0.85, 0.55, 1.28);
   const tongueMesh = new THREE.Mesh(tongueGeo, tongueMat);
-  tongueMesh.position.set(0, 0.15, 0.25);
+  tongueMesh.position.set(0, 0.16, 0.28);
   group.add(tongueMesh);
 
-  // B. PAROTID GLANDS (Quloqoldi so'lak bezi & Stensen yo'li - bilateral)
+  // Masseter Muscle Sheets on bilateral mandibular rami
   [-1, 1].forEach(side => {
-    // Lobulated parotid mass (Wedge-shaped)
-    const parotidGeo = new THREE.SphereGeometry(0.55, 24, 20);
-    parotidGeo.scale(0.7, 1.35, 0.85);
+    const masPts = [
+      new THREE.Vector3(side * 1.15, 1.15, -0.55),
+      new THREE.Vector3(side * 1.22, 0.35, -0.35),
+      new THREE.Vector3(side * 1.05, -0.05, -0.05)
+    ];
+    group.add(makeTube(masPts, 0.12, 14, 8, masseterMat));
+  });
+
+  // B. PAROTID GLANDS (Quloqoldi bezi & Stensen yo'li & Facial Nerve Pes Anserinus)
+  [-1, 1].forEach(side => {
+    const parotidGroup = new THREE.Group();
+
+    // 1. Main Lobulated Parotid Mass (Wedge-shaped with acini lobes)
+    const parotidGeo = new THREE.SphereGeometry(0.58, 28, 22);
+    parotidGeo.scale(0.68, 1.4, 0.88);
     const parotidMesh = new THREE.Mesh(parotidGeo, glandMat);
-    parotidMesh.position.set(side * 1.32, 0.55, -0.35);
+    parotidMesh.position.set(side * 1.34, 0.58, -0.35);
     parotidMesh.rotation.z = side * 0.18;
-    group.add(parotidMesh);
+    parotidGroup.add(parotidMesh);
 
-    // Stensen's Duct (Ductus parotideus - 5cm duct crossing masseter)
-    const stensenPts = [
-      new THREE.Vector3(side * 1.25, 0.65, -0.25),
-      new THREE.Vector3(side * 1.15, 0.62, 0.15),
-      new THREE.Vector3(side * 0.85, 0.55, 0.48),
-      new THREE.Vector3(side * 0.52, 0.45, 0.42) // Piercing buccinator
-    ];
-    group.add(makeTube(stensenPts, 0.042, 20, 8, ductMat));
-
-    // Accessory parotid gland lobule
-    const accGeo = new THREE.SphereGeometry(0.16, 14, 12);
-    const accMesh = new THREE.Mesh(accGeo, glandMat);
-    accMesh.position.set(side * 1.05, 0.78, 0.08);
-    group.add(accMesh);
-  });
-
-  // C. SUBMANDIBULAR GLANDS (Jag'osti so'lak bezi & Wharton yo'li)
-  [-1, 1].forEach(side => {
-    // Walnut-shaped gland under mandible angle
-    const submanGeo = new THREE.SphereGeometry(0.42, 22, 18);
-    submanGeo.scale(1.1, 0.85, 0.9);
-    const submanMesh = new THREE.Mesh(submanGeo, glandMat);
-    submanMesh.position.set(side * 0.85, -0.25, 0.05);
-    group.add(submanMesh);
-
-    // Wharton's Duct (Ductus submandibularis)
-    const whartonPts = [
-      new THREE.Vector3(side * 0.75, -0.18, 0.1),
-      new THREE.Vector3(side * 0.45, -0.05, 0.35),
-      new THREE.Vector3(side * 0.12, 0.02, 0.65) // Caruncula sublingualis
-    ];
-    group.add(makeTube(whartonPts, 0.038, 18, 8, ductMat));
-  });
-
-  // D. SUBLINGUAL GLANDS (Tilosti so'lak bezi - under anterior tongue)
-  [-1, 1].forEach(side => {
-    // Almond-shaped cluster
-    const sublingGeo = new THREE.SphereGeometry(0.32, 20, 16);
-    sublingGeo.scale(0.55, 0.45, 1.35);
-    const sublingMesh = new THREE.Mesh(sublingGeo, glandMat);
-    sublingMesh.position.set(side * 0.32, -0.02, 0.52);
-    group.add(sublingMesh);
-
-    // Minor sublingual ducts (Rivinus)
-    for (let d = 0; d < 4; d++) {
-      const dPts = [
-        new THREE.Vector3(side * 0.32, 0.06, 0.35 + d * 0.12),
-        new THREE.Vector3(side * 0.25, 0.15, 0.35 + d * 0.12)
-      ];
-      group.add(makeTube(dPts, 0.018, 6, 6, ductMat));
+    // Microscopic lobular acini spheres on surface
+    for (let a = 0; a < 14; a++) {
+      const theta = (a / 14) * Math.PI * 2;
+      const acinusGeo = new THREE.SphereGeometry(0.12, 10, 8);
+      const acinusMesh = new THREE.Mesh(acinusGeo, glandMat);
+      acinusMesh.position.set(
+        side * (1.34 + Math.cos(theta) * 0.22),
+        0.58 + Math.sin(theta) * 0.45,
+        -0.35 + (a % 3) * 0.1
+      );
+      parotidGroup.add(acinusMesh);
     }
+
+    // 2. Stensen's Duct (Ductus parotideus - 5 cm duct crossing masseter, piercing buccinator)
+    const stensenPts = [
+      new THREE.Vector3(side * 1.26, 0.68, -0.25),
+      new THREE.Vector3(side * 1.16, 0.65, 0.15),
+      new THREE.Vector3(side * 0.86, 0.58, 0.52),
+      new THREE.Vector3(side * 0.52, 0.46, 0.46) // Piercing buccinator opposite 2nd upper molar
+    ];
+    parotidGroup.add(makeTube(stensenPts, 0.048, 24, 10, ductMat));
+
+    // 3. Accessory Parotid Gland Lobule
+    const accGeo = new THREE.SphereGeometry(0.18, 14, 12);
+    const accMesh = new THREE.Mesh(accGeo, glandMat);
+    accMesh.position.set(side * 1.05, 0.82, 0.12);
+    parotidGroup.add(accMesh);
+
+    // 4. Facial Nerve (VII) Pes Anserinus branching inside parotid:
+    // Main Trunk entering posterior border
+    const nTrunk = [
+      new THREE.Vector3(side * 1.45, 0.95, -0.65),
+      new THREE.Vector3(side * 1.35, 0.65, -0.35)
+    ];
+    parotidGroup.add(makeTube(nTrunk, 0.038, 10, 6, nerveMat));
+
+    // 5 Terminal branches: Temporal, Zygomatic, Buccal, Marginal mandibular, Cervical
+    const branches = [
+      [new THREE.Vector3(side * 1.35, 0.65, -0.35), new THREE.Vector3(side * 1.15, 1.25, -0.15)], // Temporal
+      [new THREE.Vector3(side * 1.35, 0.65, -0.35), new THREE.Vector3(side * 0.95, 0.95, 0.22)],  // Zygomatic
+      [new THREE.Vector3(side * 1.35, 0.65, -0.35), new THREE.Vector3(side * 0.85, 0.62, 0.38)],  // Buccal
+      [new THREE.Vector3(side * 1.35, 0.65, -0.35), new THREE.Vector3(side * 0.92, 0.15, 0.25)],  // Marginal mandibular
+      [new THREE.Vector3(side * 1.35, 0.65, -0.35), new THREE.Vector3(side * 1.05, -0.25, -0.1)]  // Cervical
+    ];
+    branches.forEach(bPts => {
+      parotidGroup.add(makeTube(bPts, 0.022, 10, 6, nerveMat));
+    });
+
+    group.add(parotidGroup);
   });
 
-  // Facial Artery vascular curve
+  // C. SUBMANDIBULAR GLANDS (Jag'osti bezi & Wharton yo'li)
+  [-1, 1].forEach(side => {
+    const submanGroup = new THREE.Group();
+
+    // 1. Walnut-shaped Submandibular Lobular Mass
+    const submanGeo = new THREE.SphereGeometry(0.46, 24, 20);
+    submanGeo.scale(1.15, 0.88, 0.92);
+    const submanMesh = new THREE.Mesh(submanGeo, glandMat);
+    submanMesh.position.set(side * 0.88, -0.25, 0.05);
+    submanGroup.add(submanMesh);
+
+    // Acinar lobule beads
+    for (let a = 0; a < 8; a++) {
+      const ang = (a / 8) * Math.PI * 2;
+      const acGeo = new THREE.SphereGeometry(0.11, 8, 8);
+      const acMesh = new THREE.Mesh(acGeo, glandMat);
+      acMesh.position.set(side * (0.88 + Math.cos(ang) * 0.2), -0.25 + Math.sin(ang) * 0.15, 0.05 + (a % 2) * 0.1);
+      submanGroup.add(acMesh);
+    }
+
+    // 2. Wharton's Duct (Ductus submandibularis - traveling forward beneath oral floor)
+    const whartonPts = [
+      new THREE.Vector3(side * 0.78, -0.16, 0.12),
+      new THREE.Vector3(side * 0.48, -0.04, 0.38),
+      new THREE.Vector3(side * 0.12, 0.03, 0.68) // Caruncula sublingualis at frenulum of tongue
+    ];
+    submanGroup.add(makeTube(whartonPts, 0.042, 22, 8, ductMat));
+
+    // Sublingual papilla / caruncle terminal bead
+    const caruncleGeo = new THREE.SphereGeometry(0.045, 10, 8);
+    const caruncleMesh = new THREE.Mesh(caruncleGeo, new THREE.MeshBasicMaterial({ color: 0xef4444 }));
+    caruncleMesh.position.set(side * 0.12, 0.03, 0.68);
+    submanGroup.add(caruncleMesh);
+
+    group.add(submanGroup);
+  });
+
+  // D. SUBLINGUAL GLANDS (Tilosti bezi - floor of mouth)
+  [-1, 1].forEach(side => {
+    const sublingGroup = new THREE.Group();
+
+    // 1. Almond-shaped Sublingual Cluster
+    const sublingGeo = new THREE.SphereGeometry(0.34, 22, 18);
+    sublingGeo.scale(0.58, 0.46, 1.4);
+    const sublingMesh = new THREE.Mesh(sublingGeo, glandMat);
+    sublingMesh.position.set(side * 0.34, -0.02, 0.52);
+    sublingGroup.add(sublingMesh);
+
+    // 2. Minor Sublingual Ducts of Rivinus (8-12 ductules opening along sublingual fold)
+    for (let d = 0; d < 5; d++) {
+      const dPts = [
+        new THREE.Vector3(side * 0.34, 0.06, 0.32 + d * 0.1),
+        new THREE.Vector3(side * 0.24, 0.16, 0.32 + d * 0.1)
+      ];
+      sublingGroup.add(makeTube(dPts, 0.019, 8, 6, ductMat));
+    }
+
+    group.add(sublingGroup);
+  });
+
+  // E. FACIAL ARTERY & VEIN VASCULAR LOOP (Arteria facialis)
   [-1, 1].forEach(side => {
     const artPts = [
-      new THREE.Vector3(side * 0.65, -0.65, -0.15),
-      new THREE.Vector3(side * 0.88, -0.32, -0.05),
-      new THREE.Vector3(side * 0.82, -0.12, 0.22),
-      new THREE.Vector3(side * 0.65, 0.18, 0.45)
+      new THREE.Vector3(side * 0.65, -0.68, -0.15),
+      new THREE.Vector3(side * 0.92, -0.32, -0.05), // Grooving posterior submandibular gland
+      new THREE.Vector3(side * 0.85, -0.12, 0.24), // Crossing inferior border of mandible
+      new THREE.Vector3(side * 0.68, 0.18, 0.48)   // Ascending onto face towards mouth angle
     ];
-    group.add(makeTube(artPts, 0.035, 16, 8, new THREE.MeshStandardMaterial({ color: 0xdc2626, roughness: 0.25 })));
+    group.add(makeTube(artPts, 0.038, 20, 8, new THREE.MeshPhysicalMaterial({ color: 0xdc2626, roughness: 0.22, clearcoat: 0.8 })));
   });
 
   return group;
