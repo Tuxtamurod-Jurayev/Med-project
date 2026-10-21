@@ -616,6 +616,95 @@ if (mobTabDiseases) {
   });
 }
 
+// STARTUP SPLASH SCREEN & WALKING SKELETON LOADER
+function initStartupSplashScreen() {
+  const splash = document.getElementById('appStartupSplash');
+  const fill = document.getElementById('splashProgressFill');
+  const walker = document.getElementById('splashSkeletonWalker');
+  const trackArea = document.querySelector('.splash-skeleton-track-area');
+  const percentText = document.getElementById('splashPercentText');
+  const statusText = document.getElementById('splashStatusText');
+  const skipBtn = document.getElementById('skipSplashBtn');
+
+  if (!splash) return;
+
+  let isDismissed = false;
+  let startTime = null;
+  const DURATION_MS = 2700; // 2.7s total (matches 2-3s requirement)
+
+  function dismissSplash() {
+    if (isDismissed) return;
+    isDismissed = true;
+    splash.classList.add('splash-fade-out');
+    setTimeout(() => {
+      splash.style.display = 'none';
+      if (splash.parentNode) {
+        splash.parentNode.removeChild(splash);
+      }
+    }, 500);
+  }
+
+  if (skipBtn) {
+    skipBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      dismissSplash();
+    });
+  }
+
+  splash.addEventListener('click', (e) => {
+    if (e.target.closest('#skipSplashBtn')) return;
+    dismissSplash();
+  });
+
+  function updateSplash(timestamp) {
+    if (isDismissed) return;
+    if (!startTime) startTime = timestamp;
+    const elapsed = timestamp - startTime;
+    const progress = Math.min(elapsed / DURATION_MS, 1.0);
+    const pct = Math.floor(progress * 100);
+
+    if (fill) {
+      fill.style.width = `${progress * 100}%`;
+    }
+
+    if (walker && trackArea) {
+      const areaWidth = trackArea.clientWidth || 360;
+      const walkerWidth = walker.clientWidth || 54;
+      const maxX = Math.max(0, areaWidth - walkerWidth);
+      const currentX = progress * maxX;
+      walker.style.transform = `translateX(${currentX}px)`;
+    }
+
+    if (percentText) {
+      percentText.textContent = `${pct}%`;
+    }
+
+    if (statusText) {
+      if (pct < 28) {
+        statusText.textContent = "Anatomik modellar yuklanmoqda...";
+      } else if (pct < 62) {
+        statusText.textContent = "Skelet va to'qimalar tayyorlanmoqda...";
+      } else if (pct < 92) {
+        statusText.textContent = "3D interaktiv atlas ishga tushmoqda...";
+      } else {
+        statusText.textContent = "Tayyor! Xush kelibsiz!";
+        statusText.style.color = "#10b981";
+      }
+    }
+
+    if (progress < 1.0) {
+      requestAnimationFrame(updateSplash);
+    } else {
+      setTimeout(() => {
+        dismissSplash();
+      }, 250);
+    }
+  }
+
+  requestAnimationFrame(updateSplash);
+}
+
 // INITIAL APP LAUNCH WITH REAL LUNGS 3D MODEL
+initStartupSplashScreen();
 updateSystemsTabsUI();
 selectOrgan('lung');

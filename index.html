@@ -13,6 +13,148 @@
 </head>
 <body>
 
+  <!-- APP STARTUP SPLASH SCREEN LOADER (2-3s animated walking skeleton & progress) -->
+  <div id="appStartupSplash" class="app-splash-overlay">
+    <div class="splash-content-card">
+      
+      <!-- BRAND LOGO BADGE -->
+      <div class="splash-logo-badge">
+        <svg class="splash-logo-icon" viewBox="0 0 384 512" fill="currentColor">
+          <path d="M222.6 43.2l-.1 4.8L288 48c53 0 96 43 96 96s-43 96-96 96l-40 0 0-80 40 0c8.8 0 16-7.2 16-16s-7.2-16-16-16l-40 0-28 0-4.5 144 40.5 0c53 0 96 43 96 96s-43 96-96 96l-16 0 0-80 16 0c8.8 0 16-7.2 16-16s-7.2-16-16-16l-43 0-3.1 99.5L208.5 495l0 1c-.3 8.9-7.6 16-16.5 16s-16.2-7.1-16.5-16l0-1-1-31L136 464c-22.1 0-40-17.9-40-40s17.9-40 40-40l36 0-1-32-19 0c-53 0-96-43-96-96c0-47.6 34.6-87.1 80-94.7l0 94.7c0 8.8 7.2 16 16 16l16.5 0L164 128l-28 0-13.4 0c-9 18.9-28.3 32-50.6 32l-16 0c-30.9 0-56-25.1-56-56S25.1 48 56 48l8 0 8 0 89.5 0-.1-4.8L161 32c0-.7 0-1.3 0-1.9c.5-16.6 14.1-30 31-30s30.5 13.4 31 30c0 .6 0 1.3 0 1.9l-.4 11.2zM64 112a16 16 0 1 0 0-32 16 16 0 1 0 0 32z"/>
+        </svg>
+      </div>
+
+      <!-- BRAND TITLES -->
+      <h1 class="splash-title">MedAnatomy</h1>
+      <p class="splash-subtitle">Interaktiv anatomiya atlasi</p>
+
+      <!-- HORIZONTAL TRACK & WALKING SKELETON -->
+      <div class="splash-progress-container">
+        
+        <!-- Walking Skeleton Track Area -->
+        <div class="splash-skeleton-track-area">
+          <div class="splash-skeleton-walker" id="splashSkeletonWalker">
+            <svg class="walking-skeleton-svg" viewBox="0 0 100 130" width="54" height="70" style="overflow: visible;">
+              <defs>
+                <linearGradient id="skelBoneFront" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#f8fafc"/>
+                  <stop offset="100%" stop-color="#cbd5e1"/>
+                </linearGradient>
+                <linearGradient id="skelBoneBack" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#94a3b8"/>
+                  <stop offset="100%" stop-color="#475569"/>
+                </linearGradient>
+                <filter id="skelGlow" x="-20%" y="-20%" width="140%" height="140%">
+                  <feDropShadow dx="0" dy="0" stdDeviation="1.5" flood-color="#38bdf8" flood-opacity="0.5"/>
+                </filter>
+              </defs>
+
+              <g filter="url(#skelGlow)">
+                <!-- 1. FAR ARM -->
+                <g transform="translate(48, 42)">
+                  <g class="skel-anim-far-shoulder">
+                    <line x1="0" y1="0" x2="-4" y2="16" stroke="url(#skelBoneBack)" stroke-width="2.6" stroke-linecap="round"/>
+                    <circle cx="0" cy="0" r="1.8" fill="#64748b"/>
+                    <g transform="translate(-4, 16)">
+                      <g class="skel-anim-far-elbow">
+                        <line x1="0" y1="0" x2="3" y2="15" stroke="url(#skelBoneBack)" stroke-width="2.2" stroke-linecap="round"/>
+                        <circle cx="0" cy="0" r="1.4" fill="#64748b"/>
+                        <path d="M3 15 L7 20 L4 21 Z" fill="#64748b"/>
+                      </g>
+                    </g>
+                  </g>
+                </g>
+
+                <!-- 2. FAR LEG -->
+                <g transform="translate(47, 76)">
+                  <g class="skel-anim-far-hip">
+                    <line x1="0" y1="0" x2="-2" y2="23" stroke="url(#skelBoneBack)" stroke-width="3.2" stroke-linecap="round"/>
+                    <circle cx="0" cy="0" r="2.2" fill="#64748b"/>
+                    <g transform="translate(-2, 23)">
+                      <g class="skel-anim-far-knee">
+                        <line x1="0" y1="0" x2="1" y2="23" stroke="url(#skelBoneBack)" stroke-width="2.6" stroke-linecap="round"/>
+                        <circle cx="0" cy="0" r="1.8" fill="#64748b"/>
+                        <path d="M1 23 L11 26 L0 26 Z" fill="#64748b"/>
+                      </g>
+                    </g>
+                  </g>
+                </g>
+
+                <!-- 3. TORSO & SKULL -->
+                <g class="skel-anim-torso">
+                  <path d="M42 72 Q50 70 58 72 Q57 80 50 82 Q43 80 42 72 Z" fill="url(#skelBoneFront)" stroke="#94a3b8" stroke-width="0.8"/>
+                  <circle cx="45" cy="77" r="1.8" fill="#0f172a"/>
+                  <circle cx="53" cy="77" r="1.8" fill="#0f172a"/>
+                  <path d="M50 72 Q47 62 50 52 Q52 44 49 38" fill="none" stroke="url(#skelBoneFront)" stroke-width="3.4" stroke-linecap="round"/>
+                  <path d="M50 44 Q59 46 58 53 Q49 55 48 54" fill="none" stroke="url(#skelBoneFront)" stroke-width="2" stroke-linecap="round"/>
+                  <path d="M49 49 Q61 51 59 59 Q48 62 47 60" fill="none" stroke="url(#skelBoneFront)" stroke-width="2" stroke-linecap="round"/>
+                  <path d="M48 55 Q60 57 58 65 Q47 68 46 66" fill="none" stroke="url(#skelBoneFront)" stroke-width="1.8" stroke-linecap="round"/>
+                  <line x1="58" y1="50" x2="57" y2="63" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round"/>
+
+                  <!-- Skull facing right -->
+                  <g class="skel-anim-skull">
+                    <path d="M43 25 C42 13 60 12 62 23 C63 28 59 31 54 32 L51 37 L47 37 L48 31 C44 30 43 28 43 25 Z" fill="url(#skelBoneFront)" stroke="#94a3b8" stroke-width="0.7"/>
+                    <ellipse cx="55" cy="23" rx="2.5" ry="3.2" fill="#0f172a"/>
+                    <path d="M58 27 L56 29 L58 30 Z" fill="#0f172a"/>
+                    <path d="M52 33 L59 33 L57 36 L52 36 Z" fill="#e2e8f0" stroke="#0f172a" stroke-width="0.5"/>
+                    <line x1="55" y1="33" x2="55" y2="36" stroke="#0f172a" stroke-width="0.5"/>
+                  </g>
+                </g>
+
+                <!-- 4. NEAR LEG -->
+                <g transform="translate(52, 76)">
+                  <g class="skel-anim-near-hip">
+                    <line x1="0" y1="0" x2="3" y2="23" stroke="url(#skelBoneFront)" stroke-width="3.6" stroke-linecap="round"/>
+                    <circle cx="0" cy="0" r="2.5" fill="#f8fafc"/>
+                    <g transform="translate(3, 23)">
+                      <g class="skel-anim-near-knee">
+                        <line x1="0" y1="0" x2="3" y2="23" stroke="url(#skelBoneFront)" stroke-width="3" stroke-linecap="round"/>
+                        <circle cx="0" cy="0" r="2.2" fill="#ffffff"/>
+                        <path d="M2 23 L15 26 L1 26 Z" fill="url(#skelBoneFront)" stroke="#94a3b8" stroke-width="0.6"/>
+                      </g>
+                    </g>
+                  </g>
+                </g>
+
+                <!-- 5. NEAR ARM -->
+                <g transform="translate(51, 42)">
+                  <g class="skel-anim-near-shoulder">
+                    <line x1="0" y1="0" x2="5" y2="17" stroke="url(#skelBoneFront)" stroke-width="3" stroke-linecap="round"/>
+                    <circle cx="0" cy="0" r="2" fill="#ffffff"/>
+                    <g transform="translate(5, 17)">
+                      <g class="skel-anim-near-elbow">
+                        <line x1="0" y1="0" x2="8" y2="15" stroke="url(#skelBoneFront)" stroke-width="2.5" stroke-linecap="round"/>
+                        <circle cx="0" cy="0" r="1.6" fill="#ffffff"/>
+                        <path d="M8 15 L14 20 L9 21 Z" fill="url(#skelBoneFront)"/>
+                      </g>
+                    </g>
+                  </g>
+                </g>
+              </g>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Horizontal Progress Bar (0% - 100%) -->
+        <div class="splash-progress-track">
+          <div class="splash-progress-fill" id="splashProgressFill">
+            <span class="splash-progress-light"></span>
+          </div>
+        </div>
+
+        <!-- Percentage & Medical Info Status Row -->
+        <div class="splash-meta-row">
+          <span class="splash-status-text" id="splashStatusText">Anatomik modellar yuklanmoqda...</span>
+          <span class="splash-percent-text" id="splashPercentText">0%</span>
+        </div>
+      </div>
+
+      <!-- Skip Button -->
+      <button id="skipSplashBtn" class="splash-skip-btn">O'tkazib yuborish &rarr;</button>
+
+    </div>
+  </div>
+
   <div class="app-container">
 
     <!-- TOP HEADER -->
@@ -20,12 +162,8 @@
       <div class="header-left">
         <div class="app-logo">
           <div class="logo-icon-wrap">
-            <svg class="react-icon logo-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 2v20"/>
-              <path d="M9.5 2.5h5"/>
-              <path d="M7 6.5C7.8 4.2 10.2 3.2 12.5 3.5c2.4.3 4 1.8 3.8 3.5-.2 1.8-2 2.8-3.8 3.5-2.2.8-4.2 1.8-4.2 3.8 0 2.2 2 3.2 4.2 3.8 2.2.6 3.5 1.8 3.5 3.4"/>
-              <path d="M7 6.5C6.2 7 5.5 7.8 5.7 8.8c.2.8 1.1 1.2 2 1.2"/>
-              <circle cx="6.4" cy="8" r="0.6" fill="currentColor"/>
+            <svg class="react-icon logo-svg" viewBox="0 0 384 512" fill="currentColor">
+              <path d="M222.6 43.2l-.1 4.8L288 48c53 0 96 43 96 96s-43 96-96 96l-40 0 0-80 40 0c8.8 0 16-7.2 16-16s-7.2-16-16-16l-40 0-28 0-4.5 144 40.5 0c53 0 96 43 96 96s-43 96-96 96l-16 0 0-80 16 0c8.8 0 16-7.2 16-16s-7.2-16-16-16l-43 0-3.1 99.5L208.5 495l0 1c-.3 8.9-7.6 16-16.5 16s-16.2-7.1-16.5-16l0-1-1-31L136 464c-22.1 0-40-17.9-40-40s17.9-40 40-40l36 0-1-32-19 0c-53 0-96-43-96-96c0-47.6 34.6-87.1 80-94.7l0 94.7c0 8.8 7.2 16 16 16l16.5 0L164 128l-28 0-13.4 0c-9 18.9-28.3 32-50.6 32l-16 0c-30.9 0-56-25.1-56-56S25.1 48 56 48l8 0 8 0 89.5 0-.1-4.8L161 32c0-.7 0-1.3 0-1.9c.5-16.6 14.1-30 31-30s30.5 13.4 31 30c0 .6 0 1.3 0 1.9l-.4 11.2zM64 112a16 16 0 1 0 0-32 16 16 0 1 0 0 32z"/>
             </svg>
           </div>
           <div class="logo-text">
@@ -303,12 +441,8 @@
       <div class="mobile-menu-card">
         <div class="modal-header">
           <div class="modal-title-row">
-            <svg class="react-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 2v20"/>
-              <path d="M9.5 2.5h5"/>
-              <path d="M7 6.5C7.8 4.2 10.2 3.2 12.5 3.5c2.4.3 4 1.8 3.8 3.5-.2 1.8-2 2.8-3.8 3.5-2.2.8-4.2 1.8-4.2 3.8 0 2.2 2 3.2 4.2 3.8 2.2.6 3.5 1.8 3.5 3.4"/>
-              <path d="M7 6.5C6.2 7 5.5 7.8 5.7 8.8c.2.8 1.1 1.2 2 1.2"/>
-              <circle cx="6.4" cy="8" r="0.6" fill="currentColor"/>
+            <svg class="react-icon" viewBox="0 0 384 512" fill="currentColor">
+              <path d="M222.6 43.2l-.1 4.8L288 48c53 0 96 43 96 96s-43 96-96 96l-40 0 0-80 40 0c8.8 0 16-7.2 16-16s-7.2-16-16-16l-40 0-28 0-4.5 144 40.5 0c53 0 96 43 96 96s-43 96-96 96l-16 0 0-80 16 0c8.8 0 16-7.2 16-16s-7.2-16-16-16l-43 0-3.1 99.5L208.5 495l0 1c-.3 8.9-7.6 16-16.5 16s-16.2-7.1-16.5-16l0-1-1-31L136 464c-22.1 0-40-17.9-40-40s17.9-40 40-40l36 0-1-32-19 0c-53 0-96-43-96-96c0-47.6 34.6-87.1 80-94.7l0 94.7c0 8.8 7.2 16 16 16l16.5 0L164 128l-28 0-13.4 0c-9 18.9-28.3 32-50.6 32l-16 0c-30.9 0-56-25.1-56-56S25.1 48 56 48l8 0 8 0 89.5 0-.1-4.8L161 32c0-.7 0-1.3 0-1.9c.5-16.6 14.1-30 31-30s30.5 13.4 31 30c0 .6 0 1.3 0 1.9l-.4 11.2zM64 112a16 16 0 1 0 0-32 16 16 0 1 0 0 32z"/>
             </svg>
             <h3>Anatomik Tizimlar Menyusi</h3>
           </div>

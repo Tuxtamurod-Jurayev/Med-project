@@ -126,20 +126,30 @@ html, body {
 }
 
 .logo-icon-wrap {
-  width: 36px;
-  height: 36px;
+  width: 38px;
+  height: 38px;
   background: linear-gradient(135deg, #0284c7 0%, #06b6d4 100%);
-  border-radius: var(--radius-sm);
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
   display: flex;
   align-items: center;
   justify-content: center;
   color: #fff;
-  box-shadow: 0 4px 12px rgba(6, 182, 212, 0.3);
+  box-shadow: 0 4px 14px rgba(6, 182, 212, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  flex-shrink: 0;
+}
+
+.app-logo:hover .logo-icon-wrap {
+  transform: scale(1.05);
+  box-shadow: 0 6px 18px rgba(6, 182, 212, 0.5);
 }
 
 .logo-icon-wrap .logo-svg {
-  width: 22px;
-  height: 22px;
+  width: 19px;
+  height: 25px;
+  fill: currentColor;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
 }
 
 .logo-text {
@@ -1168,8 +1178,9 @@ html, body {
 }
 
 .modal-title-row .react-icon {
-  width: 22px;
-  height: 22px;
+  width: 20px;
+  height: 24px;
+  fill: currentColor;
 }
 
 .modal-title-row h3 {
@@ -1616,4 +1627,281 @@ html, body {
     overflow: hidden;
     text-overflow: ellipsis;
   }
+}
+
+/* ==========================================================================
+   APP STARTUP SPLASH SCREEN & WALKING SKELETON LOADER
+   ========================================================================== */
+.app-splash-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 999999;
+  background: radial-gradient(ellipse 90% 70% at 50% 35%, #182234 0%, #0c121d 60%, #06090e 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  padding: 24px;
+  user-select: none;
+  opacity: 1;
+  transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.app-splash-overlay.splash-fade-out {
+  opacity: 0;
+  transform: scale(1.04);
+  pointer-events: none;
+}
+
+.splash-content-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  width: 100%;
+  max-width: 440px;
+}
+
+.splash-logo-badge {
+  width: 68px;
+  height: 68px;
+  background: linear-gradient(135deg, #0284c7 0%, #06b6d4 100%);
+  border-radius: 18px;
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  box-shadow: 0 0 32px rgba(6, 182, 212, 0.45), 0 8px 24px rgba(0, 0, 0, 0.4);
+  margin-bottom: 16px;
+  animation: splashBadgePulse 2.4s ease-in-out infinite;
+}
+
+@keyframes splashBadgePulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 30px rgba(6, 182, 212, 0.45);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 0 45px rgba(6, 182, 212, 0.7);
+  }
+}
+
+.splash-logo-icon {
+  width: 32px;
+  height: 42px;
+  fill: #ffffff;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+.splash-title {
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  margin: 0 0 6px 0;
+  background: linear-gradient(180deg, #ffffff 40%, #cbd5e1 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.splash-subtitle {
+  font-size: 13.5px;
+  font-weight: 600;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: #38bdf8;
+  margin: 0 0 28px 0;
+  text-shadow: 0 0 12px rgba(56, 189, 248, 0.3);
+}
+
+.splash-progress-container {
+  width: 100%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.splash-skeleton-track-area {
+  position: relative;
+  width: 100%;
+  height: 74px;
+  margin-bottom: 4px;
+}
+
+.splash-skeleton-walker {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 54px;
+  height: 70px;
+  pointer-events: none;
+  will-change: transform;
+}
+
+.splash-progress-track {
+  width: 100%;
+  height: 10px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.splash-progress-fill {
+  width: 0%;
+  height: 100%;
+  background: linear-gradient(90deg, #0284c7 0%, #06b6d4 70%, #10b981 100%);
+  border-radius: 999px;
+  position: relative;
+  box-shadow: 0 0 14px rgba(6, 182, 212, 0.75);
+}
+
+.splash-progress-light {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 0 8px 3px #ffffff, 0 0 16px 6px #06b6d4;
+}
+
+.splash-meta-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-top: 14px;
+  padding: 0 4px;
+}
+
+.splash-status-text {
+  font-size: 13px;
+  color: #94a3b8;
+  font-weight: 500;
+  letter-spacing: -0.1px;
+  transition: color 0.3s ease;
+}
+
+.splash-percent-text {
+  font-size: 15px;
+  font-weight: 700;
+  color: #38bdf8;
+  font-family: 'JetBrains Mono', monospace;
+  text-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
+}
+
+.splash-skip-btn {
+  margin-top: 26px;
+  background: transparent;
+  border: none;
+  color: #64748b;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 6px 12px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.splash-skip-btn:hover {
+  color: #cbd5e1;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* SKELETON WALKING GAIT KEYFRAMES */
+@keyframes skelBobTorso {
+  0%, 100% { transform: translateY(0px); }
+  50%      { transform: translateY(-4px); }
+}
+.skel-anim-torso {
+  animation: skelBobTorso 0.65s ease-in-out infinite;
+}
+
+@keyframes skelNodSkull {
+  0%, 100% { transform: rotate(0deg); }
+  50%      { transform: rotate(3deg); }
+}
+.skel-anim-skull {
+  transform-origin: 49px 38px;
+  animation: skelNodSkull 0.65s ease-in-out infinite;
+}
+
+@keyframes skelNearHip {
+  0%   { transform: rotate(-26deg); }
+  50%  { transform: rotate(26deg); }
+  100% { transform: rotate(-26deg); }
+}
+.skel-anim-near-hip {
+  animation: skelNearHip 0.65s ease-in-out infinite;
+}
+
+@keyframes skelNearKnee {
+  0%   { transform: rotate(4deg); }
+  30%  { transform: rotate(42deg); }
+  70%  { transform: rotate(0deg); }
+  100% { transform: rotate(4deg); }
+}
+.skel-anim-near-knee {
+  animation: skelNearKnee 0.65s ease-in-out infinite;
+}
+
+@keyframes skelFarHip {
+  0%   { transform: rotate(26deg); }
+  50%  { transform: rotate(-26deg); }
+  100% { transform: rotate(26deg); }
+}
+.skel-anim-far-hip {
+  animation: skelFarHip 0.65s ease-in-out infinite;
+}
+
+@keyframes skelFarKnee {
+  0%   { transform: rotate(0deg); }
+  30%  { transform: rotate(4deg); }
+  50%  { transform: rotate(42deg); }
+  100% { transform: rotate(0deg); }
+}
+.skel-anim-far-knee {
+  animation: skelFarKnee 0.65s ease-in-out infinite;
+}
+
+@keyframes skelNearArm {
+  0%   { transform: rotate(28deg); }
+  50%  { transform: rotate(-28deg); }
+  100% { transform: rotate(28deg); }
+}
+.skel-anim-near-shoulder {
+  animation: skelNearArm 0.65s ease-in-out infinite;
+}
+
+@keyframes skelNearElbow {
+  0%   { transform: rotate(-10deg); }
+  50%  { transform: rotate(25deg); }
+  100% { transform: rotate(-10deg); }
+}
+.skel-anim-near-elbow {
+  animation: skelNearElbow 0.65s ease-in-out infinite;
+}
+
+@keyframes skelFarArm {
+  0%   { transform: rotate(-28deg); }
+  50%  { transform: rotate(28deg); }
+  100% { transform: rotate(-28deg); }
+}
+.skel-anim-far-shoulder {
+  animation: skelFarArm 0.65s ease-in-out infinite;
+}
+
+@keyframes skelFarElbow {
+  0%   { transform: rotate(25deg); }
+  50%  { transform: rotate(-10deg); }
+  100% { transform: rotate(25deg); }
+}
+.skel-anim-far-elbow {
+  animation: skelFarElbow 0.65s ease-in-out infinite;
 }
